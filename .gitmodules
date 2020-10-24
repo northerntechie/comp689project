@@ -1,0 +1,3 @@
+[submodule "server/modules/OpenDSA"]
+	path = server/modules/OpenDSA
+	url = https://github.com/northerntechie/OpenDSA
