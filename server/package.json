@@ -1,0 +1,13 @@
+{
+    "name": "docker_opendsa_server",
+    "version": "1.0.0",
+    "description": "Docker deployment of OpenDSA server application",
+    "author": "Todd Saharchuk",
+    "main": "server.js",
+    "scripts": {
+        "start": "Node.js server"
+    },
+    "dependencies": {
+        "express": "latest"
+    }
+}
