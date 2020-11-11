@@ -5,7 +5,7 @@
     "author": "Todd Saharchuk",
     "main": "server.js",
     "scripts": {
-        "start": "Node.js server"
+        "start": "nodemon server.js"
     },
     "dependencies": {
         "express": "latest"
