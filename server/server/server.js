@@ -1,6 +1,18 @@
 'use strict';
 const fs = require('fs');
 const express = require('express');
+const catalog = require('./catalog.js');
+
+var fullCatalog;
+
+catalog.build('./modules/OpenDSA/AV/Blockchain/', (err,cat) => {
+    if(err) {
+        fullCatalog = {};
+    }
+    else {
+        fullCatalog = cat;
+    }
+});
 
 const PORT = 3000;
 const HOST = 'localhost';
@@ -14,7 +26,7 @@ app.get('/', (req,res) => {
 
 //! Catalog request
 app.get('/catalog', (req,res) => {
-    res.send('Catalog');
+    res.send(fullCatalog);
 });
 
 //! Lesson request by id
@@ -22,5 +34,11 @@ app.get('/lesson/:id', (req,res) => {
     res.send(`Lesson ${req.params.id} requested.`);
 });
 
-app.listen(PORT, HOST);
-console.log(`Running OpenDSA server on host: ${HOST} and port: ${PORT}`);
+//! Default handler for all other requests
+app.use(function(req, res){
+    res.status(404);
+})
+
+app.listen(PORT, HOST, () => {
+    console.log(`Running OpenDSA server on host: ${HOST} and port: ${PORT}`);
+});

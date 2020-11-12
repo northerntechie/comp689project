@@ -3,11 +3,12 @@
     "version": "1.0.0",
     "description": "Docker deployment of OpenDSA server application",
     "author": "Todd Saharchuk",
-    "main": "server.js",
+    "main": "server/server.js",
     "scripts": {
-        "start": "nodemon server.js"
+        "start": "nodemon server/server.js"
     },
     "dependencies": {
-        "express": "latest"
+        "express": "latest",
+        "uuid": "^8.3.1"
     }
 }
