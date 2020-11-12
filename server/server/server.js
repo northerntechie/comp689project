@@ -5,7 +5,7 @@ const catalog = require('./catalog.js');
 
 var fullCatalog;
 
-catalog.build('./modules/OpenDSA/AV/Blockchain/', (err,cat) => {
+catalog.build('./modules/OpenDSA/Exercises/', '.', (err,cat) => {
     if(err) {
         fullCatalog = {};
     }
@@ -18,6 +18,8 @@ const PORT = 3000;
 const HOST = 'localhost';
 
 const app = express();
+app.use(express.static('./modules/OpenDSA/lib'));
+app.use(express.static('./modules/OpenDSA/Exercises'));
 
 //! Main document request
 app.get('/', (req,res) => {

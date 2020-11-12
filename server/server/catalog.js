@@ -1,22 +1,28 @@
 const fs = require('fs');
-const { v5: uuidv5, v5 }  = require('uuid');
+const { v5: uuidv5 }  = require('uuid');
+const namespace = '123e4567-e89b-12d3-a456-426614174000';
 
-module.exports.build = (rootPath, callback) => {
-    catalog = [];
+var catalog = [];
 
-    entry = fs.readdir(rootPath, (err, filenames) => {
+module.exports.build = (rootPath, relPath, callback) => {
+    entry = fs.readdir(rootPath, { withFileTypes : true }, (err, filenames) => {
         if (err) {
             callback(err,null);
         }
         else {
             filenames.forEach((entry) => {
-                if (entry.isDirectory) {
-                    ;
+                console.log(`Processing filenames entry: ${entry.name}, isFile= ${entry.isFile()}`);
+                if (entry.isDirectory()) {
+                    this.build(rootPath + '/' + entry.name, relPath + '/' + entry.name, (err, cat) => {
+                        ;
+                    });                  
                 }
-                else if (entry.isFile) {
+                else if (entry.isFile() && entry.name.endsWith('.html')) {
+                    const name = entry.name.substr(0,entry.name.lastIndexOf('.html'));
                     catalog.push({
-                        "name" : entry.name(),
-                        "GUID" : v5.GUID(entry.name)
+                        "name" : name,
+                        "path" : relPath + '/' + entry.name,
+                        "GUID" : uuidv5(entry.name, namespace)
                     });
                 }        
             });
