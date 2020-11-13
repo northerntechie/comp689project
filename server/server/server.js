@@ -20,10 +20,19 @@ const HOST = 'localhost';
 const app = express();
 app.use(express.static('./modules/OpenDSA/lib'));
 app.use(express.static('./modules/OpenDSA/Exercises'));
+app.use(express.static('./client'));
 
 //! Main document request
 app.get('/', (req,res) => {
-    res.send('Hello World');
+    doc = "";
+    fs.readFile("file://client/index.html", (err, data) => {
+        if(err) {
+            res.sendStatus(404);
+        }
+        else {
+            res.send(data.toString());
+        }
+    });
 });
 
 //! Catalog request

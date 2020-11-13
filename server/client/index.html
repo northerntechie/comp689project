@@ -1,0 +1,46 @@
+<html>
+<head>
+
+</head>
+<body onload="loadDocument()">
+    <h1>Select problem from OpenDSA Catalog.</h1>
+    <form>
+        <select id="catalog" size="1">
+            <option>Lesson 1</option>
+        </select>
+    </form>
+    <iframe id="frame"></iframe>
+    <script>
+        function loadDocument() {
+            var catalog = document.getElementById('catalog')
+            loadCatalog('http://localhost:3000/catalog', (data) => {
+                data.forEach(obj => {
+                    var opt = document.createElement('option');
+                    opt.text = obj['name'];
+                    catalog.add(opt);
+                });
+            });
+        };
+        
+        function loadCatalog(url, callback) {
+            var xmlhttp = new XMLHttpRequest();
+            xmlhttp.onreadystatechange = function() {
+                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                    console.log('responseText:' + xmlhttp.responseText);
+                    try {
+                        var data = JSON.parse(xmlhttp.responseText);
+                    } catch(err) {
+                        console.log(err.message + " in " + xmlhttp.responseText);
+                        return;
+                    }
+                    callback(data);
+                }
+            };
+            xmlhttp.open("GET", url, true);
+            xmlhttp.send();
+        };
+ 
+        
+    </script>
+</body>
+</html>
