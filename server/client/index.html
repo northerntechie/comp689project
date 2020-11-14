@@ -1,35 +1,42 @@
 <html>
+
 <head>
 
 </head>
+
 <body onload="loadDocument()">
     <h1>Select problem from OpenDSA Catalog.</h1>
-    <form>
+    <form onsubmit="return false;">
         <select id="catalog" size="1">
-            <option>Lesson 1</option>
         </select>
+        <button id="start" onclick="startProblem()" onsubmit="return false;">Start Problem</button>
     </form>
-    <iframe id="frame"></iframe>
+    <iframe id="frame" width="100%" height="100%"></iframe>
     <script>
         function loadDocument() {
-            var catalog = document.getElementById('catalog')
+            var sessionStorage = window.sessionStorage;
+            var catalog = document.getElementById('catalog');
+
             loadCatalog('http://localhost:3000/catalog', (data) => {
                 data.forEach(obj => {
                     var opt = document.createElement('option');
                     opt.text = obj['name'];
                     catalog.add(opt);
+                    let path = obj['path'];
+                    let guid = obj['GUID'];
+                    sessionStorage.setItem(obj['name'], JSON.stringify({ "path": path, "guid": guid }));
                 });
             });
         };
-        
+
         function loadCatalog(url, callback) {
             var xmlhttp = new XMLHttpRequest();
-            xmlhttp.onreadystatechange = function() {
+            xmlhttp.onreadystatechange = function () {
                 if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
                     console.log('responseText:' + xmlhttp.responseText);
                     try {
                         var data = JSON.parse(xmlhttp.responseText);
-                    } catch(err) {
+                    } catch (err) {
                         console.log(err.message + " in " + xmlhttp.responseText);
                         return;
                     }
@@ -39,8 +46,21 @@
             xmlhttp.open("GET", url, true);
             xmlhttp.send();
         };
- 
-        
+
+        function startProblem() {
+            let selection = document.getElementById('catalog');
+            let key = selection.value;
+            let pathObj = JSON.parse(sessionStorage.getItem(key));
+            let url = document.referrer;
+            let link = 'http://localhost:3000' + pathObj['path'];
+            let frame = document.getElementById('frame');
+            console.log(`Loading webpage from ${link}`);
+            frame.src = link;
+            frame.src += '';
+            
+            return false;
+        }; 
     </script>
 </body>
+
 </html>

@@ -5,7 +5,7 @@ const catalog = require('./catalog.js');
 
 var fullCatalog;
 
-catalog.build('./modules/OpenDSA/Exercises/', '.', (err,cat) => {
+catalog.build('./modules/OpenDSA/Exercises/', '/Exercises', (err,cat) => {
     if(err) {
         fullCatalog = {};
     }
@@ -18,8 +18,11 @@ const PORT = 3000;
 const HOST = 'localhost';
 
 const app = express();
-app.use(express.static('./modules/OpenDSA/lib'));
-app.use(express.static('./modules/OpenDSA/Exercises'));
+app.use('/lib/',express.static('./modules/OpenDSA/lib'));
+app.use('/JSAV',express.static('./modules/OpenDSA/lib'));
+app.use('/Exercises/',express.static('./modules/OpenDSA/Exercises'));
+app.use('/ODSAkhan-exercises/',express.static('./modules/OpenDSA/khan-exercises'));
+app.use('/khan-exercises/',express.static('./modules/OpenDSA/khan-exercises'));
 app.use(express.static('./client'));
 
 //! Main document request
@@ -47,7 +50,9 @@ app.get('/lesson/:id', (req,res) => {
 
 //! Default handler for all other requests
 app.use(function(req, res){
+    console.log(`Received unhandled request: ${req.originalUrl}`);
     res.status(404);
+    res.send();
 })
 
 app.listen(PORT, HOST, () => {
