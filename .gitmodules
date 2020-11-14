@@ -1,3 +1,6 @@
 [submodule "server/modules/OpenDSA"]
 	path = server/modules/OpenDSA
 	url = https://github.com/northerntechie/OpenDSA
+[submodule "server/modules/JSAV"]
+	path = server/modules/JSAV
+	url = https://github.com/vkaravir/JSAV.git

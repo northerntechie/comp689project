@@ -5,7 +5,7 @@ const catalog = require('./catalog.js');
 
 var fullCatalog;
 
-catalog.build('./modules/OpenDSA/Exercises/', '/Exercises', (err,cat) => {
+catalog.build('./modules/OpenDSA/AV/', '/AV', (err,cat) => {
     if(err) {
         fullCatalog = {};
     }
@@ -19,8 +19,10 @@ const HOST = 'localhost';
 
 const app = express();
 app.use('/lib/',express.static('./modules/OpenDSA/lib'));
-app.use('/JSAV',express.static('./modules/OpenDSA/lib'));
+app.use('/Exercises/JSAV',express.static('./modules/JSAV'));
 app.use('/Exercises/',express.static('./modules/OpenDSA/Exercises'));
+app.use('/AV',express.static('./modules/OpenDSA/AV'));
+app.use('/DataStructures',express.static('./modules/OpenDSA/DataStructures'));
 app.use('/ODSAkhan-exercises/',express.static('./modules/OpenDSA/khan-exercises'));
 app.use('/khan-exercises/',express.static('./modules/OpenDSA/khan-exercises'));
 app.use(express.static('./client'));
