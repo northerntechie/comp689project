@@ -14,7 +14,7 @@ catalog.build('./modules/OpenDSA/AV/', '/AV', (err,cat) => {
     }
 });
 
-const PORT = 3000;
+const PORT = 8080;
 const HOST = 'localhost';
 
 const app = express();
