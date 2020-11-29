@@ -8,20 +8,18 @@ COPY package*.json ./
 RUN npm install
 
 # Build directory structure
-RUN mkdir -p modules/JSAV/build/JSAV
-COPY ./modules/JSAV/build/* modules/JSAV/build/
+RUN mkdir -p modules/JSAV
+COPY ./modules/JSAV modules/JSAV
 
-RUN mkdir -p modules/OpenDSA/AV
-COPY modules/OpenDSA/* ./
-ADD modules/OpenDSA/AV/* ./
+RUN mkdir -p modules/OpenDSA
+COPY modules/OpenDSA ./modules/OpenDSA
 
 RUN mkdir -p modules/lib
-ADD modules/OpenDSA/lib/* ./
+COPY modules/OpenDSA/lib ./modules/lib
 
 RUN mkdir server
-COPY server/* ./server/
+COPY server ./server
 
 EXPOSE 8080
 
 CMD [ "node", "server/server.js" ]
-
