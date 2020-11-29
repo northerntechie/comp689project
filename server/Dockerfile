@@ -17,9 +17,12 @@ COPY modules/OpenDSA ./modules/OpenDSA
 RUN mkdir -p modules/lib
 COPY modules/OpenDSA/lib ./modules/lib
 
+RUN mkdir client
+COPY client ./client
+
 RUN mkdir server
 COPY server ./server
 
 EXPOSE 8080
 
-CMD [ "node", "server/server.js" ]
+CMD ["/bin/bash", "-c", "node server/server.js > server.log 2>&1" ]

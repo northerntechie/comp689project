@@ -29,7 +29,6 @@ app.use(express.static('./client'));
 
 //! Main document request
 app.get('/', (req,res) => {
-    doc = "";
     fs.readFile("file://client/index.html", (err, data) => {
         if(err) {
             res.sendStatus(404);
