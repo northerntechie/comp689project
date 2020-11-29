@@ -17,7 +17,7 @@
             var sessionStorage = window.sessionStorage;
             var catalog = document.getElementById('catalog');
 
-            loadCatalog('http://localhost:3000/catalog', (data) => {
+            loadCatalog('http://localhost:8080/catalog', (data) => {
                 data.forEach(obj => {
                     var opt = document.createElement('option');
                     opt.text = obj['name'];
@@ -52,7 +52,7 @@
             let key = selection.value;
             let pathObj = JSON.parse(sessionStorage.getItem(key));
             let url = document.referrer;
-            let link = 'http://localhost:3000' + pathObj['path'];
+            let link = 'http://localhost:8080' + pathObj['path'];
             let frame = document.getElementById('frame');
             console.log(`Loading webpage from ${link}`);
             frame.src = link;

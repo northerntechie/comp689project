@@ -47,6 +47,7 @@ app.get('/catalog', (req,res) => {
 
 //! Lesson request by id
 app.get('/lesson/:id', (req,res) => {
+    console.log(`Processing request for lesson: {req.params.id}`)
     res.send(`Lesson ${req.params.id} requested.`);
 });
 
