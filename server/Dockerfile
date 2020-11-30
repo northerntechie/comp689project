@@ -25,4 +25,4 @@ COPY server ./server
 
 EXPOSE 8080
 
-CMD ["/bin/bash", "-c", "node server/server.js > server.log 2>&1" ]
+CMD ["node", "server/server.js"]
