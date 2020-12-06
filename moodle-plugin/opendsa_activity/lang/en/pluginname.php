@@ -1,0 +1,1 @@
+$string['pluginname'] = 'comp689_opendsa';
