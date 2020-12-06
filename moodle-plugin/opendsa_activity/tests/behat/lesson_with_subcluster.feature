@@ -1,6 +1,6 @@
-@mod @mod_lesson
-Feature: In a lesson activity, students can see questions in random order and a single question drawn from a branch
-  In order to create a lesson with a cluster and a subcluster
+@mod @mod_opendsa_activity
+Feature: In a opendsa_activity activity, students can see questions in random order and a single question drawn from a branch
+  In order to create a opendsa_activity with a cluster and a subcluster
   As a teacher
   I need to add content pages and questions with cluster, branchtable and end of branchtable  and end of cluster pages
 
@@ -22,7 +22,7 @@ Feature: In a lesson activity, students can see questions in random order and a 
   Scenario: Lesson with subcluster
     Given I add a "Lesson" to section "1" and I fill the form with:
       | Name | Lesson with subcluster |
-      | Description | Test lesson description |
+      | Description | Test opendsa_activity description |
     And I follow "Lesson with subcluster"
     And I follow "Add a content page"
     And I set the following fields to these values:
@@ -171,5 +171,5 @@ Feature: In a lesson activity, students can see questions in random order and a 
     And I press "Continue"
     And I should see "Content page after cluster"
     And I press "Next page"
-    And I should see "Congratulations - end of lesson reached"
+    And I should see "Congratulations - end of opendsa_activity reached"
     And I should see "Your score is 4 (out of 4)."

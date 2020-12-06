@@ -1,6 +1,6 @@
-@mod @mod_lesson
+@mod @mod_opendsa_activity
 Feature: Lesson reset
-  In order to reuse past lessons
+  In order to reuse past opendsa_activitys
   As a teacher
   I need to remove all previous data.
 
@@ -24,10 +24,10 @@ Feature: Lesson reset
       | Group 2 | C1     | G2       |
     And the following "activities" exist:
       | activity | name             | intro                   | course | idnumber |
-      | lesson   | Test lesson name | Test lesson description | C1     | lesson1  |
+      | opendsa_activity   | Test opendsa_activity name | Test opendsa_activity description | C1     | opendsa_activity1  |
     And I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
     And I follow "Add a question page"
     And I set the field "Select a question type" to "True/false"
     And I press "Add a question page"
@@ -46,33 +46,33 @@ Feature: Lesson reset
     When I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
     And I should see "Cat is an amphibian"
     And I set the following fields to these values:
       | False | 1 |
     And I press "Submit"
     And I press "Continue"
-    And I should see "Congratulations - end of lesson reached"
+    And I should see "Congratulations - end of opendsa_activity reached"
     And I log out
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
     And I navigate to "Reports > Overview" in current page administration
     And I should see "Sam1 Student1"
     And I am on "Course 1" course homepage
     And I navigate to "Reset" in current page administration
     And I set the following fields to these values:
-        | Delete all lesson attempts | 1  |
+        | Delete all opendsa_activity attempts | 1  |
     And I press "Reset course"
     And I press "Continue"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
     And I navigate to "Reports > Overview" in current page administration
-    Then I should see "No attempts have been made on this lesson"
+    Then I should see "No attempts have been made on this opendsa_activity"
 
   @javascript
   Scenario: Use course reset to remove user overrides.
-    When I follow "Test lesson name"
+    When I follow "Test opendsa_activity name"
     And I navigate to "User overrides" in current page administration
     And I press "Add user override"
     And I set the following fields to these values:
@@ -87,12 +87,12 @@ Feature: Lesson reset
     And I press "Reset course"
     And I press "Continue"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
     And I navigate to "User overrides" in current page administration
     Then I should not see "Sam1 Student1"
 
   Scenario: Use course reset to remove group overrides.
-    When I follow "Test lesson name"
+    When I follow "Test opendsa_activity name"
     And I navigate to "Group overrides" in current page administration
     And I press "Add group override"
     And I set the following fields to these values:
@@ -107,6 +107,6 @@ Feature: Lesson reset
     And I press "Reset course"
     And I press "Continue"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
     And I navigate to "Group overrides" in current page administration
     Then I should not see "Group 1"

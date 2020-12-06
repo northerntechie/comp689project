@@ -1,5 +1,5 @@
-@mod @mod_lesson
-Feature: In a lesson activity, teacher can add embedded images in questions answers and responses
+@mod @mod_opendsa_activity
+Feature: In a opendsa_activity activity, teacher can add embedded images in questions answers and responses
   As a teacher
   I need to add questions with images in answers and responses
 
@@ -18,13 +18,13 @@ Feature: In a lesson activity, teacher can add embedded images in questions answ
       | student1 | C1 | student |
     And I log in as "teacher1"
     And I follow "Manage private files"
-    And I upload "mod/lesson/tests/fixtures/moodle_logo.jpg" file to "Files" filemanager
+    And I upload "mod/opendsa_activity/tests/fixtures/moodle_logo.jpg" file to "Files" filemanager
     And I click on "Save changes" "button"
     When I am on "Course 1" course homepage with editing mode on
     And I add a "Lesson" to section "1" and I fill the form with:
-      | Name | Test lesson name |
-      | Description | Test lesson description |
-    And I follow "Test lesson name"
+      | Name | Test opendsa_activity name |
+      | Description | Test opendsa_activity description |
+    And I follow "Test opendsa_activity name"
     And I follow "Add a question page"
     And I set the field "Select a question type" to "Multichoice"
     And I press "Add a question page"
@@ -78,7 +78,7 @@ Feature: In a lesson activity, teacher can add embedded images in questions answ
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    When I follow "Test lesson name"
+    When I follow "Test opendsa_activity name"
     Then I should see "What animal is an amphibian?"
     And "//*[contains(@class, 'answeroption')]//img[contains(@src, 'pluginfile.php')]" "xpath_element" should exist
     And "//*[contains(@class, 'answeroption')]//img[contains(@src, 'moodle_logo.jpg')]" "xpath_element" should exist
@@ -96,5 +96,5 @@ Feature: In a lesson activity, teacher can add embedded images in questions answ
     And "//img[contains(@src, 'pluginfile.php')]" "xpath_element" should exist in the ".correctanswer" "css_element"
     And "//img[contains(@src, 'moodle_logo.jpg')]" "xpath_element" should exist in the ".correctanswer" "css_element"
     And I press "Continue"
-    And I should see "Congratulations - end of lesson reached"
+    And I should see "Congratulations - end of opendsa_activity reached"
     And I should see "Your score is 1 (out of 2)."

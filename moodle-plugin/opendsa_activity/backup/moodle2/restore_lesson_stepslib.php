@@ -16,22 +16,22 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package mod_lesson
+ * @package mod_opendsa_activity
  * @subpackage backup-moodle2
  * @copyright 2010 onwards Eloy Lafuente (stronk7) {@link http://stronk7.com}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 /**
- * Define all the restore steps that will be used by the restore_lesson_activity_task
+ * Define all the restore steps that will be used by the restore_opendsa_activity_activity_task
  */
 
 /**
- * Structure step to restore one lesson activity
+ * Structure step to restore one opendsa_activity activity
  */
-class restore_lesson_activity_structure_step extends restore_activity_structure_step {
+class restore_opendsa_activity_activity_structure_step extends restore_activity_structure_step {
     // Store the answers as they're received but only process them at the
-    // end of the lesson
+    // end of the opendsa_activity
     protected $answers = array();
 
     protected function define_structure() {
@@ -39,23 +39,23 @@ class restore_lesson_activity_structure_step extends restore_activity_structure_
         $paths = array();
         $userinfo = $this->get_setting_value('userinfo');
 
-        $paths[] = new restore_path_element('lesson', '/activity/lesson');
-        $paths[] = new restore_path_element('lesson_page', '/activity/lesson/pages/page');
-        $paths[] = new restore_path_element('lesson_answer', '/activity/lesson/pages/page/answers/answer');
-        $paths[] = new restore_path_element('lesson_override', '/activity/lesson/overrides/override');
+        $paths[] = new restore_path_element('opendsa_activity', '/activity/opendsa_activity');
+        $paths[] = new restore_path_element('opendsa_activity_page', '/activity/opendsa_activity/pages/page');
+        $paths[] = new restore_path_element('opendsa_activity_answer', '/activity/opendsa_activity/pages/page/answers/answer');
+        $paths[] = new restore_path_element('opendsa_activity_override', '/activity/opendsa_activity/overrides/override');
         if ($userinfo) {
-            $paths[] = new restore_path_element('lesson_attempt', '/activity/lesson/pages/page/answers/answer/attempts/attempt');
-            $paths[] = new restore_path_element('lesson_grade', '/activity/lesson/grades/grade');
-            $paths[] = new restore_path_element('lesson_branch', '/activity/lesson/pages/page/branches/branch');
-            $paths[] = new restore_path_element('lesson_highscore', '/activity/lesson/highscores/highscore');
-            $paths[] = new restore_path_element('lesson_timer', '/activity/lesson/timers/timer');
+            $paths[] = new restore_path_element('opendsa_activity_attempt', '/activity/opendsa_activity/pages/page/answers/answer/attempts/attempt');
+            $paths[] = new restore_path_element('opendsa_activity_grade', '/activity/opendsa_activity/grades/grade');
+            $paths[] = new restore_path_element('opendsa_activity_branch', '/activity/opendsa_activity/pages/page/branches/branch');
+            $paths[] = new restore_path_element('opendsa_activity_highscore', '/activity/opendsa_activity/highscores/highscore');
+            $paths[] = new restore_path_element('opendsa_activity_timer', '/activity/opendsa_activity/timers/timer');
         }
 
         // Return the paths wrapped into standard activity structure
         return $this->prepare_activity_structure($paths);
     }
 
-    protected function process_lesson($data) {
+    protected function process_opendsa_activity($data) {
         global $DB;
 
         $data = (object)$data;
@@ -67,7 +67,7 @@ class restore_lesson_activity_structure_step extends restore_activity_structure_
         $data->available = $this->apply_date_offset($data->available);
         $data->deadline = $this->apply_date_offset($data->deadline);
 
-        // The lesson->highscore code was removed in MDL-49581.
+        // The opendsa_activity->highscore code was removed in MDL-49581.
         // Remove it if found in the backup file.
         if (isset($data->showhighscores)) {
             unset($data->showhighscores);
@@ -97,107 +97,107 @@ class restore_lesson_activity_structure_step extends restore_activity_structure_
                 $data->timelimit = 0;
             }
         }
-        // insert the lesson record
-        $newitemid = $DB->insert_record('lesson', $data);
+        // insert the opendsa_activity record
+        $newitemid = $DB->insert_record('opendsa_activity', $data);
         // immediately after inserting "activity" record, call this
         $this->apply_activity_instance($newitemid);
     }
 
-    protected function process_lesson_page($data) {
+    protected function process_opendsa_activity_page($data) {
         global $DB;
 
         $data = (object)$data;
         $oldid = $data->id;
-        $data->opendsa_activity_id = $this->get_new_parentid('lesson');
+        $data->opendsa_activity_id = $this->get_new_parentid('opendsa_activity');
 
         // We'll remap all the prevpageid and nextpageid at the end, once all pages have been created
 
-        $newitemid = $DB->insert_record('lesson_pages', $data);
-        $this->set_mapping('lesson_page', $oldid, $newitemid, true); // Has related fileareas
+        $newitemid = $DB->insert_record('opendsa_activity_pages', $data);
+        $this->set_mapping('opendsa_activity_page', $oldid, $newitemid, true); // Has related fileareas
     }
 
-    protected function process_lesson_answer($data) {
+    protected function process_opendsa_activity_answer($data) {
         global $DB;
 
         $data = (object)$data;
-        $data->opendsa_activity_id = $this->get_new_parentid('lesson');
-        $data->pageid = $this->get_new_parentid('lesson_page');
+        $data->opendsa_activity_id = $this->get_new_parentid('opendsa_activity');
+        $data->pageid = $this->get_new_parentid('opendsa_activity_page');
         $data->answer = $data->answer_text;
 
         // Set a dummy mapping to get the old ID so that it can be used by get_old_parentid when
         // processing attempts. It will be corrected in after_execute
-        $this->set_mapping('lesson_answer', $data->id, 0, true); // Has related fileareas.
+        $this->set_mapping('opendsa_activity_answer', $data->id, 0, true); // Has related fileareas.
 
         // Answers need to be processed in order, so we store them in an
         // instance variable and insert them in the after_execute stage
         $this->answers[$data->id] = $data;
     }
 
-    protected function process_lesson_attempt($data) {
+    protected function process_opendsa_activity_attempt($data) {
         global $DB;
 
         $data = (object)$data;
         $oldid = $data->id;
-        $data->opendsa_activity_id = $this->get_new_parentid('lesson');
-        $data->pageid = $this->get_new_parentid('lesson_page');
+        $data->opendsa_activity_id = $this->get_new_parentid('opendsa_activity');
+        $data->pageid = $this->get_new_parentid('opendsa_activity_page');
 
         // We use the old answerid here as the answer isn't created until after_execute
-        $data->answerid = $this->get_old_parentid('lesson_answer');
+        $data->answerid = $this->get_old_parentid('opendsa_activity_answer');
         $data->userid = $this->get_mappingid('user', $data->userid);
 
-        $newitemid = $DB->insert_record('lesson_attempts', $data);
-        $this->set_mapping('lesson_attempt', $oldid, $newitemid, true); // Has related fileareas.
+        $newitemid = $DB->insert_record('opendsa_activity_attempts', $data);
+        $this->set_mapping('opendsa_activity_attempt', $oldid, $newitemid, true); // Has related fileareas.
     }
 
-    protected function process_lesson_grade($data) {
+    protected function process_opendsa_activity_grade($data) {
         global $DB;
 
         $data = (object)$data;
         $oldid = $data->id;
-        $data->opendsa_activity_id = $this->get_new_parentid('lesson');
+        $data->opendsa_activity_id = $this->get_new_parentid('opendsa_activity');
         $data->userid = $this->get_mappingid('user', $data->userid);
 
-        $newitemid = $DB->insert_record('lesson_grades', $data);
-        $this->set_mapping('lesson_grade', $oldid, $newitemid);
+        $newitemid = $DB->insert_record('opendsa_activity_grades', $data);
+        $this->set_mapping('opendsa_activity_grade', $oldid, $newitemid);
     }
 
-    protected function process_lesson_branch($data) {
+    protected function process_opendsa_activity_branch($data) {
         global $DB;
 
         $data = (object)$data;
         $oldid = $data->id;
-        $data->opendsa_activity_id = $this->get_new_parentid('lesson');
-        $data->pageid = $this->get_new_parentid('lesson_page');
+        $data->opendsa_activity_id = $this->get_new_parentid('opendsa_activity');
+        $data->pageid = $this->get_new_parentid('opendsa_activity_page');
         $data->userid = $this->get_mappingid('user', $data->userid);
 
-        $newitemid = $DB->insert_record('lesson_branch', $data);
+        $newitemid = $DB->insert_record('opendsa_activity_branch', $data);
     }
 
-    protected function process_lesson_highscore($data) {
+    protected function process_opendsa_activity_highscore($data) {
         // Do not process any high score data.
         // high scores were removed in Moodle 3.0 See MDL-49581.
     }
 
-    protected function process_lesson_timer($data) {
+    protected function process_opendsa_activity_timer($data) {
         global $DB;
 
         $data = (object)$data;
         $oldid = $data->id;
-        $data->opendsa_activity_id = $this->get_new_parentid('lesson');
+        $data->opendsa_activity_id = $this->get_new_parentid('opendsa_activity');
         $data->userid = $this->get_mappingid('user', $data->userid);
         // Supply item that maybe missing from previous versions.
         if (!isset($data->completed)) {
             $data->completed = 0;
         }
-        $newitemid = $DB->insert_record('lesson_timer', $data);
+        $newitemid = $DB->insert_record('opendsa_activity_timer', $data);
     }
 
     /**
-     * Process a lesson override restore
+     * Process a opendsa_activity override restore
      * @param object $data The data in object form
      * @return void
      */
-    protected function process_lesson_override($data) {
+    protected function process_opendsa_activity_override($data) {
         global $DB;
 
         $data = (object)$data;
@@ -211,7 +211,7 @@ class restore_lesson_activity_structure_step extends restore_activity_structure_
             return;
         }
 
-        $data->opendsa_activity_id = $this->get_new_parentid('lesson');
+        $data->opendsa_activity_id = $this->get_new_parentid('opendsa_activity');
 
         if (!is_null($data->userid)) {
             $data->userid = $this->get_mappingid('user', $data->userid);
@@ -228,10 +228,10 @@ class restore_lesson_activity_structure_step extends restore_activity_structure_
         $data->available = $this->apply_date_offset($data->available);
         $data->deadline = $this->apply_date_offset($data->deadline);
 
-        $newitemid = $DB->insert_record('lesson_overrides', $data);
+        $newitemid = $DB->insert_record('opendsa_activity_overrides', $data);
 
         // Add mapping, restore of logs needs it.
-        $this->set_mapping('lesson_override', $oldid, $newitemid);
+        $this->set_mapping('opendsa_activity_override', $oldid, $newitemid);
     }
 
     protected function after_execute() {
@@ -240,65 +240,65 @@ class restore_lesson_activity_structure_step extends restore_activity_structure_
         // Answers must be sorted by id to ensure that they're shown correctly
         ksort($this->answers);
         foreach ($this->answers as $answer) {
-            $newitemid = $DB->insert_record('lesson_answers', $answer);
-            $this->set_mapping('lesson_answer', $answer->id, $newitemid, true);
+            $newitemid = $DB->insert_record('opendsa_activity_answers', $answer);
+            $this->set_mapping('opendsa_activity_answer', $answer->id, $newitemid, true);
 
-            // Update the lesson attempts to use the newly created answerid
-            $DB->set_field('lesson_attempts', 'answerid', $newitemid, array(
+            // Update the opendsa_activity attempts to use the newly created answerid
+            $DB->set_field('opendsa_activity_attempts', 'answerid', $newitemid, array(
                     'opendsa_activity_id' => $answer->opendsa_activity_id,
                     'pageid' => $answer->pageid,
                     'answerid' => $answer->id));
         }
 
-        // Add lesson files, no need to match by itemname (just internally handled context).
-        $this->add_related_files('mod_lesson', 'intro', null);
-        $this->add_related_files('mod_lesson', 'mediafile', null);
-        // Add lesson page files, by lesson_page itemname
-        $this->add_related_files('mod_lesson', 'page_contents', 'lesson_page');
-        $this->add_related_files('mod_lesson', 'page_answers', 'lesson_answer');
-        $this->add_related_files('mod_lesson', 'page_responses', 'lesson_answer');
-        $this->add_related_files('mod_lesson', 'essay_responses', 'lesson_attempt');
-        $this->add_related_files('mod_lesson', 'essay_answers', 'lesson_attempt');
+        // Add opendsa_activity files, no need to match by itemname (just internally handled context).
+        $this->add_related_files('mod_opendsa_activity', 'intro', null);
+        $this->add_related_files('mod_opendsa_activity', 'mediafile', null);
+        // Add opendsa_activity page files, by opendsa_activity_page itemname
+        $this->add_related_files('mod_opendsa_activity', 'page_contents', 'opendsa_activity_page');
+        $this->add_related_files('mod_opendsa_activity', 'page_answers', 'opendsa_activity_answer');
+        $this->add_related_files('mod_opendsa_activity', 'page_responses', 'opendsa_activity_answer');
+        $this->add_related_files('mod_opendsa_activity', 'essay_responses', 'opendsa_activity_attempt');
+        $this->add_related_files('mod_opendsa_activity', 'essay_answers', 'opendsa_activity_attempt');
 
         // Remap all the restored prevpageid and nextpageid now that we have all the pages and their mappings
-        $rs = $DB->get_recordset('lesson_pages', array('opendsa_activity_id' => $this->task->get_activityid()),
+        $rs = $DB->get_recordset('opendsa_activity_pages', array('opendsa_activity_id' => $this->task->get_activityid()),
                                  '', 'id, prevpageid, nextpageid');
         foreach ($rs as $page) {
-            $page->prevpageid = (empty($page->prevpageid)) ? 0 : $this->get_mappingid('lesson_page', $page->prevpageid);
-            $page->nextpageid = (empty($page->nextpageid)) ? 0 : $this->get_mappingid('lesson_page', $page->nextpageid);
-            $DB->update_record('lesson_pages', $page);
+            $page->prevpageid = (empty($page->prevpageid)) ? 0 : $this->get_mappingid('opendsa_activity_page', $page->prevpageid);
+            $page->nextpageid = (empty($page->nextpageid)) ? 0 : $this->get_mappingid('opendsa_activity_page', $page->nextpageid);
+            $DB->update_record('opendsa_activity_pages', $page);
         }
         $rs->close();
 
         // Remap all the restored 'jumpto' fields now that we have all the pages and their mappings
-        $rs = $DB->get_recordset('lesson_answers', array('opendsa_activity_id' => $this->task->get_activityid()),
+        $rs = $DB->get_recordset('opendsa_activity_answers', array('opendsa_activity_id' => $this->task->get_activityid()),
                                  '', 'id, jumpto');
         foreach ($rs as $answer) {
             if ($answer->jumpto > 0) {
-                $answer->jumpto = $this->get_mappingid('lesson_page', $answer->jumpto);
-                $DB->update_record('lesson_answers', $answer);
+                $answer->jumpto = $this->get_mappingid('opendsa_activity_page', $answer->jumpto);
+                $DB->update_record('opendsa_activity_answers', $answer);
             }
         }
         $rs->close();
 
         // Remap all the restored 'nextpageid' fields now that we have all the pages and their mappings.
-        $rs = $DB->get_recordset('lesson_branch', array('opendsa_activity_id' => $this->task->get_activityid()),
+        $rs = $DB->get_recordset('opendsa_activity_branch', array('opendsa_activity_id' => $this->task->get_activityid()),
                                  '', 'id, nextpageid');
         foreach ($rs as $answer) {
             if ($answer->nextpageid > 0) {
-                $answer->nextpageid = $this->get_mappingid('lesson_page', $answer->nextpageid);
-                $DB->update_record('lesson_branch', $answer);
+                $answer->nextpageid = $this->get_mappingid('opendsa_activity_page', $answer->nextpageid);
+                $DB->update_record('opendsa_activity_branch', $answer);
             }
         }
         $rs->close();
 
         // Replay the upgrade step 2015030301
-        // to clean lesson answers that should be plain text.
-        // 1 = LESSON_PAGE_SHORTANSWER, 8 = LESSON_PAGE_NUMERICAL, 20 = LESSON_PAGE_BRANCHTABLE.
+        // to clean opendsa_activity answers that should be plain text.
+        // 1 = OPENDSA_ACTIVITY_PAGE_SHORTANSWER, 8 = OPENDSA_ACTIVITY_PAGE_NUMERICAL, 20 = OPENDSA_ACTIVITY_PAGE_BRANCHTABLE.
 
         $sql = 'SELECT a.*
-                  FROM {lesson_answers} a
-                  JOIN {lesson_pages} p ON p.id = a.pageid
+                  FROM {opendsa_activity_answers} a
+                  JOIN {opendsa_activity_pages} p ON p.id = a.pageid
                  WHERE a.answerformat <> :format
                    AND a.opendsa_activity_id = :opendsa_activity_id
                    AND p.qtype IN (1, 8, 20)';
@@ -308,23 +308,23 @@ class restore_lesson_activity_structure_step extends restore_activity_structure_
             // Strip tags from answer text and convert back the format to FORMAT_MOODLE.
             $badanswer->answer = strip_tags($badanswer->answer);
             $badanswer->answerformat = FORMAT_MOODLE;
-            $DB->update_record('lesson_answers', $badanswer);
+            $DB->update_record('opendsa_activity_answers', $badanswer);
         }
         $badanswers->close();
 
         // Replay the upgrade step 2015032700.
-        // Delete any orphaned lesson_branch record.
+        // Delete any orphaned opendsa_activity_branch record.
         if ($DB->get_dbfamily() === 'mysql') {
-            $sql = "DELETE {lesson_branch}
-                      FROM {lesson_branch}
-                 LEFT JOIN {lesson_pages}
-                        ON {lesson_branch}.pageid = {lesson_pages}.id
-                     WHERE {lesson_pages}.id IS NULL";
+            $sql = "DELETE {opendsa_activity_branch}
+                      FROM {opendsa_activity_branch}
+                 LEFT JOIN {opendsa_activity_pages}
+                        ON {opendsa_activity_branch}.pageid = {opendsa_activity_pages}.id
+                     WHERE {opendsa_activity_pages}.id IS NULL";
         } else {
-            $sql = "DELETE FROM {lesson_branch}
+            $sql = "DELETE FROM {opendsa_activity_branch}
                WHERE NOT EXISTS (
-                         SELECT 'x' FROM {lesson_pages}
-                          WHERE {lesson_branch}.pageid = {lesson_pages}.id)";
+                         SELECT 'x' FROM {opendsa_activity_pages}
+                          WHERE {opendsa_activity_branch}.pageid = {opendsa_activity_pages}.id)";
         }
 
         $DB->execute($sql);

@@ -1,8 +1,8 @@
-@mod @mod_lesson
-Feature: In a lesson activity, teacher can edit lesson's pages
-  In order to modify an existing lesson
+@mod @mod_opendsa_activity
+Feature: In a opendsa_activity activity, teacher can edit opendsa_activity's pages
+  In order to modify an existing opendsa_activity
   As a teacher
-  I need to edit pages in the lesson
+  I need to edit pages in the opendsa_activity
 
   Background:
     Given the following "users" exist:
@@ -19,9 +19,9 @@ Feature: In a lesson activity, teacher can edit lesson's pages
     And I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
     And I add a "Lesson" to section "1" and I fill the form with:
-      | Name | Test lesson name |
-      | Description | Test lesson description |
-    And I follow "Test lesson name"
+      | Name | Test opendsa_activity name |
+      | Description | Test opendsa_activity description |
+    And I follow "Test opendsa_activity name"
     And I follow "Add a content page"
     And I set the following fields to these values:
       | Page title | First page name |
@@ -47,7 +47,7 @@ Feature: In a lesson activity, teacher can edit lesson's pages
       | Page contents | 1 + 1? |
       | id_answer_editor_0 | 2 |
       | id_response_editor_0 | Correct answer |
-      | id_jumpto_0 | End of lesson |
+      | id_jumpto_0 | End of opendsa_activity |
       | id_score_0 | 1 |
       | id_answer_editor_1 | 1 |
       | id_response_editor_1 | Incorrect answer |
@@ -55,7 +55,7 @@ Feature: In a lesson activity, teacher can edit lesson's pages
       | id_score_1 | 0 |
     And I press "Save page"
 
-  Scenario: Edit lesson content page
+  Scenario: Edit opendsa_activity content page
     Given I click on "//th[normalize-space(.)='Second page name']/descendant::a[3]" "xpath_element"
     When I set the following fields to these values:
       | Page title | Modified second page |
@@ -70,7 +70,7 @@ Feature: In a lesson activity, teacher can edit lesson's pages
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
     And I should see "First page contents"
     And I press "Next page"
     And I should see "Modified contents"
@@ -87,21 +87,21 @@ Feature: In a lesson activity, teacher can edit lesson's pages
     And I should see "Correct answer"
     And I should not see "Incorrect answer"
     And I press "Continue"
-    And I should see "Congratulations - end of lesson reached"
+    And I should see "Congratulations - end of opendsa_activity reached"
     And I should see "Your score is 1 (out of 1)."
 
-  Scenario: Edit lesson question page
+  Scenario: Edit opendsa_activity question page
     Given I click on "//th[normalize-space(.)='Hardest question ever']/descendant::a[3]" "xpath_element"
     When I set the following fields to these values:
       | Page title | New hardest question |
       | Page contents | 1 + 2? |
       | id_answer_editor_0 | 2 |
       | id_response_editor_0 | Your answer is incorrect |
-      | id_jumpto_0 | End of lesson |
+      | id_jumpto_0 | End of opendsa_activity |
       | id_score_0 | 0 |
       | id_answer_editor_1 | 3 |
       | id_response_editor_1 | Your answer is correct |
-      | id_jumpto_1 | End of lesson |
+      | id_jumpto_1 | End of opendsa_activity |
       | id_score_1 | 1 |
     And I press "Save page"
     Then I should see "New hardest question"
@@ -109,7 +109,7 @@ Feature: In a lesson activity, teacher can edit lesson's pages
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
     And I should see "First page contents"
     And I press "Next page"
     And I should see "Second page contents"
@@ -122,5 +122,5 @@ Feature: In a lesson activity, teacher can edit lesson's pages
     And I should see "Your answer is correct"
     And I should not see "Incorrect answer"
     And I press "Continue"
-    And I should see "Congratulations - end of lesson reached"
+    And I should see "Congratulations - end of opendsa_activity reached"
     And I should see "Your score is 1 (out of 1)."

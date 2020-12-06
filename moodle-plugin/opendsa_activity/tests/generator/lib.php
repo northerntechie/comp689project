@@ -15,9 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * mod_lesson data generator.
+ * mod_opendsa_activity data generator.
  *
- * @package    mod_lesson
+ * @package    mod_opendsa_activity
  * @category   test
  * @copyright  2013 Marina Glancy
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -26,14 +26,14 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * mod_lesson data generator class.
+ * mod_opendsa_activity data generator class.
  *
- * @package    mod_lesson
+ * @package    mod_opendsa_activity
  * @category   test
  * @copyright  2013 Marina Glancy
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class mod_lesson_generator extends testing_module_generator {
+class mod_opendsa_activity_generator extends testing_module_generator {
 
     /**
      * @var int keep track of how many pages have been created.
@@ -53,16 +53,16 @@ class mod_lesson_generator extends testing_module_generator {
     public function create_instance($record = null, array $options = null) {
         global $CFG;
 
-        // Add default values for lesson.
-        $lessonconfig = get_config('mod_lesson');
+        // Add default values for opendsa_activity.
+        $opendsa_activityconfig = get_config('mod_opendsa_activity');
         $record = (array)$record + array(
-            'progressbar' => $lessonconfig->progressbar,
-            'ongoing' => $lessonconfig->ongoing,
-            'displayleft' => $lessonconfig->displayleftmenu,
-            'displayleftif' => $lessonconfig->displayleftif,
-            'slideshow' => $lessonconfig->slideshow,
-            'maxanswers' => $lessonconfig->maxanswers,
-            'feedback' => $lessonconfig->defaultfeedback,
+            'progressbar' => $opendsa_activityconfig->progressbar,
+            'ongoing' => $opendsa_activityconfig->ongoing,
+            'displayleft' => $opendsa_activityconfig->displayleftmenu,
+            'displayleftif' => $opendsa_activityconfig->displayleftif,
+            'slideshow' => $opendsa_activityconfig->slideshow,
+            'maxanswers' => $opendsa_activityconfig->maxanswers,
+            'feedback' => $opendsa_activityconfig->defaultfeedback,
             'activitylink' => 0,
             'available' => 0,
             'deadline' => 0,
@@ -72,16 +72,16 @@ class mod_lesson_generator extends testing_module_generator {
             'timespent' => 0,
             'completed' => 0,
             'gradebetterthan' => 0,
-            'modattempts' => $lessonconfig->modattempts,
-            'review' => $lessonconfig->displayreview,
-            'maxattempts' => $lessonconfig->maximumnumberofattempts,
-            'nextpagedefault' => $lessonconfig->defaultnextpage,
-            'maxpages' => $lessonconfig->numberofpagestoshow,
-            'practice' => $lessonconfig->practice,
-            'custom' => $lessonconfig->customscoring,
-            'retake' => $lessonconfig->retakesallowed,
-            'usemaxgrade' => $lessonconfig->handlingofretakes,
-            'minquestions' => $lessonconfig->minimumnumberofquestions,
+            'modattempts' => $opendsa_activityconfig->modattempts,
+            'review' => $opendsa_activityconfig->displayreview,
+            'maxattempts' => $opendsa_activityconfig->maximumnumberofattempts,
+            'nextpagedefault' => $opendsa_activityconfig->defaultnextpage,
+            'maxpages' => $opendsa_activityconfig->numberofpagestoshow,
+            'practice' => $opendsa_activityconfig->practice,
+            'custom' => $opendsa_activityconfig->customscoring,
+            'retake' => $opendsa_activityconfig->retakesallowed,
+            'usemaxgrade' => $opendsa_activityconfig->handlingofretakes,
+            'minquestions' => $opendsa_activityconfig->minimumnumberofquestions,
             'grade' => 100,
         );
         if (!isset($record['mediafile'])) {
@@ -92,46 +92,46 @@ class mod_lesson_generator extends testing_module_generator {
         return parent::create_instance($record, (array)$options);
     }
 
-    public function create_content($lesson, $record = array()) {
+    public function create_content($opendsa_activity, $record = array()) {
         global $DB, $CFG;
-        require_once($CFG->dirroot.'/mod/lesson/locallib.php');
+        require_once($CFG->dirroot.'/mod/opendsa_activity/locallib.php');
         $now = time();
         $this->pagecount++;
         $record = (array)$record + array(
-            'opendsa_activity_id' => $lesson->id,
+            'opendsa_activity_id' => $opendsa_activity->id,
             'title' => 'Lesson page '.$this->pagecount,
             'timecreated' => $now,
-            'qtype' => 20, // LESSON_PAGE_BRANCHTABLE
+            'qtype' => 20, // OPENDSA_ACTIVITY_PAGE_BRANCHTABLE
             'pageid' => 0, // By default insert in the beginning.
         );
         if (!isset($record['contents_editor'])) {
             $record['contents_editor'] = array(
-                'text' => 'Contents of lesson page '.$this->pagecount,
+                'text' => 'Contents of opendsa_activity page '.$this->pagecount,
                 'format' => FORMAT_MOODLE,
                 'itemid' => 0,
             );
         }
-        $context = context_module::instance($lesson->cmid);
-        $page = lesson_page::create((object)$record, new lesson($lesson), $context, $CFG->maxbytes);
-        return $DB->get_record('lesson_pages', array('id' => $page->id), '*', MUST_EXIST);
+        $context = context_module::instance($opendsa_activity->cmid);
+        $page = opendsa_activity_page::create((object)$record, new opendsa_activity($opendsa_activity), $context, $CFG->maxbytes);
+        return $DB->get_record('opendsa_activity_pages', array('id' => $page->id), '*', MUST_EXIST);
     }
 
     /**
      * Create True/false question pages.
-     * @param object $lesson
+     * @param object $opendsa_activity
      * @param array $record
      * @return int
      */
-    public function create_question_truefalse($lesson, $record = array()) {
+    public function create_question_truefalse($opendsa_activity, $record = array()) {
         global $DB, $CFG;
-        require_once($CFG->dirroot.'/mod/lesson/locallib.php');
+        require_once($CFG->dirroot.'/mod/opendsa_activity/locallib.php');
         $now = time();
         $this->pagecount++;
         $record = (array)$record + array(
-            'opendsa_activity_id' => $lesson->id,
+            'opendsa_activity_id' => $opendsa_activity->id,
             'title' => 'Lesson TF question '.$this->pagecount,
             'timecreated' => $now,
-            'qtype' => 2,  // LESSON_PAGE_TRUEFALSE.
+            'qtype' => 2,  // OPENDSA_ACTIVITY_PAGE_TRUEFALSE.
             'pageid' => 0, // By default insert in the beginning.
         );
         if (!isset($record['contents_editor'])) {
@@ -150,7 +150,7 @@ class mod_lesson_generator extends testing_module_generator {
             );
         }
         if (!isset($record['jumpto'][0])) {
-            $record['jumpto'][0] = LESSON_NEXTPAGE;
+            $record['jumpto'][0] = OPENDSA_ACTIVITY_NEXTPAGE;
         }
 
         // Second Answer (FALSE).
@@ -161,30 +161,30 @@ class mod_lesson_generator extends testing_module_generator {
             );
         }
         if (!isset($record['jumpto'][1])) {
-            $record['jumpto'][1] = LESSON_THISPAGE;
+            $record['jumpto'][1] = OPENDSA_ACTIVITY_THISPAGE;
         }
 
-        $context = context_module::instance($lesson->cmid);
-        $page = lesson_page::create((object)$record, new lesson($lesson), $context, $CFG->maxbytes);
-        return $DB->get_record('lesson_pages', array('id' => $page->id), '*', MUST_EXIST);
+        $context = context_module::instance($opendsa_activity->cmid);
+        $page = opendsa_activity_page::create((object)$record, new opendsa_activity($opendsa_activity), $context, $CFG->maxbytes);
+        return $DB->get_record('opendsa_activity_pages', array('id' => $page->id), '*', MUST_EXIST);
     }
 
     /**
      * Create multichoice question pages.
-     * @param object $lesson
+     * @param object $opendsa_activity
      * @param array $record
      * @return int
      */
-    public function create_question_multichoice($lesson, $record = array()) {
+    public function create_question_multichoice($opendsa_activity, $record = array()) {
         global $DB, $CFG;
-        require_once($CFG->dirroot.'/mod/lesson/locallib.php');
+        require_once($CFG->dirroot.'/mod/opendsa_activity/locallib.php');
         $now = time();
         $this->pagecount++;
         $record = (array)$record + array(
-            'opendsa_activity_id' => $lesson->id,
+            'opendsa_activity_id' => $opendsa_activity->id,
             'title' => 'Lesson multichoice question '.$this->pagecount,
             'timecreated' => $now,
-            'qtype' => 3,  // LESSON_PAGE_MULTICHOICE.
+            'qtype' => 3,  // OPENDSA_ACTIVITY_PAGE_MULTICHOICE.
             'pageid' => 0, // By default insert in the beginning.
         );
         if (!isset($record['contents_editor'])) {
@@ -203,7 +203,7 @@ class mod_lesson_generator extends testing_module_generator {
             );
         }
         if (!isset($record['jumpto'][0])) {
-            $record['jumpto'][0] = LESSON_NEXTPAGE;
+            $record['jumpto'][0] = OPENDSA_ACTIVITY_NEXTPAGE;
         }
 
         // Second Answer (incorrect).
@@ -214,30 +214,30 @@ class mod_lesson_generator extends testing_module_generator {
             );
         }
         if (!isset($record['jumpto'][1])) {
-            $record['jumpto'][1] = LESSON_THISPAGE;
+            $record['jumpto'][1] = OPENDSA_ACTIVITY_THISPAGE;
         }
 
-        $context = context_module::instance($lesson->cmid);
-        $page = lesson_page::create((object)$record, new lesson($lesson), $context, $CFG->maxbytes);
-        return $DB->get_record('lesson_pages', array('id' => $page->id), '*', MUST_EXIST);
+        $context = context_module::instance($opendsa_activity->cmid);
+        $page = opendsa_activity_page::create((object)$record, new opendsa_activity($opendsa_activity), $context, $CFG->maxbytes);
+        return $DB->get_record('opendsa_activity_pages', array('id' => $page->id), '*', MUST_EXIST);
     }
 
     /**
      * Create essay question pages.
-     * @param object $lesson
+     * @param object $opendsa_activity
      * @param array $record
      * @return int
      */
-    public function create_question_essay($lesson, $record = array()) {
+    public function create_question_essay($opendsa_activity, $record = array()) {
         global $DB, $CFG;
-        require_once($CFG->dirroot.'/mod/lesson/locallib.php');
+        require_once($CFG->dirroot.'/mod/opendsa_activity/locallib.php');
         $now = time();
         $this->pagecount++;
         $record = (array)$record + array(
-            'opendsa_activity_id' => $lesson->id,
+            'opendsa_activity_id' => $opendsa_activity->id,
             'title' => 'Lesson Essay question '.$this->pagecount,
             'timecreated' => $now,
-            'qtype' => 10, // LESSON_PAGE_ESSAY.
+            'qtype' => 10, // OPENDSA_ACTIVITY_PAGE_ESSAY.
             'pageid' => 0, // By default insert in the beginning.
         );
         if (!isset($record['contents_editor'])) {
@@ -256,30 +256,30 @@ class mod_lesson_generator extends testing_module_generator {
             );
         }
         if (!isset($record['jumpto'][0])) {
-            $record['jumpto'][0] = LESSON_NEXTPAGE;
+            $record['jumpto'][0] = OPENDSA_ACTIVITY_NEXTPAGE;
         }
 
-        $context = context_module::instance($lesson->cmid);
-        $page = lesson_page::create((object)$record, new lesson($lesson), $context, $CFG->maxbytes);
-        return $DB->get_record('lesson_pages', array('id' => $page->id), '*', MUST_EXIST);
+        $context = context_module::instance($opendsa_activity->cmid);
+        $page = opendsa_activity_page::create((object)$record, new opendsa_activity($opendsa_activity), $context, $CFG->maxbytes);
+        return $DB->get_record('opendsa_activity_pages', array('id' => $page->id), '*', MUST_EXIST);
     }
 
     /**
      * Create matching question pages.
-     * @param object $lesson
+     * @param object $opendsa_activity
      * @param array $record
      * @return int
      */
-    public function create_question_matching($lesson, $record = array()) {
+    public function create_question_matching($opendsa_activity, $record = array()) {
         global $DB, $CFG;
-        require_once($CFG->dirroot.'/mod/lesson/locallib.php');
+        require_once($CFG->dirroot.'/mod/opendsa_activity/locallib.php');
         $now = time();
         $this->pagecount++;
         $record = (array)$record + array(
-            'opendsa_activity_id' => $lesson->id,
+            'opendsa_activity_id' => $opendsa_activity->id,
             'title' => 'Lesson Matching question '.$this->pagecount,
             'timecreated' => $now,
-            'qtype' => 5,  // LESSON_PAGE_MATCHING.
+            'qtype' => 5,  // OPENDSA_ACTIVITY_PAGE_MATCHING.
             'pageid' => 0, // By default insert in the beginning.
         );
         if (!isset($record['contents_editor'])) {
@@ -328,37 +328,37 @@ class mod_lesson_generator extends testing_module_generator {
 
         // Jump Values.
         if (!isset($record['jumpto'][0])) {
-            $record['jumpto'][0] = LESSON_NEXTPAGE;
+            $record['jumpto'][0] = OPENDSA_ACTIVITY_NEXTPAGE;
         }
         if (!isset($record['jumpto'][1])) {
-            $record['jumpto'][1] = LESSON_THISPAGE;
+            $record['jumpto'][1] = OPENDSA_ACTIVITY_THISPAGE;
         }
 
         // Mark the correct values.
         if (!isset($record['score'][0])) {
             $record['score'][0] = 1;
         }
-        $context = context_module::instance($lesson->cmid);
-        $page = lesson_page::create((object)$record, new lesson($lesson), $context, $CFG->maxbytes);
-        return $DB->get_record('lesson_pages', array('id' => $page->id), '*', MUST_EXIST);
+        $context = context_module::instance($opendsa_activity->cmid);
+        $page = opendsa_activity_page::create((object)$record, new opendsa_activity($opendsa_activity), $context, $CFG->maxbytes);
+        return $DB->get_record('opendsa_activity_pages', array('id' => $page->id), '*', MUST_EXIST);
     }
 
     /**
      * Create shortanswer question pages.
-     * @param object $lesson
+     * @param object $opendsa_activity
      * @param array $record
      * @return int
      */
-    public function create_question_shortanswer($lesson, $record = array()) {
+    public function create_question_shortanswer($opendsa_activity, $record = array()) {
         global $DB, $CFG;
-        require_once($CFG->dirroot.'/mod/lesson/locallib.php');
+        require_once($CFG->dirroot.'/mod/opendsa_activity/locallib.php');
         $now = time();
         $this->pagecount++;
         $record = (array)$record + array(
-            'opendsa_activity_id' => $lesson->id,
+            'opendsa_activity_id' => $opendsa_activity->id,
             'title' => 'Lesson Shortanswer question '.$this->pagecount,
             'timecreated' => $now,
-            'qtype' => 1,  // LESSON_PAGE_SHORTANSWER.
+            'qtype' => 1,  // OPENDSA_ACTIVITY_PAGE_SHORTANSWER.
             'pageid' => 0, // By default insert in the beginning.
         );
         if (!isset($record['contents_editor'])) {
@@ -377,30 +377,30 @@ class mod_lesson_generator extends testing_module_generator {
             );
         }
         if (!isset($record['jumpto'][0])) {
-            $record['jumpto'][0] = LESSON_NEXTPAGE;
+            $record['jumpto'][0] = OPENDSA_ACTIVITY_NEXTPAGE;
         }
 
-        $context = context_module::instance($lesson->cmid);
-        $page = lesson_page::create((object)$record, new lesson($lesson), $context, $CFG->maxbytes);
-        return $DB->get_record('lesson_pages', array('id' => $page->id), '*', MUST_EXIST);
+        $context = context_module::instance($opendsa_activity->cmid);
+        $page = opendsa_activity_page::create((object)$record, new opendsa_activity($opendsa_activity), $context, $CFG->maxbytes);
+        return $DB->get_record('opendsa_activity_pages', array('id' => $page->id), '*', MUST_EXIST);
     }
 
     /**
      * Create shortanswer question pages.
-     * @param object $lesson
+     * @param object $opendsa_activity
      * @param array $record
      * @return int
      */
-    public function create_question_numeric($lesson, $record = array()) {
+    public function create_question_numeric($opendsa_activity, $record = array()) {
         global $DB, $CFG;
-        require_once($CFG->dirroot.'/mod/lesson/locallib.php');
+        require_once($CFG->dirroot.'/mod/opendsa_activity/locallib.php');
         $now = time();
         $this->pagecount++;
         $record = (array)$record + array(
-            'opendsa_activity_id' => $lesson->id,
+            'opendsa_activity_id' => $opendsa_activity->id,
             'title' => 'Lesson numerical question '.$this->pagecount,
             'timecreated' => $now,
-            'qtype' => 8,  // LESSON_PAGE_NUMERICAL.
+            'qtype' => 8,  // OPENDSA_ACTIVITY_PAGE_NUMERICAL.
             'pageid' => 0, // By default insert in the beginning.
         );
         if (!isset($record['contents_editor'])) {
@@ -419,11 +419,11 @@ class mod_lesson_generator extends testing_module_generator {
             );
         }
         if (!isset($record['jumpto'][0])) {
-            $record['jumpto'][0] = LESSON_NEXTPAGE;
+            $record['jumpto'][0] = OPENDSA_ACTIVITY_NEXTPAGE;
         }
 
-        $context = context_module::instance($lesson->cmid);
-        $page = lesson_page::create((object)$record, new lesson($lesson), $context, $CFG->maxbytes);
-        return $DB->get_record('lesson_pages', array('id' => $page->id), '*', MUST_EXIST);
+        $context = context_module::instance($opendsa_activity->cmid);
+        $page = opendsa_activity_page::create((object)$record, new opendsa_activity($opendsa_activity), $context, $CFG->maxbytes);
+        return $DB->get_record('opendsa_activity_pages', array('id' => $page->id), '*', MUST_EXIST);
     }
 }

@@ -15,24 +15,24 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The mod_lesson highscores viewed.
+ * The mod_opendsa_activity highscores viewed.
  *
- * @package    mod_lesson
+ * @package    mod_opendsa_activity
  * @deprecated since Moodle 3.0
  * @copyright  2013 Mark Nelson <markn@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 
-namespace mod_lesson\event;
+namespace mod_opendsa_activity\event;
 
 defined('MOODLE_INTERNAL') || die();
 
-debugging('mod_lesson\event\highscores_viewed has been deprecated. Since the functionality no longer resides in the lesson module.',
+debugging('mod_opendsa_activity\event\highscores_viewed has been deprecated. Since the functionality no longer resides in the opendsa_activity module.',
         DEBUG_DEVELOPER);
 /**
- * The mod_lesson highscores viewed class.
+ * The mod_opendsa_activity highscores viewed class.
  *
- * @package    mod_lesson
+ * @package    mod_opendsa_activity
  * @since      Moodle 2.7
  * @copyright  2013 Mark Nelson <markn@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
@@ -43,7 +43,7 @@ class highscores_viewed extends \core\event\base {
      * Set basic properties for the event.
      */
     protected function init() {
-        $this->data['objecttable'] = 'lesson';
+        $this->data['objecttable'] = 'opendsa_activity';
         $this->data['crud'] = 'r';
         $this->data['edulevel'] = self::LEVEL_PARTICIPATING;
     }
@@ -54,7 +54,7 @@ class highscores_viewed extends \core\event\base {
      * @return string
      */
     public static function get_name() {
-        return get_string('eventhighscoresviewed', 'mod_lesson');
+        return get_string('eventhighscoresviewed', 'mod_opendsa_activity');
     }
 
     /**
@@ -63,7 +63,7 @@ class highscores_viewed extends \core\event\base {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url('/mod/lesson/highscores.php', array('id' => $this->contextinstanceid));
+        return new \moodle_url('/mod/opendsa_activity/highscores.php', array('id' => $this->contextinstanceid));
     }
 
     /**
@@ -72,7 +72,7 @@ class highscores_viewed extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        return "The user with id '$this->userid' viewed the highscores for the lesson activity with course module " .
+        return "The user with id '$this->userid' viewed the highscores for the opendsa_activity activity with course module " .
             "id '$this->contextinstanceid'.";
     }
 
@@ -82,10 +82,10 @@ class highscores_viewed extends \core\event\base {
      * @return array of parameters to be passed to legacy add_to_log() function.
      */
     protected function get_legacy_logdata() {
-        $lesson = $this->get_record_snapshot('lesson', $this->objectid);
+        $opendsa_activity = $this->get_record_snapshot('opendsa_activity', $this->objectid);
 
-        return array($this->courseid, 'lesson', 'view highscores', 'highscores.php?id=' . $this->contextinstanceid,
-            $lesson->name, $this->contextinstanceid);
+        return array($this->courseid, 'opendsa_activity', 'view highscores', 'highscores.php?id=' . $this->contextinstanceid,
+            $opendsa_activity->name, $this->contextinstanceid);
     }
 
     public static function get_objectid_mapping() {

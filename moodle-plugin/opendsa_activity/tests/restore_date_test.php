@@ -17,7 +17,7 @@
 /**
  * Restore date tests.
  *
- * @package    mod_lesson
+ * @package    mod_opendsa_activity
  * @copyright  2017 onwards Ankit Agarwal <ankit.agrr@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -30,38 +30,38 @@ require_once($CFG->libdir . "/phpunit/classes/restore_date_testcase.php");
 /**
  * Restore date tests.
  *
- * @package    mod_lesson
+ * @package    mod_opendsa_activity
  * @copyright  2017 onwards Ankit Agarwal <ankit.agrr@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class mod_lesson_restore_date_testcase extends restore_date_testcase {
+class mod_opendsa_activity_restore_date_testcase extends restore_date_testcase {
 
     /**
      * Creates an attempt for the given userwith a correct or incorrect answer and optionally finishes it.
      *
      * TODO This api can be better extracted to a generator.
      *
-     * @param  stdClass $lesson  Lesson object.
+     * @param  stdClass $opendsa_activity  Lesson object.
      * @param  stdClass $page    page object.
      * @param  boolean $correct  If the answer should be correct.
      * @param  boolean $finished If we should finish the attempt.
      *
      * @return array the result of the attempt creation or finalisation.
      */
-    protected function create_attempt($lesson, $page, $correct = true, $finished = false) {
+    protected function create_attempt($opendsa_activity, $page, $correct = true, $finished = false) {
         global $DB, $USER;
 
-        // First we need to launch the lesson so the timer is on.
-        mod_lesson_external::launch_attempt($lesson->id);
+        // First we need to launch the opendsa_activity so the timer is on.
+        mod_opendsa_activity_external::launch_attempt($opendsa_activity->id);
 
-        $DB->set_field('lesson', 'feedback', 1, array('id' => $lesson->id));
-        $DB->set_field('lesson', 'progressbar', 1, array('id' => $lesson->id));
-        $DB->set_field('lesson', 'custom', 0, array('id' => $lesson->id));
-        $DB->set_field('lesson', 'maxattempts', 3, array('id' => $lesson->id));
+        $DB->set_field('opendsa_activity', 'feedback', 1, array('id' => $opendsa_activity->id));
+        $DB->set_field('opendsa_activity', 'progressbar', 1, array('id' => $opendsa_activity->id));
+        $DB->set_field('opendsa_activity', 'custom', 0, array('id' => $opendsa_activity->id));
+        $DB->set_field('opendsa_activity', 'maxattempts', 3, array('id' => $opendsa_activity->id));
 
         $answercorrect = 0;
         $answerincorrect = 0;
-        $p2answers = $DB->get_records('lesson_answers', array('opendsa_activity_id' => $lesson->id, 'pageid' => $page->id), 'id');
+        $p2answers = $DB->get_records('opendsa_activity_answers', array('opendsa_activity_id' => $opendsa_activity->id, 'pageid' => $page->id), 'id');
         foreach ($p2answers as $answer) {
             if ($answer->jumpto == 0) {
                 $answerincorrect = $answer->id;
@@ -76,16 +76,16 @@ class mod_lesson_restore_date_testcase extends restore_date_testcase {
                 'value' => $correct ? $answercorrect : $answerincorrect,
             ),
             array(
-                'name' => '_qf__lesson_display_answer_form_truefalse',
+                'name' => '_qf__opendsa_activity_display_answer_form_truefalse',
                 'value' => 1,
             )
         );
-        $result = mod_lesson_external::process_page($lesson->id, $page->id, $data);
-        $result = external_api::clean_returnvalue(mod_lesson_external::process_page_returns(), $result);
+        $result = mod_opendsa_activity_external::process_page($opendsa_activity->id, $page->id, $data);
+        $result = external_api::clean_returnvalue(mod_opendsa_activity_external::process_page_returns(), $result);
 
         // Create attempt.
         $newpageattempt = [
-            'opendsa_activity_id' => $lesson->id,
+            'opendsa_activity_id' => $opendsa_activity->id,
             'pageid' => $page->id,
             'userid' => $USER->id,
             'answerid' => $answercorrect,
@@ -94,11 +94,11 @@ class mod_lesson_restore_date_testcase extends restore_date_testcase {
             'useranswer' => '1',
             'timeseen' => time(),
         ];
-        $DB->insert_record('lesson_attempts', (object) $newpageattempt);
+        $DB->insert_record('opendsa_activity_attempts', (object) $newpageattempt);
 
         if ($finished) {
-            $result = mod_lesson_external::finish_attempt($lesson->id);
-            $result = external_api::clean_returnvalue(mod_lesson_external::finish_attempt_returns(), $result);
+            $result = mod_opendsa_activity_external::finish_attempt($opendsa_activity->id);
+            $result = external_api::clean_returnvalue(mod_opendsa_activity_external::finish_attempt_returns(), $result);
         }
         return $result;
     }
@@ -109,56 +109,56 @@ class mod_lesson_restore_date_testcase extends restore_date_testcase {
     public function test_restore_dates() {
         global $DB, $USER;
 
-        // Create lesson data.
+        // Create opendsa_activity data.
         $record = ['available' => 100, 'deadline' => 100, 'timemodified' => 100];
-        list($course, $lesson) = $this->create_course_and_module('lesson', $record);
-        $lessongenerator = $this->getDataGenerator()->get_plugin_generator('mod_lesson');
-        $page = $lessongenerator->create_content($lesson);
-        $page2 = $lessongenerator->create_question_truefalse($lesson);
-        $this->create_attempt($lesson, $page2, true, true);
+        list($course, $opendsa_activity) = $this->create_course_and_module('opendsa_activity', $record);
+        $opendsa_activitygenerator = $this->getDataGenerator()->get_plugin_generator('mod_opendsa_activity');
+        $page = $opendsa_activitygenerator->create_content($opendsa_activity);
+        $page2 = $opendsa_activitygenerator->create_question_truefalse($opendsa_activity);
+        $this->create_attempt($opendsa_activity, $page2, true, true);
 
-        $timer = $DB->get_record('lesson_timer', ['opendsa_activity_id' => $lesson->id]);
+        $timer = $DB->get_record('opendsa_activity_timer', ['opendsa_activity_id' => $opendsa_activity->id]);
         // Lesson grade.
         $timestamp = 100;
         $grade = new stdClass();
-        $grade->opendsa_activity_id = $lesson->id;
+        $grade->opendsa_activity_id = $opendsa_activity->id;
         $grade->userid = $USER->id;
         $grade->grade = 8.9;
         $grade->completed = $timestamp;
-        $grade->id = $DB->insert_record('lesson_grades', $grade);
+        $grade->id = $DB->insert_record('opendsa_activity_grades', $grade);
 
         // User override.
         $override = (object)[
-            'opendsa_activity_id' => $lesson->id,
+            'opendsa_activity_id' => $opendsa_activity->id,
             'groupid' => 0,
             'userid' => $USER->id,
             'sortorder' => 1,
             'available' => 100,
             'deadline' => 200
         ];
-        $DB->insert_record('lesson_overrides', $override);
+        $DB->insert_record('opendsa_activity_overrides', $override);
 
         // Set time fields to a constant for easy validation.
-        $DB->set_field('lesson_pages', 'timecreated', $timestamp);
-        $DB->set_field('lesson_pages', 'timemodified', $timestamp);
-        $DB->set_field('lesson_answers', 'timecreated', $timestamp);
-        $DB->set_field('lesson_answers', 'timemodified', $timestamp);
-        $DB->set_field('lesson_attempts', 'timeseen', $timestamp);
+        $DB->set_field('opendsa_activity_pages', 'timecreated', $timestamp);
+        $DB->set_field('opendsa_activity_pages', 'timemodified', $timestamp);
+        $DB->set_field('opendsa_activity_answers', 'timecreated', $timestamp);
+        $DB->set_field('opendsa_activity_answers', 'timemodified', $timestamp);
+        $DB->set_field('opendsa_activity_attempts', 'timeseen', $timestamp);
 
         // Do backup and restore.
         $newcourseid = $this->backup_and_restore($course);
-        $newlesson = $DB->get_record('lesson', ['course' => $newcourseid]);
+        $newopendsa_activity = $DB->get_record('opendsa_activity', ['course' => $newcourseid]);
 
-        $this->assertFieldsNotRolledForward($lesson, $newlesson, ['timemodified']);
+        $this->assertFieldsNotRolledForward($opendsa_activity, $newopendsa_activity, ['timemodified']);
         $props = ['available', 'deadline'];
-        $this->assertFieldsRolledForward($lesson, $newlesson, $props);
+        $this->assertFieldsRolledForward($opendsa_activity, $newopendsa_activity, $props);
 
-        $newpages = $DB->get_records('lesson_pages', ['opendsa_activity_id' => $newlesson->id]);
-        $newanswers = $DB->get_records('lesson_answers', ['opendsa_activity_id' => $newlesson->id]);
-        $newgrade = $DB->get_record('lesson_grades', ['opendsa_activity_id' => $newlesson->id]);
-        $newoverride = $DB->get_record('lesson_overrides', ['opendsa_activity_id' => $newlesson->id]);
-        $newtimer = $DB->get_record('lesson_timer', ['opendsa_activity_id' => $newlesson->id]);
-        $newattempt = $DB->get_record('lesson_attempts', ['opendsa_activity_id' => $newlesson->id]);
+        $newpages = $DB->get_records('opendsa_activity_pages', ['opendsa_activity_id' => $newopendsa_activity->id]);
+        $newanswers = $DB->get_records('opendsa_activity_answers', ['opendsa_activity_id' => $newopendsa_activity->id]);
+        $newgrade = $DB->get_record('opendsa_activity_grades', ['opendsa_activity_id' => $newopendsa_activity->id]);
+        $newoverride = $DB->get_record('opendsa_activity_overrides', ['opendsa_activity_id' => $newopendsa_activity->id]);
+        $newtimer = $DB->get_record('opendsa_activity_timer', ['opendsa_activity_id' => $newopendsa_activity->id]);
+        $newattempt = $DB->get_record('opendsa_activity_attempts', ['opendsa_activity_id' => $newopendsa_activity->id]);
 
         // Page time checks.
         foreach ($newpages as $newpage) {
@@ -182,7 +182,7 @@ class mod_lesson_restore_date_testcase extends restore_date_testcase {
 
         // Lesson timer time checks.
         $this->assertEquals($timer->starttime, $newtimer->starttime);
-        $this->assertEquals($timer->lessontime, $newtimer->lessontime);
+        $this->assertEquals($timer->opendsa_activitytime, $newtimer->opendsa_activitytime);
 
         // Lesson attempt time check.
         $this->assertEquals($timestamp, $newattempt->timeseen);

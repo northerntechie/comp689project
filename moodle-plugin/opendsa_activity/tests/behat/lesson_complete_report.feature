@@ -1,5 +1,5 @@
-@mod @mod_lesson
-Feature: Teachers can review student progress on all lessons in a course by viewing the complete report
+@mod @mod_opendsa_activity
+Feature: Teachers can review student progress on all opendsa_activitys in a course by viewing the complete report
   As a Teacher
   I need to view the complete report for one of my students.
 
@@ -19,13 +19,13 @@ Feature: Teachers can review student progress on all lessons in a course by view
     And I am on "Course 1" course homepage with editing mode on
     And I add a "Lesson" to section "1"
     And I set the following fields to these values:
-      | Name | Test lesson name |
-      | Description | Test lesson description |
+      | Name | Test opendsa_activity name |
+      | Description | Test opendsa_activity description |
       | Re-takes allowed | Yes |
     And I press "Save and return to course"
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
 
-  Scenario: View student progress for lesson that was never attempted
+  Scenario: View student progress for opendsa_activity that was never attempted
     Given I follow "Add a content page"
     And I set the following fields to these values:
       | Page title | First page name |
@@ -50,9 +50,9 @@ Feature: Teachers can review student progress on all lessons in a course by view
     And I navigate to course participants
     And I follow "Student 1"
     And I follow "Complete report"
-    Then I should see "No attempts have been made on this lesson"
+    Then I should see "No attempts have been made on this opendsa_activity"
 
-  Scenario: View student progress for an incomplete lesson containing both content and question pages
+  Scenario: View student progress for an incomplete opendsa_activity containing both content and question pages
     Given I follow "Add a content page"
     And I set the following fields to these values:
       | Page title | First page name |
@@ -85,7 +85,7 @@ Feature: Teachers can review student progress on all lessons in a course by view
     And I log out
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
     And I should see "First page contents"
     And I press "Next page"
     And I log out
@@ -98,7 +98,7 @@ Feature: Teachers can review student progress on all lessons in a course by view
     And I should see "1" in the ".cell.c1" "css_element"
     And I should see "0" in the ".cell.c2" "css_element"
 
-  Scenario: View student progress for a lesson containing both content and question pages
+  Scenario: View student progress for a opendsa_activity containing both content and question pages
     Given I follow "Add a content page"
     And I set the following fields to these values:
       | Page title | First page name |
@@ -144,7 +144,7 @@ Feature: Teachers can review student progress on all lessons in a course by view
     And I log out
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
     And I should see "First page contents"
     And I press "Next page"
     And I should see "Second page contents"
@@ -159,7 +159,7 @@ Feature: Teachers can review student progress on all lessons in a course by view
       | True | 1 |
     And I press "Submit"
     And I press "Continue"
-    And I should see "Congratulations - end of lesson reached"
+    And I should see "Congratulations - end of opendsa_activity reached"
     And I log out
     Then I log in as "teacher1"
     And I am on "Course 1" course homepage
@@ -171,7 +171,7 @@ Feature: Teachers can review student progress on all lessons in a course by view
     And I should see "2" in the ".cell.c2" "css_element"
     And I should see "1" in the ".cell.c3" "css_element"
 
-  Scenario: View student attempts in a lesson containing only content pages
+  Scenario: View student attempts in a opendsa_activity containing only content pages
     Given I follow "Add a content page"
     And I set the following fields to these values:
       | Page title | First page name |
@@ -185,17 +185,17 @@ Feature: Teachers can review student progress on all lessons in a course by view
       | Page contents | Second page contents |
       | id_answer_editor_0 | Previous page |
       | id_jumpto_0 | Previous page |
-      | id_answer_editor_1 | End of lesson |
-      | id_jumpto_1 | End of lesson |
+      | id_answer_editor_1 | End of opendsa_activity |
+      | id_jumpto_1 | End of opendsa_activity |
     And I press "Save page"
     And I log out
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
     And I should see "First page contents"
     And I press "Next page"
     And I should see "Second page contents"
-    And I press "End of lesson"
+    And I press "End of opendsa_activity"
     And I log out
     Then I log in as "teacher1"
     And I am on "Course 1" course homepage

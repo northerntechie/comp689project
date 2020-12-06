@@ -15,27 +15,27 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The mod_lesson group override updated event.
+ * The mod_opendsa_activity group override updated event.
  *
- * @package    mod_lesson
+ * @package    mod_opendsa_activity
  * @copyright  2015 Jean-Michel Vedrine
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-namespace mod_lesson\event;
+namespace mod_opendsa_activity\event;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * The mod_lesson group override updated event class.
+ * The mod_opendsa_activity group override updated event class.
  *
  * @property-read array $other {
  *      Extra information about event.
  *
- *      - int opendsa_activity_id: the id of the lesson.
+ *      - int opendsa_activity_id: the id of the opendsa_activity.
  *      - int groupid: the id of the group.
  * }
  *
- * @package    mod_lesson
+ * @package    mod_opendsa_activity
  * @since      Moodle 2.9
  * @copyright  2015 Jean-Michel Vedrine
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -46,7 +46,7 @@ class group_override_updated extends \core\event\base {
      * Init method.
      */
     protected function init() {
-        $this->data['objecttable'] = 'lesson_overrides';
+        $this->data['objecttable'] = 'opendsa_activity_overrides';
         $this->data['crud'] = 'u';
         $this->data['edulevel'] = self::LEVEL_TEACHING;
     }
@@ -57,7 +57,7 @@ class group_override_updated extends \core\event\base {
      * @return string
      */
     public static function get_name() {
-        return get_string('eventoverrideupdated', 'mod_lesson');
+        return get_string('eventoverrideupdated', 'mod_opendsa_activity');
     }
 
     /**
@@ -66,7 +66,7 @@ class group_override_updated extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        return "The user with id '$this->userid' updated the override with id '$this->objectid' for the lesson with " .
+        return "The user with id '$this->userid' updated the override with id '$this->objectid' for the opendsa_activity with " .
             "course module id '$this->contextinstanceid' for the group with id '{$this->other['groupid']}'.";
     }
 
@@ -76,7 +76,7 @@ class group_override_updated extends \core\event\base {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url('/mod/lesson/overrideedit.php', array('id' => $this->objectid));
+        return new \moodle_url('/mod/opendsa_activity/overrideedit.php', array('id' => $this->objectid));
     }
 
     /**
@@ -98,12 +98,12 @@ class group_override_updated extends \core\event\base {
     }
 
     public static function get_objectid_mapping() {
-        return array('db' => 'lesson_overrides', 'restore' => 'lesson_override');
+        return array('db' => 'opendsa_activity_overrides', 'restore' => 'opendsa_activity_override');
     }
 
     public static function get_other_mapping() {
         $othermapped = array();
-        $othermapped['opendsa_activity_id'] = array('db' => 'lesson', 'restore' => 'lesson');
+        $othermapped['opendsa_activity_id'] = array('db' => 'opendsa_activity', 'restore' => 'opendsa_activity');
         $othermapped['groupid'] = array('db' => 'groups', 'restore' => 'group');
 
         return $othermapped;

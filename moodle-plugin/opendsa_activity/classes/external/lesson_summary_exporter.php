@@ -15,13 +15,13 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Class for exporting partial lesson data.
+ * Class for exporting partial opendsa_activity data.
  *
- * @package    mod_lesson
+ * @package    mod_opendsa_activity
  * @copyright  2017 Juan Leyva <juan@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-namespace mod_lesson\external;
+namespace mod_opendsa_activity\external;
 defined('MOODLE_INTERNAL') || die();
 
 use core\external\exporter;
@@ -30,12 +30,12 @@ use external_files;
 use external_util;
 
 /**
- * Class for exporting partial lesson data (some fields are only viewable by admins).
+ * Class for exporting partial opendsa_activity data (some fields are only viewable by admins).
  *
  * @copyright  2017 Juan Leyva <juan@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class lesson_summary_exporter extends exporter {
+class opendsa_activity_summary_exporter extends exporter {
 
     protected static function define_properties() {
 
@@ -46,7 +46,7 @@ class lesson_summary_exporter extends exporter {
             ),
             'course' => array(
                 'type' => PARAM_INT,
-                'description' => 'Foreign key reference to the course this lesson is part of.'
+                'description' => 'Foreign key reference to the course this opendsa_activity is part of.'
             ),
             'coursemodule' => array(
                 'type' => PARAM_INT,
@@ -68,7 +68,7 @@ class lesson_summary_exporter extends exporter {
             ),
             'practice' => array(
                 'type' => PARAM_BOOL,
-                'description' => 'Practice lesson?',
+                'description' => 'Practice opendsa_activity?',
                 'optional' => true,
             ),
             'modattempts' => array(
@@ -78,7 +78,7 @@ class lesson_summary_exporter extends exporter {
             ),
             'usepassword' => array(
                 'type' => PARAM_BOOL,
-                'description' => 'Password protected lesson?',
+                'description' => 'Password protected opendsa_activity?',
                 'optional' => true,
             ),
             'password' => array(
@@ -88,12 +88,12 @@ class lesson_summary_exporter extends exporter {
             ),
             'dependency' => array(
                 'type' => PARAM_INT,
-                'description' => 'Dependent on (another lesson id)',
+                'description' => 'Dependent on (another opendsa_activity id)',
                 'optional' => true,
             ),
             'conditions' => array(
                 'type' => PARAM_RAW,
-                'description' => 'Conditions to enable the lesson',
+                'description' => 'Conditions to enable the opendsa_activity',
                 'optional' => true,
             ),
             'grade' => array(
@@ -163,7 +163,7 @@ class lesson_summary_exporter extends exporter {
             ),
             'activitylink' => array(
                 'type' => PARAM_INT,
-                'description' => 'Id of the next activity to be linked once the lesson is completed',
+                'description' => 'Id of the next activity to be linked once the opendsa_activity is completed',
                 'optional' => true,
             ),
             'mediafile' => array(
@@ -188,7 +188,7 @@ class lesson_summary_exporter extends exporter {
             ),
             'slideshow' => array(
                 'type' => PARAM_BOOL,
-                'description' => 'Display lesson as slideshow',
+                'description' => 'Display opendsa_activity as slideshow',
                 'optional' => true,
             ),
             'width' => array(
@@ -248,7 +248,7 @@ class lesson_summary_exporter extends exporter {
              ),
             'allowofflineattempts' => array(
                 'type' => PARAM_BOOL,
-                'description' => 'Whether to allow the lesson to be attempted offline in the mobile app',
+                'description' => 'Whether to allow the opendsa_activity to be attempted offline in the mobile app',
             ),
         );
     }
@@ -285,8 +285,8 @@ class lesson_summary_exporter extends exporter {
         );
 
         if (isset($this->data->intro)) {
-            $values['introfiles'] = external_util::get_area_files($context->id, 'mod_lesson', 'intro', false, false);
-            $values['mediafiles'] = external_util::get_area_files($context->id, 'mod_lesson', 'mediafile', 0);
+            $values['introfiles'] = external_util::get_area_files($context->id, 'mod_opendsa_activity', 'intro', false, false);
+            $values['mediafiles'] = external_util::get_area_files($context->id, 'mod_opendsa_activity', 'mediafile', 0);
         }
 
         return $values;
@@ -299,7 +299,7 @@ class lesson_summary_exporter extends exporter {
      */
     protected function get_format_parameters_for_intro() {
         return [
-            'component' => 'mod_lesson',
+            'component' => 'mod_opendsa_activity',
             'filearea' => 'intro',
             'options' => array('noclean' => true),
         ];

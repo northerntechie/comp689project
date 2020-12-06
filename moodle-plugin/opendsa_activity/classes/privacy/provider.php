@@ -17,13 +17,13 @@
 /**
  * Data provider.
  *
- * @package    mod_lesson
+ * @package    mod_opendsa_activity
  * @copyright  2018 Frédéric Massart
  * @author     Frédéric Massart <fred@branchup.tech>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_lesson\privacy;
+namespace mod_opendsa_activity\privacy;
 defined('MOODLE_INTERNAL') || die();
 
 use context;
@@ -38,15 +38,15 @@ use core_privacy\local\request\transform;
 use core_privacy\local\request\userlist;
 use core_privacy\local\request\writer;
 
-require_once($CFG->dirroot . '/mod/lesson/locallib.php');
-require_once($CFG->dirroot . '/mod/lesson/pagetypes/essay.php');
-require_once($CFG->dirroot . '/mod/lesson/pagetypes/matching.php');
-require_once($CFG->dirroot . '/mod/lesson/pagetypes/multichoice.php');
+require_once($CFG->dirroot . '/mod/opendsa_activity/locallib.php');
+require_once($CFG->dirroot . '/mod/opendsa_activity/pagetypes/essay.php');
+require_once($CFG->dirroot . '/mod/opendsa_activity/pagetypes/matching.php');
+require_once($CFG->dirroot . '/mod/opendsa_activity/pagetypes/multichoice.php');
 
 /**
  * Data provider class.
  *
- * @package    mod_lesson
+ * @package    mod_opendsa_activity
  * @copyright  2018 Frédéric Massart
  * @author     Frédéric Massart <fred@branchup.tech>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -64,7 +64,7 @@ class provider implements
      * @return collection A listing of user data stored through this system.
      */
     public static function get_metadata(collection $collection) : collection {
-        $collection->add_database_table('lesson_attempts', [
+        $collection->add_database_table('opendsa_activity_attempts', [
             'userid' => 'privacy:metadata:attempts:userid',
             'pageid' => 'privacy:metadata:attempts:pageid',
             'answerid' => 'privacy:metadata:attempts:answerid',
@@ -74,22 +74,22 @@ class provider implements
             'timeseen' => 'privacy:metadata:attempts:timeseen',
         ], 'privacy:metadata:attempts');
 
-        $collection->add_database_table('lesson_grades', [
+        $collection->add_database_table('opendsa_activity_grades', [
             'userid' => 'privacy:metadata:grades:userid',
             'grade' => 'privacy:metadata:grades:grade',
             'completed' => 'privacy:metadata:grades:completed',
             // The column late is not used.
         ], 'privacy:metadata:grades');
 
-        $collection->add_database_table('lesson_timer', [
+        $collection->add_database_table('opendsa_activity_timer', [
             'userid' => 'privacy:metadata:timer:userid',
             'starttime' => 'privacy:metadata:timer:starttime',
-            'lessontime' => 'privacy:metadata:timer:lessontime',
+            'opendsa_activitytime' => 'privacy:metadata:timer:opendsa_activitytime',
             'completed' => 'privacy:metadata:timer:completed',
             'timemodifiedoffline' => 'privacy:metadata:timer:timemodifiedoffline',
         ], 'privacy:metadata:timer');
 
-        $collection->add_database_table('lesson_branch', [
+        $collection->add_database_table('opendsa_activity_branch', [
             'userid' => 'privacy:metadata:branch:userid',
             'pageid' => 'privacy:metadata:branch:pageid',
             'retry' => 'privacy:metadata:branch:retry',
@@ -98,7 +98,7 @@ class provider implements
             'nextpageid' => 'privacy:metadata:branch:nextpageid',
         ], 'privacy:metadata:branch');
 
-        $collection->add_database_table('lesson_overrides', [
+        $collection->add_database_table('opendsa_activity_overrides', [
             'userid' => 'privacy:metadata:overrides:userid',
             'available' => 'privacy:metadata:overrides:available',
             'deadline' => 'privacy:metadata:overrides:deadline',
@@ -109,7 +109,7 @@ class provider implements
             'password' => 'privacy:metadata:overrides:password',
         ], 'privacy:metadata:overrides');
 
-        $collection->add_user_preference('lesson_view', 'privacy:metadata:userpref:lessonview');
+        $collection->add_user_preference('opendsa_activity_view', 'privacy:metadata:userpref:opendsa_activityview');
 
         return $collection;
     }
@@ -125,28 +125,28 @@ class provider implements
 
         $sql = "
             SELECT DISTINCT ctx.id
-              FROM {lesson} l
+              FROM {opendsa_activity} l
               JOIN {modules} m
-                ON m.name = :lesson
+                ON m.name = :opendsa_activity
               JOIN {course_modules} cm
                 ON cm.instance = l.id
                AND cm.module = m.id
               JOIN {context} ctx
                 ON ctx.instanceid = cm.id
                AND ctx.contextlevel = :modulelevel
-         LEFT JOIN {lesson_attempts} la
+         LEFT JOIN {opendsa_activity_attempts} la
                 ON la.opendsa_activity_id = l.id
                AND la.userid = :userid1
-         LEFT JOIN {lesson_branch} lb
+         LEFT JOIN {opendsa_activity_branch} lb
                 ON lb.opendsa_activity_id = l.id
                AND lb.userid = :userid2
-         LEFT JOIN {lesson_grades} lg
+         LEFT JOIN {opendsa_activity_grades} lg
                 ON lg.opendsa_activity_id = l.id
                AND lg.userid = :userid3
-         LEFT JOIN {lesson_overrides} lo
+         LEFT JOIN {opendsa_activity_overrides} lo
                 ON lo.opendsa_activity_id = l.id
                AND lo.userid = :userid4
-         LEFT JOIN {lesson_timer} lt
+         LEFT JOIN {opendsa_activity_timer} lt
                 ON lt.opendsa_activity_id = l.id
                AND lt.userid = :userid5
              WHERE la.id IS NOT NULL
@@ -156,7 +156,7 @@ class provider implements
                 OR lt.id IS NOT NULL";
 
         $params = [
-            'lesson' => 'lesson',
+            'opendsa_activity' => 'opendsa_activity',
             'modulelevel' => CONTEXT_MODULE,
             'userid1' => $userid,
             'userid2' => $userid,
@@ -183,26 +183,26 @@ class provider implements
         }
 
         $params = [
-            'lesson' => 'lesson',
+            'opendsa_activity' => 'opendsa_activity',
             'modulelevel' => CONTEXT_MODULE,
             'contextid' => $context->id,
         ];
 
-        // Mapping of lesson tables which may contain user data.
+        // Mapping of opendsa_activity tables which may contain user data.
         $joins = [
-            'lesson_attempts',
-            'lesson_branch',
-            'lesson_grades',
-            'lesson_overrides',
-            'lesson_timer',
+            'opendsa_activity_attempts',
+            'opendsa_activity_branch',
+            'opendsa_activity_grades',
+            'opendsa_activity_overrides',
+            'opendsa_activity_timer',
         ];
 
         foreach ($joins as $join) {
             $sql = "
                 SELECT lx.userid
-                  FROM {lesson} l
+                  FROM {opendsa_activity} l
                   JOIN {modules} m
-                    ON m.name = :lesson
+                    ON m.name = :opendsa_activity
                   JOIN {course_modules} cm
                     ON cm.instance = l.id
                    AND cm.module = m.id
@@ -237,7 +237,7 @@ class provider implements
             return;
         }
 
-        // If the context export was requested, then let's at least describe the lesson.
+        // If the context export was requested, then let's at least describe the opendsa_activity.
         foreach ($cmids as $cmid) {
             $context = context_module::instance($cmid);
             $contextdata = helper::get_context_data($context, $user);
@@ -245,18 +245,18 @@ class provider implements
             writer::with_context($context)->export_data([], $contextdata);
         }
 
-        // Find the lesson IDs.
-        $opendsa_activity_idstocmids = static::get_lesson_ids_to_cmids_from_cmids($cmids);
+        // Find the opendsa_activity IDs.
+        $opendsa_activity_idstocmids = static::get_opendsa_activity_ids_to_cmids_from_cmids($cmids);
 
         // Prepare the common SQL fragments.
-        list($inlessonsql, $inlessonparams) = $DB->get_in_or_equal(array_keys($opendsa_activity_idstocmids), SQL_PARAMS_NAMED);
-        $sqluserlesson = "userid = :userid AND opendsa_activity_id $inlessonsql";
-        $paramsuserlesson = array_merge($inlessonparams, ['userid' => $userid]);
+        list($inopendsa_activitysql, $inopendsa_activityparams) = $DB->get_in_or_equal(array_keys($opendsa_activity_idstocmids), SQL_PARAMS_NAMED);
+        $sqluseropendsa_activity = "userid = :userid AND opendsa_activity_id $inopendsa_activitysql";
+        $paramsuseropendsa_activity = array_merge($inopendsa_activityparams, ['userid' => $userid]);
 
         // Export the overrides.
-        $recordset = $DB->get_recordset_select('lesson_overrides', $sqluserlesson, $paramsuserlesson);
+        $recordset = $DB->get_recordset_select('opendsa_activity_overrides', $sqluseropendsa_activity, $paramsuseropendsa_activity);
         static::recordset_loop_and_export($recordset, 'opendsa_activity_id', null, function($carry, $record) {
-            // We know that there is only one row per lesson, so no need to use $carry.
+            // We know that there is only one row per opendsa_activity, so no need to use $carry.
             return (object) [
                 'available' => $record->available !== null ? transform::datetime($record->available) : null,
                 'deadline' => $record->deadline !== null ? transform::datetime($record->deadline) : null,
@@ -272,7 +272,7 @@ class provider implements
         });
 
         // Export the grades.
-        $recordset = $DB->get_recordset_select('lesson_grades', $sqluserlesson, $paramsuserlesson, 'opendsa_activity_id, completed');
+        $recordset = $DB->get_recordset_select('opendsa_activity_grades', $sqluseropendsa_activity, $paramsuseropendsa_activity, 'opendsa_activity_id, completed');
         static::recordset_loop_and_export($recordset, 'opendsa_activity_id', [], function($carry, $record) {
             $carry[] = (object) [
                 'grade' => $record->grade,
@@ -285,11 +285,11 @@ class provider implements
         });
 
         // Export the timers.
-        $recordset = $DB->get_recordset_select('lesson_timer', $sqluserlesson, $paramsuserlesson, 'opendsa_activity_id, starttime');
+        $recordset = $DB->get_recordset_select('opendsa_activity_timer', $sqluseropendsa_activity, $paramsuseropendsa_activity, 'opendsa_activity_id, starttime');
         static::recordset_loop_and_export($recordset, 'opendsa_activity_id', [], function($carry, $record) {
             $carry[] = (object) [
                 'starttime' => transform::datetime($record->starttime),
-                'lastactivity' => transform::datetime($record->lessontime),
+                'lastactivity' => transform::datetime($record->opendsa_activitytime),
                 'completed' => transform::yesno($record->completed),
                 'timemodifiedoffline' => $record->timemodifiedoffline ? transform::datetime($record->timemodifiedoffline) : null,
             ];
@@ -324,19 +324,19 @@ class provider implements
                    lpb.id AS nextpage_id,
                    lpb.title AS nextpage_title
 
-              FROM {lesson_pages} lp
-         LEFT JOIN {lesson_attempts} la
+              FROM {opendsa_activity_pages} lp
+         LEFT JOIN {opendsa_activity_attempts} la
                 ON la.pageid = lp.id
                AND la.userid = :userid1
-         LEFT JOIN {lesson_branch} lb
+         LEFT JOIN {opendsa_activity_branch} lb
                 ON lb.pageid = lp.id
                AND lb.userid = :userid2
-         LEFT JOIN {lesson_pages} lpb
+         LEFT JOIN {opendsa_activity_pages} lpb
                 ON lpb.id = lb.nextpageid
-             WHERE lp.opendsa_activity_id $inlessonsql
+             WHERE lp.opendsa_activity_id $inopendsa_activitysql
                AND (la.id IS NOT NULL OR lb.id IS NOT NULL)
           ORDER BY lp.opendsa_activity_id, lp.id, la.retry, lb.retry, la.id, lb.id";
-        $params = array_merge($inlessonparams, ['userid1' => $userid, 'userid2' => $userid]);
+        $params = array_merge($inopendsa_activityparams, ['userid1' => $userid, 'userid2' => $userid]);
 
         $recordset = $DB->get_recordset_sql($sql, $params);
         static::recordset_loop_and_export($recordset, 'opendsa_activity_id', [], function($carry, $record) use ($opendsa_activity_idstocmids) {
@@ -352,12 +352,12 @@ class provider implements
                 ];
             }
 
-            $pagefilespath = [get_string('privacy:path:pages', 'mod_lesson'), $record->page_id];
-            writer::with_context($context)->export_area_files($pagefilespath, 'mod_lesson', 'page_contents', $record->page_id);
+            $pagefilespath = [get_string('privacy:path:pages', 'mod_opendsa_activity'), $record->page_id];
+            writer::with_context($context)->export_area_files($pagefilespath, 'mod_opendsa_activity', 'page_contents', $record->page_id);
             $pagecontents = format_text(
                 writer::with_context($context)->rewrite_pluginfile_urls(
                     $pagefilespath,
-                    'mod_lesson',
+                    'mod_opendsa_activity',
                     'page_contents',
                     $record->page_id,
                     $record->page_contents
@@ -380,7 +380,7 @@ class provider implements
                 if (!empty($record->nextpage_id)) {
                     $wentto = $record->nextpage_title . " (id: {$record->nextpage_id})";
                 } else {
-                    $wentto = get_string('endoflesson', 'mod_lesson');
+                    $wentto = get_string('endofopendsa_activity', 'mod_opendsa_activity');
                 }
                 $carry[$take]->jumps[] = array_merge($pagebase, [
                     'went_to' => $wentto,
@@ -404,20 +404,20 @@ class provider implements
      * @param int $userid The userid of the user whose data is to be exported.
      */
     public static function export_user_preferences(int $userid) {
-        $lessonview = get_user_preferences('lesson_view', null, $userid);
-        if ($lessonview !== null) {
-            $value = $lessonview;
+        $opendsa_activityview = get_user_preferences('opendsa_activity_view', null, $userid);
+        if ($opendsa_activityview !== null) {
+            $value = $opendsa_activityview;
 
             // The code seems to indicate that there also is the option 'simple', but it's not
             // described nor accessible from anywhere so we won't describe it more than being 'simple'.
-            if ($lessonview == 'full') {
-                $value = get_string('full', 'mod_lesson');
-            } else if ($lessonview == 'collapsed') {
-                $value = get_string('collapsed', 'mod_lesson');
+            if ($opendsa_activityview == 'full') {
+                $value = get_string('full', 'mod_opendsa_activity');
+            } else if ($opendsa_activityview == 'collapsed') {
+                $value = get_string('collapsed', 'mod_opendsa_activity');
             }
 
-            writer::export_user_preference('mod_lesson', 'lesson_view', $lessonview,
-                get_string('privacy:metadata:userpref:lessonview', 'mod_lesson'));
+            writer::export_user_preference('mod_opendsa_activity', 'opendsa_activity_view', $opendsa_activityview,
+                get_string('privacy:metadata:userpref:opendsa_activityview', 'mod_opendsa_activity'));
         }
     }
 
@@ -433,19 +433,19 @@ class provider implements
             return;
         }
 
-        if (!$opendsa_activity_id = static::get_lesson_id_from_context($context)) {
+        if (!$opendsa_activity_id = static::get_opendsa_activity_id_from_context($context)) {
             return;
         }
 
-        $DB->delete_records('lesson_attempts', ['opendsa_activity_id' => $opendsa_activity_id]);
-        $DB->delete_records('lesson_branch', ['opendsa_activity_id' => $opendsa_activity_id]);
-        $DB->delete_records('lesson_grades', ['opendsa_activity_id' => $opendsa_activity_id]);
-        $DB->delete_records('lesson_timer', ['opendsa_activity_id' => $opendsa_activity_id]);
-        $DB->delete_records_select('lesson_overrides', 'opendsa_activity_id = :id AND userid IS NOT NULL', ['id' => $opendsa_activity_id]);
+        $DB->delete_records('opendsa_activity_attempts', ['opendsa_activity_id' => $opendsa_activity_id]);
+        $DB->delete_records('opendsa_activity_branch', ['opendsa_activity_id' => $opendsa_activity_id]);
+        $DB->delete_records('opendsa_activity_grades', ['opendsa_activity_id' => $opendsa_activity_id]);
+        $DB->delete_records('opendsa_activity_timer', ['opendsa_activity_id' => $opendsa_activity_id]);
+        $DB->delete_records_select('opendsa_activity_overrides', 'opendsa_activity_id = :id AND userid IS NOT NULL', ['id' => $opendsa_activity_id]);
 
         $fs = get_file_storage();
-        $fs->delete_area_files($context->id, 'mod_lesson', 'essay_responses');
-        $fs->delete_area_files($context->id, 'mod_lesson', 'essay_answers');
+        $fs->delete_area_files($context->id, 'mod_opendsa_activity', 'essay_responses');
+        $fs->delete_area_files($context->id, 'mod_opendsa_activity', 'essay_answers');
     }
 
     /**
@@ -467,8 +467,8 @@ class provider implements
             return;
         }
 
-        // Find the lesson IDs.
-        $opendsa_activity_idstocmids = static::get_lesson_ids_to_cmids_from_cmids($cmids);
+        // Find the opendsa_activity IDs.
+        $opendsa_activity_idstocmids = static::get_opendsa_activity_ids_to_cmids_from_cmids($cmids);
         $opendsa_activity_ids = array_keys($opendsa_activity_idstocmids);
         if (empty($opendsa_activity_ids)) {
             return;
@@ -481,21 +481,21 @@ class provider implements
 
         // Delete the attempt files.
         $fs = get_file_storage();
-        $recordset = $DB->get_recordset_select('lesson_attempts', $sql, $params, '', 'id, opendsa_activity_id');
+        $recordset = $DB->get_recordset_select('opendsa_activity_attempts', $sql, $params, '', 'id, opendsa_activity_id');
         foreach ($recordset as $record) {
             $cmid = $opendsa_activity_idstocmids[$record->opendsa_activity_id];
             $context = context_module::instance($cmid);
-            $fs->delete_area_files($context->id, 'mod_lesson', 'essay_responses', $record->id);
-            $fs->delete_area_files($context->id, 'mod_lesson', 'essay_answers', $record->id);
+            $fs->delete_area_files($context->id, 'mod_opendsa_activity', 'essay_responses', $record->id);
+            $fs->delete_area_files($context->id, 'mod_opendsa_activity', 'essay_answers', $record->id);
         }
         $recordset->close();
 
         // Delete all the things.
-        $DB->delete_records_select('lesson_attempts', $sql, $params);
-        $DB->delete_records_select('lesson_branch', $sql, $params);
-        $DB->delete_records_select('lesson_grades', $sql, $params);
-        $DB->delete_records_select('lesson_timer', $sql, $params);
-        $DB->delete_records_select('lesson_overrides', $sql, $params);
+        $DB->delete_records_select('opendsa_activity_attempts', $sql, $params);
+        $DB->delete_records_select('opendsa_activity_branch', $sql, $params);
+        $DB->delete_records_select('opendsa_activity_grades', $sql, $params);
+        $DB->delete_records_select('opendsa_activity_timer', $sql, $params);
+        $DB->delete_records_select('opendsa_activity_overrides', $sql, $params);
     }
 
     /**
@@ -507,7 +507,7 @@ class provider implements
         global $DB;
 
         $context = $userlist->get_context();
-        $opendsa_activity_id = static::get_lesson_id_from_context($context);
+        $opendsa_activity_id = static::get_opendsa_activity_id_from_context($context);
         $userids = $userlist->get_userids();
 
         if (empty($opendsa_activity_id)) {
@@ -521,19 +521,19 @@ class provider implements
 
         // Delete the attempt files.
         $fs = get_file_storage();
-        $recordset = $DB->get_recordset_select('lesson_attempts', $sql, $params, '', 'id, opendsa_activity_id');
+        $recordset = $DB->get_recordset_select('opendsa_activity_attempts', $sql, $params, '', 'id, opendsa_activity_id');
         foreach ($recordset as $record) {
-            $fs->delete_area_files($context->id, 'mod_lesson', 'essay_responses', $record->id);
-            $fs->delete_area_files($context->id, 'mod_lesson', 'essay_answers', $record->id);
+            $fs->delete_area_files($context->id, 'mod_opendsa_activity', 'essay_responses', $record->id);
+            $fs->delete_area_files($context->id, 'mod_opendsa_activity', 'essay_answers', $record->id);
         }
         $recordset->close();
 
         // Delete all the things.
-        $DB->delete_records_select('lesson_attempts', $sql, $params);
-        $DB->delete_records_select('lesson_branch', $sql, $params);
-        $DB->delete_records_select('lesson_grades', $sql, $params);
-        $DB->delete_records_select('lesson_timer', $sql, $params);
-        $DB->delete_records_select('lesson_overrides', $sql, $params);
+        $DB->delete_records_select('opendsa_activity_attempts', $sql, $params);
+        $DB->delete_records_select('opendsa_activity_branch', $sql, $params);
+        $DB->delete_records_select('opendsa_activity_grades', $sql, $params);
+        $DB->delete_records_select('opendsa_activity_timer', $sql, $params);
+        $DB->delete_records_select('opendsa_activity_overrides', $sql, $params);
     }
 
     /**
@@ -542,30 +542,30 @@ class provider implements
      * @param context_module $context The module context.
      * @return int
      */
-    protected static function get_lesson_id_from_context(context_module $context) {
-        $cm = get_coursemodule_from_id('lesson', $context->instanceid);
+    protected static function get_opendsa_activity_id_from_context(context_module $context) {
+        $cm = get_coursemodule_from_id('opendsa_activity', $context->instanceid);
         return $cm ? (int) $cm->instance : 0;
     }
 
     /**
-     * Return a dict of lesson IDs mapped to their course module ID.
+     * Return a dict of opendsa_activity IDs mapped to their course module ID.
      *
      * @param array $cmids The course module IDs.
      * @return array In the form of [$opendsa_activity_id => $cmid].
      */
-    protected static function get_lesson_ids_to_cmids_from_cmids(array $cmids) {
+    protected static function get_opendsa_activity_ids_to_cmids_from_cmids(array $cmids) {
         global $DB;
         list($insql, $inparams) = $DB->get_in_or_equal($cmids, SQL_PARAMS_NAMED);
         $sql = "
             SELECT l.id, cm.id AS cmid
-              FROM {lesson} l
+              FROM {opendsa_activity} l
               JOIN {modules} m
-                ON m.name = :lesson
+                ON m.name = :opendsa_activity
               JOIN {course_modules} cm
                 ON cm.instance = l.id
                AND cm.module = m.id
              WHERE cm.id $insql";
-        $params = array_merge($inparams, ['lesson' => 'lesson']);
+        $params = array_merge($inparams, ['opendsa_activity' => 'opendsa_activity']);
         return $DB->get_records_sql_menu($sql, $params);
     }
 
@@ -616,14 +616,14 @@ class provider implements
         $responsefilesfolder = null;
 
         if ($answer !== null) {
-            if ($data->page_qtype == LESSON_PAGE_ESSAY) {
+            if ($data->page_qtype == OPENDSA_ACTIVITY_PAGE_ESSAY) {
                 // Essay questions serialise data in the answer field.
-                $info = \lesson_page_type_essay::extract_useranswer($answer);
-                $answerfilespath = [get_string('privacy:path:essayanswers', 'mod_lesson'), $data->attempt_id];
+                $info = \opendsa_activity_page_type_essay::extract_useranswer($answer);
+                $answerfilespath = [get_string('privacy:path:essayanswers', 'mod_opendsa_activity'), $data->attempt_id];
                 $answer = format_text(
                     writer::with_context($context)->rewrite_pluginfile_urls(
                         $answerfilespath,
-                        'mod_lesson',
+                        'mod_opendsa_activity',
                         'essay_answers',
                         $data->attempt_id,
                         $info->answer
@@ -631,19 +631,19 @@ class provider implements
                     $info->answerformat,
                     $options
                 );
-                writer::with_context($context)->export_area_files($answerfilespath, 'mod_lesson',
+                writer::with_context($context)->export_area_files($answerfilespath, 'mod_opendsa_activity',
                     'essay_answers', $data->page_id);
 
                 if ($info->response !== null) {
                     // We export the files in a subfolder to avoid conflicting files, and tell the user
                     // where those files were exported. That is because we are not using a subfolder for
                     // every single essay response.
-                    $responsefilespath = [get_string('privacy:path:essayresponses', 'mod_lesson'), $data->attempt_id];
+                    $responsefilespath = [get_string('privacy:path:essayresponses', 'mod_opendsa_activity'), $data->attempt_id];
                     $responsefilesfolder = implode('/', $responsefilespath);
                     $response = format_text(
                         writer::with_context($context)->rewrite_pluginfile_urls(
                             $responsefilespath,
-                            'mod_lesson',
+                            'mod_opendsa_activity',
                             'essay_responses',
                             $data->attempt_id,
                             $info->response
@@ -651,24 +651,24 @@ class provider implements
                         $info->responseformat,
                         $options
                     );
-                    writer::with_context($context)->export_area_files($responsefilespath, 'mod_lesson',
+                    writer::with_context($context)->export_area_files($responsefilespath, 'mod_opendsa_activity',
                         'essay_responses', $data->page_id);
 
                 }
 
-            } else if ($data->page_qtype == LESSON_PAGE_MULTICHOICE && $data->page_qoption) {
+            } else if ($data->page_qtype == OPENDSA_ACTIVITY_PAGE_MULTICHOICE && $data->page_qoption) {
                 // Multiple choice quesitons with multiple answers encode the answers.
                 list($insql, $inparams) = $DB->get_in_or_equal(explode(',', $answer), SQL_PARAMS_NAMED);
                 $orderby = 'id, ' . $DB->sql_order_by_text('answer') . ', answerformat';
-                $records = $DB->get_records_select('lesson_answers', "id $insql", $inparams, $orderby);
+                $records = $DB->get_records_select('opendsa_activity_answers', "id $insql", $inparams, $orderby);
                 $answer = array_values(array_map(function($record) use ($options) {
                     return format_text($record->answer, $record->answerformat, $options);
                 }, empty($records) ? [] : $records));
 
-            } else if ($data->page_qtype == LESSON_PAGE_MATCHING) {
+            } else if ($data->page_qtype == OPENDSA_ACTIVITY_PAGE_MATCHING) {
                 // Matching questions need sorting.
                 $chosen = explode(',', $answer);
-                $answers = $DB->get_records_select('lesson_answers', 'pageid = :pageid', ['pageid' => $data->page_id],
+                $answers = $DB->get_records_select('opendsa_activity_answers', 'pageid = :pageid', ['pageid' => $data->page_id],
                     'id', 'id, answer, answerformat', 2); // The two first entries are not options.
                 $i = -1;
                 $answer = array_values(array_map(function($record) use (&$i, $chosen, $options) {

@@ -15,9 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Settings form for overrides in the lesson module.
+ * Settings form for overrides in the opendsa_activity module.
  *
- * @package    mod_lesson
+ * @package    mod_opendsa_activity
  * @copyright  2015 Jean-Michel Vedrine
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -26,7 +26,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir . '/formslib.php');
-require_once($CFG->dirroot . '/mod/lesson/mod_form.php');
+require_once($CFG->dirroot . '/mod/opendsa_activity/mod_form.php');
 
 
 /**
@@ -35,15 +35,15 @@ require_once($CFG->dirroot . '/mod/lesson/mod_form.php');
  * @copyright  2015 Jean-Michel Vedrine
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class lesson_override_form extends moodleform {
+class opendsa_activity_override_form extends moodleform {
 
     /** @var object course module object. */
     protected $cm;
 
-    /** @var object the lesson settings object. */
-    protected $lesson;
+    /** @var object the opendsa_activity settings object. */
+    protected $opendsa_activity;
 
-    /** @var context the lesson context. */
+    /** @var context the opendsa_activity context. */
     protected $context;
 
     /** @var bool editing group override (true) or user override (false). */
@@ -59,15 +59,15 @@ class lesson_override_form extends moodleform {
      * Constructor.
      * @param moodle_url $submiturl the form action URL.
      * @param object $cm course module object.
-     * @param object $lesson the lesson settings object.
-     * @param object $context the lesson context.
+     * @param object $opendsa_activity the opendsa_activity settings object.
+     * @param object $context the opendsa_activity context.
      * @param bool $groupmode editing group override (true) or user override (false).
      * @param object $override the override being edited, if it already exists.
      */
-    public function __construct($submiturl, $cm, $lesson, $context, $groupmode, $override) {
+    public function __construct($submiturl, $cm, $opendsa_activity, $context, $groupmode, $override) {
 
         $this->cm = $cm;
-        $this->lesson = $lesson;
+        $this->opendsa_activity = $opendsa_activity;
         $this->context = $context;
         $this->groupmode = $groupmode;
         $this->groupid = empty($override->groupid) ? 0 : $override->groupid;
@@ -86,10 +86,10 @@ class lesson_override_form extends moodleform {
         $cm = $this->cm;
         $mform = $this->_form;
 
-        $mform->addElement('header', 'override', get_string('override', 'lesson'));
+        $mform->addElement('header', 'override', get_string('override', 'opendsa_activity'));
 
-        $lessongroupmode = groups_get_activity_groupmode($cm);
-        $accessallgroups = ($lessongroupmode == NOGROUPS) || has_capability('moodle/site:accessallgroups', $this->context);
+        $opendsa_activitygroupmode = groups_get_activity_groupmode($cm);
+        $accessallgroups = ($opendsa_activitygroupmode == NOGROUPS) || has_capability('moodle/site:accessallgroups', $this->context);
 
         if ($this->groupmode) {
             // Group override.
@@ -98,7 +98,7 @@ class lesson_override_form extends moodleform {
                 $groupchoices = array();
                 $groupchoices[$this->groupid] = groups_get_group_name($this->groupid);
                 $mform->addElement('select', 'groupid',
-                        get_string('overridegroup', 'lesson'), $groupchoices);
+                        get_string('overridegroup', 'opendsa_activity'), $groupchoices);
                 $mform->freeze('groupid');
             } else {
                 // Prepare the list of groups.
@@ -106,8 +106,8 @@ class lesson_override_form extends moodleform {
                 $groups = $accessallgroups ? groups_get_all_groups($cm->course) :  groups_get_activity_allowed_groups($cm);
                 if (empty($groups)) {
                     // Generate an error.
-                    $link = new moodle_url('/mod/lesson/overrides.php', array('cmid' => $cm->id));
-                    print_error('groupsnone', 'lesson', $link);
+                    $link = new moodle_url('/mod/opendsa_activity/overrides.php', array('cmid' => $cm->id));
+                    print_error('groupsnone', 'opendsa_activity', $link);
                 }
 
                 $groupchoices = array();
@@ -121,7 +121,7 @@ class lesson_override_form extends moodleform {
                 }
 
                 $mform->addElement('select', 'groupid',
-                        get_string('overridegroup', 'lesson'), $groupchoices);
+                        get_string('overridegroup', 'opendsa_activity'), $groupchoices);
                 $mform->addRule('groupid', get_string('required'), 'required', null, 'client');
             }
         } else {
@@ -132,7 +132,7 @@ class lesson_override_form extends moodleform {
                 $userchoices = array();
                 $userchoices[$this->userid] = fullname($user);
                 $mform->addElement('select', 'userid',
-                        get_string('overrideuser', 'lesson'), $userchoices);
+                        get_string('overrideuser', 'opendsa_activity'), $userchoices);
                 $mform->freeze('userid');
             } else {
                 // Prepare the list of users.
@@ -164,8 +164,8 @@ class lesson_override_form extends moodleform {
 
                 if (empty($users)) {
                     // Generate an error.
-                    $link = new moodle_url('/mod/lesson/overrides.php', array('cmid' => $cm->id));
-                    print_error('usersnone', 'lesson', $link);
+                    $link = new moodle_url('/mod/opendsa_activity/overrides.php', array('cmid' => $cm->id));
+                    print_error('usersnone', 'opendsa_activity', $link);
                 }
 
                 $userchoices = array();
@@ -186,7 +186,7 @@ class lesson_override_form extends moodleform {
                     $userchoices[0] = get_string('none');
                 }
                 $mform->addElement('searchableselector', 'userid',
-                        get_string('overrideuser', 'lesson'), $userchoices);
+                        get_string('overrideuser', 'opendsa_activity'), $userchoices);
                 $mform->addRule('userid', get_string('required'), 'required', null, 'client');
             }
         }
@@ -194,55 +194,55 @@ class lesson_override_form extends moodleform {
         // Password.
         // This field has to be above the date and timelimit fields,
         // otherwise browsers will clear it when those fields are changed.
-        $mform->addElement('passwordunmask', 'password', get_string('usepassword', 'lesson'));
+        $mform->addElement('passwordunmask', 'password', get_string('usepassword', 'opendsa_activity'));
         $mform->setType('password', PARAM_TEXT);
-        $mform->addHelpButton('password', 'usepassword', 'lesson');
-        $mform->setDefault('password', $this->lesson->password);;
+        $mform->addHelpButton('password', 'usepassword', 'opendsa_activity');
+        $mform->setDefault('password', $this->opendsa_activity->password);;
 
         // Open and close dates.
-        $mform->addElement('date_time_selector', 'available', get_string('available', 'lesson'), array('optional' => true));
-        $mform->setDefault('available', $this->lesson->available);
+        $mform->addElement('date_time_selector', 'available', get_string('available', 'opendsa_activity'), array('optional' => true));
+        $mform->setDefault('available', $this->opendsa_activity->available);
 
-        $mform->addElement('date_time_selector', 'deadline', get_string('deadline', 'lesson'), array('optional' => true));
-        $mform->setDefault('deadline', $this->lesson->deadline);
+        $mform->addElement('date_time_selector', 'deadline', get_string('deadline', 'opendsa_activity'), array('optional' => true));
+        $mform->setDefault('deadline', $this->opendsa_activity->deadline);
 
         // Lesson time limit.
         $mform->addElement('duration', 'timelimit',
-                get_string('timelimit', 'lesson'), array('optional' => true));
-        if ($this->lesson->timelimit != 0) {
+                get_string('timelimit', 'opendsa_activity'), array('optional' => true));
+        if ($this->opendsa_activity->timelimit != 0) {
             $mform->setDefault('timelimit', 0);
         } else {
-            $mform->setDefault('timelimit', $this->lesson->timelimit);
+            $mform->setDefault('timelimit', $this->opendsa_activity->timelimit);
         }
 
         // Try a question again.
-        $mform->addElement('selectyesno', 'review', get_string('displayreview', 'lesson'));
-        $mform->addHelpButton('review', 'displayreview', 'lesson');
-        $mform->setDefault('review', $this->lesson->review);
+        $mform->addElement('selectyesno', 'review', get_string('displayreview', 'opendsa_activity'));
+        $mform->addHelpButton('review', 'displayreview', 'opendsa_activity');
+        $mform->setDefault('review', $this->opendsa_activity->review);
 
         // Number of attempts.
         $numbers = array();
         for ($i = 10; $i > 0; $i--) {
             $numbers[$i] = $i;
         }
-        $mform->addElement('select', 'maxattempts', get_string('maximumnumberofattempts', 'lesson'), $numbers);
-        $mform->addHelpButton('maxattempts', 'maximumnumberofattempts', 'lesson');
-        $mform->setDefault('maxattempts', $this->lesson->maxattempts);
+        $mform->addElement('select', 'maxattempts', get_string('maximumnumberofattempts', 'opendsa_activity'), $numbers);
+        $mform->addHelpButton('maxattempts', 'maximumnumberofattempts', 'opendsa_activity');
+        $mform->setDefault('maxattempts', $this->opendsa_activity->maxattempts);
 
         // Retake allowed.
-        $mform->addElement('selectyesno', 'retake', get_string('retakesallowed', 'lesson'));
-        $mform->addHelpButton('retake', 'retakesallowed', 'lesson');
-        $mform->setDefault('retake', $this->lesson->retake);
+        $mform->addElement('selectyesno', 'retake', get_string('retakesallowed', 'opendsa_activity'));
+        $mform->addHelpButton('retake', 'retakesallowed', 'opendsa_activity');
+        $mform->setDefault('retake', $this->opendsa_activity->retake);
 
         // Submit buttons.
         $mform->addElement('submit', 'resetbutton',
-                get_string('reverttodefaults', 'lesson'));
+                get_string('reverttodefaults', 'opendsa_activity'));
 
         $buttonarray = array();
         $buttonarray[] = $mform->createElement('submit', 'submitbutton',
-                get_string('save', 'lesson'));
+                get_string('save', 'opendsa_activity'));
         $buttonarray[] = $mform->createElement('submit', 'againbutton',
-                get_string('saveoverrideandstay', 'lesson'));
+                get_string('saveoverrideandstay', 'opendsa_activity'));
         $buttonarray[] = $mform->createElement('cancel');
 
         $mform->addGroup($buttonarray, 'buttonbar', '', array(' '), false);
@@ -261,7 +261,7 @@ class lesson_override_form extends moodleform {
         $errors = parent::validation($data, $files);
 
         $mform =& $this->_form;
-        $lesson = $this->lesson;
+        $opendsa_activity = $this->opendsa_activity;
 
         if ($mform->elementExists('userid')) {
             if (empty($data['userid'])) {
@@ -278,22 +278,22 @@ class lesson_override_form extends moodleform {
         // Ensure that the dates make sense.
         if (!empty($data['available']) && !empty($data['deadline'])) {
             if ($data['deadline'] < $data['available'] ) {
-                $errors['deadline'] = get_string('closebeforeopen', 'lesson');
+                $errors['deadline'] = get_string('closebeforeopen', 'opendsa_activity');
             }
         }
 
-        // Ensure that at least one lesson setting was changed.
+        // Ensure that at least one opendsa_activity setting was changed.
         $changed = false;
         $keys = array('available', 'deadline', 'review', 'timelimit', 'maxattempts', 'retake', 'password');
         foreach ($keys as $key) {
-            if ($data[$key] != $lesson->{$key}) {
+            if ($data[$key] != $opendsa_activity->{$key}) {
                 $changed = true;
                 break;
             }
         }
 
         if (!$changed) {
-            $errors['available'] = get_string('nooverridedata', 'lesson');
+            $errors['available'] = get_string('nooverridedata', 'opendsa_activity');
         }
 
         return $errors;

@@ -18,7 +18,7 @@
 /**
  * Multichoice
  *
- * @package mod_lesson
+ * @package mod_opendsa_activity
  * @copyright  2009 Sam Hemelryk
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  **/
@@ -26,13 +26,13 @@
 defined('MOODLE_INTERNAL') || die();
 
 /** Multichoice question type */
-define("LESSON_PAGE_MULTICHOICE",   "3");
+define("OPENDSA_ACTIVITY_PAGE_MULTICHOICE",   "3");
 
-class lesson_page_type_multichoice extends lesson_page {
+class opendsa_activity_page_type_multichoice extends opendsa_activity_page {
 
-    protected $type = lesson_page::TYPE_QUESTION;
+    protected $type = opendsa_activity_page::TYPE_QUESTION;
     protected $typeidstring = 'multichoice';
-    protected $typeid = LESSON_PAGE_MULTICHOICE;
+    protected $typeid = OPENDSA_ACTIVITY_PAGE_MULTICHOICE;
     protected $string = null;
 
     public function get_typeid() {
@@ -40,7 +40,7 @@ class lesson_page_type_multichoice extends lesson_page {
     }
     public function get_typestring() {
         if ($this->string===null) {
-            $this->string = get_string($this->typeidstring, 'lesson');
+            $this->string = get_string($this->typeidstring, 'opendsa_activity');
         }
         return $this->string;
     }
@@ -65,8 +65,8 @@ class lesson_page_type_multichoice extends lesson_page {
                 $jumps[] = $this->get_jump_name($answer->jumpto);
             }
         } else {
-            // We get here is the lesson was created on a Moodle 1.9 site and
-            // the lesson contains question pages without any answers.
+            // We get here is the opendsa_activity was created on a Moodle 1.9 site and
+            // the opendsa_activity contains question pages without any answers.
             $jumps[] = $this->get_jump_name($this->properties->nextpageid);
         }
         return $jumps;
@@ -88,12 +88,12 @@ class lesson_page_type_multichoice extends lesson_page {
         global $CFG, $PAGE;
         $answers = $this->get_used_answers();
         shuffle($answers);
-        $action = $CFG->wwwroot.'/mod/lesson/continue.php';
-        $params = array('answers'=>$answers, 'opendsa_activity_id'=>$this->lesson->id, 'contents'=>$this->get_contents(), 'attempt'=>$attempt);
+        $action = $CFG->wwwroot.'/mod/opendsa_activity/continue.php';
+        $params = array('answers'=>$answers, 'opendsa_activity_id'=>$this->opendsa_activity->id, 'contents'=>$this->get_contents(), 'attempt'=>$attempt);
         if ($this->properties->qoption) {
-            $mform = new lesson_display_answer_form_multichoice_multianswer($action, $params);
+            $mform = new opendsa_activity_display_answer_form_multichoice_multianswer($action, $params);
         } else {
-            $mform = new lesson_display_answer_form_multichoice_singleanswer($action, $params);
+            $mform = new opendsa_activity_display_answer_form_multichoice_singleanswer($action, $params);
         }
         $data = new stdClass;
         $data->id = $PAGE->cm->id;
@@ -109,7 +109,7 @@ class lesson_page_type_multichoice extends lesson_page {
                 )
             );
 
-        $event = \mod_lesson\event\question_viewed::create($eventparams);
+        $event = \mod_opendsa_activity\event\question_viewed::create($eventparams);
         $event->trigger();
         return $mform->display();
     }
@@ -124,12 +124,12 @@ class lesson_page_type_multichoice extends lesson_page {
 
         $answers = $this->get_used_answers();
         shuffle($answers);
-        $action = $CFG->wwwroot.'/mod/lesson/continue.php';
-        $params = array('answers'=>$answers, 'opendsa_activity_id'=>$this->lesson->id, 'contents'=>$this->get_contents());
+        $action = $CFG->wwwroot.'/mod/opendsa_activity/continue.php';
+        $params = array('answers'=>$answers, 'opendsa_activity_id'=>$this->opendsa_activity->id, 'contents'=>$this->get_contents());
         if ($this->properties->qoption) {
-            $mform = new lesson_display_answer_form_multichoice_multianswer($action, $params);
+            $mform = new opendsa_activity_display_answer_form_multichoice_multianswer($action, $params);
         } else {
-            $mform = new lesson_display_answer_form_multichoice_singleanswer($action, $params);
+            $mform = new opendsa_activity_display_answer_form_multichoice_singleanswer($action, $params);
         }
         $data = $mform->get_data();
         require_sesskey();
@@ -180,10 +180,10 @@ class lesson_page_type_multichoice extends lesson_page {
 
             // Iterate over all the possible answers.
             foreach ($answers as $answer) {
-                if ($this->lesson->custom) {
+                if ($this->opendsa_activity->custom) {
                     $iscorrectanswer = $answer->score > 0;
                 } else {
-                    $iscorrectanswer = $this->lesson->jumpto_is_correct($this->properties->id, $answer->jumpto);
+                    $iscorrectanswer = $this->opendsa_activity->jumpto_is_correct($this->properties->id, $answer->jumpto);
                 }
 
                 // Iterate over all the student answers to check if he selected the current possible answer.
@@ -237,14 +237,14 @@ class lesson_page_type_multichoice extends lesson_page {
                 return $result;
             }
             $result->answerid = $data->answerid;
-            if (!$answer = $DB->get_record("lesson_answers", array("id" => $result->answerid))) {
+            if (!$answer = $DB->get_record("opendsa_activity_answers", array("id" => $result->answerid))) {
                 print_error("Continue: answer record not found");
             }
             $answer = parent::rewrite_answers_urls($answer);
-            if ($this->lesson->jumpto_is_correct($this->properties->id, $answer->jumpto)) {
+            if ($this->opendsa_activity->jumpto_is_correct($this->properties->id, $answer->jumpto)) {
                 $result->correctanswer = true;
             }
-            if ($this->lesson->custom) {
+            if ($this->opendsa_activity->custom) {
                 if ($answer->score > 0) {
                     $result->correctanswer = true;
                 } else {
@@ -261,7 +261,7 @@ class lesson_page_type_multichoice extends lesson_page {
 
     public function option_description_string() {
         if ($this->properties->qoption) {
-            return " - ".get_string("multianswer", "lesson");
+            return " - ".get_string("multianswer", "opendsa_activity");
         }
         return parent::option_description_string();
     }
@@ -275,32 +275,32 @@ class lesson_page_type_multichoice extends lesson_page {
         foreach ($answers as $answer) {
             $answer = parent::rewrite_answers_urls($answer);
             $cells = array();
-            if ($this->lesson->custom && $answer->score > 0) {
+            if ($this->opendsa_activity->custom && $answer->score > 0) {
                 // if the score is > 0, then it is correct
-                $cells[] = '<label class="correct">' . get_string('answer', 'lesson') . " {$i}</label>: \n";
-            } else if ($this->lesson->custom) {
-                $cells[] = '<label>' . get_string('answer', 'lesson') . " {$i}</label>: \n";
-            } else if ($this->lesson->jumpto_is_correct($this->properties->id, $answer->jumpto)) {
+                $cells[] = '<label class="correct">' . get_string('answer', 'opendsa_activity') . " {$i}</label>: \n";
+            } else if ($this->opendsa_activity->custom) {
+                $cells[] = '<label>' . get_string('answer', 'opendsa_activity') . " {$i}</label>: \n";
+            } else if ($this->opendsa_activity->jumpto_is_correct($this->properties->id, $answer->jumpto)) {
                 // underline correct answers
-                $cells[] = '<span class="correct">' . get_string('answer', 'lesson') . " {$i}</span>: \n";
+                $cells[] = '<span class="correct">' . get_string('answer', 'opendsa_activity') . " {$i}</span>: \n";
             } else {
-                $cells[] = '<label class="correct">' . get_string('answer', 'lesson') . " {$i}</label>: \n";
+                $cells[] = '<label class="correct">' . get_string('answer', 'opendsa_activity') . " {$i}</label>: \n";
             }
             $cells[] = format_text($answer->answer, $answer->answerformat, $options);
             $table->data[] = new html_table_row($cells);
 
             $cells = array();
-            $cells[] = '<label>' . get_string('response', 'lesson') . " {$i} </label>:\n";
+            $cells[] = '<label>' . get_string('response', 'opendsa_activity') . " {$i} </label>:\n";
             $cells[] = format_text($answer->response, $answer->responseformat, $options);
             $table->data[] = new html_table_row($cells);
 
             $cells = array();
-            $cells[] = '<label>' . get_string('score', 'lesson') . '</label>:';
+            $cells[] = '<label>' . get_string('score', 'opendsa_activity') . '</label>:';
             $cells[] = $answer->score;
             $table->data[] = new html_table_row($cells);
 
             $cells = array();
-            $cells[] = '<label>' . get_string('jump', 'lesson') . '</label>:';
+            $cells[] = '<label>' . get_string('jump', 'opendsa_activity') . '</label>:';
             $cells[] = $this->get_jump_name($answer->jumpto);
             $table->data[] = new html_table_row($cells);
             if ($i === 1){
@@ -311,8 +311,8 @@ class lesson_page_type_multichoice extends lesson_page {
         return $table;
     }
     public function stats(array &$pagestats, $tries) {
-        if(count($tries) > $this->lesson->maxattempts) { // if there are more tries than the max that is allowed, grab the last "legal" attempt
-            $temp = $tries[$this->lesson->maxattempts - 1];
+        if(count($tries) > $this->opendsa_activity->maxattempts) { // if there are more tries than the max that is allowed, grab the last "legal" attempt
+            $temp = $tries[$this->opendsa_activity->maxattempts - 1];
         } else {
             // else, user attempted the question less than the max, so grab the last one
             $temp = end($tries);
@@ -360,28 +360,28 @@ class lesson_page_type_multichoice extends lesson_page {
                     if (!isset($answerdata->response)) {
                         if ($answer->response == null) {
                             if ($useranswer->correct) {
-                                $answerdata->response = get_string("thatsthecorrectanswer", "lesson");
+                                $answerdata->response = get_string("thatsthecorrectanswer", "opendsa_activity");
                             } else {
-                                $answerdata->response = get_string("thatsthewronganswer", "lesson");
+                                $answerdata->response = get_string("thatsthewronganswer", "opendsa_activity");
                             }
                         } else {
                             $answerdata->response = $answer->response;
                         }
                     }
                     if (!isset($answerdata->score)) {
-                        if ($this->lesson->custom) {
-                            $answerdata->score = get_string("pointsearned", "lesson").": ".$answer->score;
+                        if ($this->opendsa_activity->custom) {
+                            $answerdata->score = get_string("pointsearned", "opendsa_activity").": ".$answer->score;
                         } elseif ($useranswer->correct) {
-                            $answerdata->score = get_string("receivedcredit", "lesson");
+                            $answerdata->score = get_string("receivedcredit", "opendsa_activity");
                         } else {
-                            $answerdata->score = get_string("didnotreceivecredit", "lesson");
+                            $answerdata->score = get_string("didnotreceivecredit", "opendsa_activity");
                         }
                     }
                 } else {
                     // unchecked
                     $data = "<input type=\"checkbox\" readonly=\"readonly\" name=\"answer[$i]\" value=\"0\" disabled=\"disabled\" />";
                 }
-                if (($answer->score > 0 && $this->lesson->custom) || ($this->lesson->jumpto_is_correct($this->properties->id, $answer->jumpto) && !$this->lesson->custom)) {
+                if (($answer->score > 0 && $this->opendsa_activity->custom) || ($this->opendsa_activity->jumpto_is_correct($this->properties->id, $answer->jumpto) && !$this->opendsa_activity->custom)) {
                     $data = "<div class=highlight>".$data.' '.format_text($answer->answer,$answer->answerformat,$formattextdefoptions)."</div>";
                 } else {
                     $data .= format_text($answer->answer,$answer->answerformat,$formattextdefoptions);
@@ -392,25 +392,25 @@ class lesson_page_type_multichoice extends lesson_page {
                     $data = "<input  readonly=\"readonly\" disabled=\"disabled\" name=\"answer[$i]\" checked=\"checked\" type=\"checkbox\" value=\"1\" />";
                     if ($answer->response == null) {
                         if ($useranswer->correct) {
-                            $answerdata->response = get_string("thatsthecorrectanswer", "lesson");
+                            $answerdata->response = get_string("thatsthecorrectanswer", "opendsa_activity");
                         } else {
-                            $answerdata->response = get_string("thatsthewronganswer", "lesson");
+                            $answerdata->response = get_string("thatsthewronganswer", "opendsa_activity");
                         }
                     } else {
                         $answerdata->response = $answer->response;
                     }
-                    if ($this->lesson->custom) {
-                        $answerdata->score = get_string("pointsearned", "lesson").": ".$answer->score;
+                    if ($this->opendsa_activity->custom) {
+                        $answerdata->score = get_string("pointsearned", "opendsa_activity").": ".$answer->score;
                     } elseif ($useranswer->correct) {
-                        $answerdata->score = get_string("receivedcredit", "lesson");
+                        $answerdata->score = get_string("receivedcredit", "opendsa_activity");
                     } else {
-                        $answerdata->score = get_string("didnotreceivecredit", "lesson");
+                        $answerdata->score = get_string("didnotreceivecredit", "opendsa_activity");
                     }
                 } else {
                     // unchecked
                     $data = "<input type=\"checkbox\" readonly=\"readonly\" name=\"answer[$i]\" value=\"0\" disabled=\"disabled\" />";
                 }
-                if (($answer->score > 0 && $this->lesson->custom) || ($this->lesson->jumpto_is_correct($this->properties->id, $answer->jumpto) && !$this->lesson->custom)) {
+                if (($answer->score > 0 && $this->opendsa_activity->custom) || ($this->opendsa_activity->jumpto_is_correct($this->properties->id, $answer->jumpto) && !$this->opendsa_activity->custom)) {
                     $data = "<div class=\"highlight\">".$data.' '.format_text($answer->answer,FORMAT_MOODLE,$formattextdefoptions)."</div>";
                 } else {
                     $data .= format_text($answer->answer,$answer->answerformat,$formattextdefoptions);
@@ -419,9 +419,9 @@ class lesson_page_type_multichoice extends lesson_page {
             if (isset($pagestats[$this->properties->id][$answer->id])) {
                 $percent = $pagestats[$this->properties->id][$answer->id] / $pagestats[$this->properties->id]["total"] * 100;
                 $percent = round($percent, 2);
-                $percent .= "% ".get_string("checkedthisone", "lesson");
+                $percent .= "% ".get_string("checkedthisone", "opendsa_activity");
             } else {
-                $percent = get_string("noonecheckedthis", "lesson");
+                $percent = get_string("noonecheckedthis", "opendsa_activity");
             }
 
             $answerdata->answers[] = array($data, $percent);
@@ -432,30 +432,30 @@ class lesson_page_type_multichoice extends lesson_page {
 }
 
 
-class lesson_add_page_form_multichoice extends lesson_add_page_form_base {
+class opendsa_activity_add_page_form_multichoice extends opendsa_activity_add_page_form_base {
 
     public $qtype = 'multichoice';
     public $qtypestring = 'multichoice';
-    protected $answerformat = LESSON_ANSWER_HTML;
-    protected $responseformat = LESSON_ANSWER_HTML;
+    protected $answerformat = OPENDSA_ACTIVITY_ANSWER_HTML;
+    protected $responseformat = OPENDSA_ACTIVITY_ANSWER_HTML;
 
     public function custom_definition() {
 
-        $this->_form->addElement('checkbox', 'qoption', get_string('options', 'lesson'), get_string('multianswer', 'lesson'));
+        $this->_form->addElement('checkbox', 'qoption', get_string('options', 'opendsa_activity'), get_string('multianswer', 'opendsa_activity'));
         $this->_form->setDefault('qoption', 0);
-        $this->_form->addHelpButton('qoption', 'multianswer', 'lesson');
+        $this->_form->addHelpButton('qoption', 'multianswer', 'opendsa_activity');
 
-        for ($i = 0; $i < $this->_customdata['lesson']->maxanswers; $i++) {
+        for ($i = 0; $i < $this->_customdata['opendsa_activity']->maxanswers; $i++) {
             $this->_form->addElement('header', 'answertitle'.$i, get_string('answer').' '.($i+1));
             $this->add_answer($i, null, ($i<2), $this->get_answer_format());
             $this->add_response($i);
-            $this->add_jumpto($i, null, ($i == 0 ? LESSON_NEXTPAGE : LESSON_THISPAGE));
+            $this->add_jumpto($i, null, ($i == 0 ? OPENDSA_ACTIVITY_NEXTPAGE : OPENDSA_ACTIVITY_THISPAGE));
             $this->add_score($i, null, ($i===0)?1:0);
         }
     }
 }
 
-class lesson_display_answer_form_multichoice_singleanswer extends moodleform {
+class opendsa_activity_display_answer_form_multichoice_singleanswer extends moodleform {
 
     public function definition() {
         global $USER, $OUTPUT;
@@ -508,15 +508,15 @@ class lesson_display_answer_form_multichoice_singleanswer extends moodleform {
         }
 
         if ($hasattempt) {
-            $this->add_action_buttons(null, get_string("nextpage", "lesson"));
+            $this->add_action_buttons(null, get_string("nextpage", "opendsa_activity"));
         } else {
-            $this->add_action_buttons(null, get_string("submit", "lesson"));
+            $this->add_action_buttons(null, get_string("submit", "opendsa_activity"));
         }
     }
 
 }
 
-class lesson_display_answer_form_multichoice_multianswer extends moodleform {
+class opendsa_activity_display_answer_form_multichoice_multianswer extends moodleform {
 
     public function definition() {
         global $USER, $OUTPUT;
@@ -571,9 +571,9 @@ class lesson_display_answer_form_multichoice_multianswer extends moodleform {
         }
 
         if ($hasattempt) {
-            $this->add_action_buttons(null, get_string("nextpage", "lesson"));
+            $this->add_action_buttons(null, get_string("nextpage", "opendsa_activity"));
         } else {
-            $this->add_action_buttons(null, get_string("submit", "lesson"));
+            $this->add_action_buttons(null, get_string("submit", "opendsa_activity"));
         }
     }
 

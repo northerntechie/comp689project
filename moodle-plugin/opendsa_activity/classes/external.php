@@ -17,7 +17,7 @@
 /**
  * Lesson external API
  *
- * @package    mod_lesson
+ * @package    mod_opendsa_activity
  * @category   external
  * @copyright  2017 Juan Leyva <juan@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -27,39 +27,39 @@
 defined('MOODLE_INTERNAL') || die;
 
 require_once($CFG->libdir . '/externallib.php');
-require_once($CFG->dirroot . '/mod/lesson/locallib.php');
+require_once($CFG->dirroot . '/mod/opendsa_activity/locallib.php');
 
-use mod_lesson\external\lesson_summary_exporter;
+use mod_opendsa_activity\external\opendsa_activity_summary_exporter;
 
 /**
  * Lesson external functions
  *
- * @package    mod_lesson
+ * @package    mod_opendsa_activity
  * @category   external
  * @copyright  2017 Juan Leyva <juan@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @since      Moodle 3.3
  */
-class mod_lesson_external extends external_api {
+class mod_opendsa_activity_external extends external_api {
 
     /**
-     * Return a lesson record ready for being exported.
+     * Return a opendsa_activity record ready for being exported.
      *
-     * @param  stdClass $lessonrecord lesson record
-     * @param  string $password       lesson password
-     * @return stdClass the lesson record ready for exporting.
+     * @param  stdClass $opendsa_activityrecord opendsa_activity record
+     * @param  string $password       opendsa_activity password
+     * @return stdClass the opendsa_activity record ready for exporting.
      */
-    protected static function get_lesson_summary_for_exporter($lessonrecord, $password = '') {
+    protected static function get_opendsa_activity_summary_for_exporter($opendsa_activityrecord, $password = '') {
         global $USER;
 
-        $lesson = new lesson($lessonrecord);
-        $lesson->update_effective_access($USER->id);
-        $lessonavailable = $lesson->get_time_restriction_status() === false;
-        $lessonavailable = $lessonavailable && $lesson->get_password_restriction_status($password) === false;
-        $lessonavailable = $lessonavailable && $lesson->get_dependencies_restriction_status() === false;
-        $canmanage = $lesson->can_manage();
+        $opendsa_activity = new opendsa_activity($opendsa_activityrecord);
+        $opendsa_activity->update_effective_access($USER->id);
+        $opendsa_activityavailable = $opendsa_activity->get_time_restriction_status() === false;
+        $opendsa_activityavailable = $opendsa_activityavailable && $opendsa_activity->get_password_restriction_status($password) === false;
+        $opendsa_activityavailable = $opendsa_activityavailable && $opendsa_activity->get_dependencies_restriction_status() === false;
+        $canmanage = $opendsa_activity->can_manage();
 
-        if (!$canmanage && !$lessonavailable) {
+        if (!$canmanage && !$opendsa_activityavailable) {
             $fields = array('intro', 'introfiles', 'mediafiles', 'practice', 'modattempts', 'usepassword',
                 'grade', 'custom', 'ongoing', 'usemaxgrade',
                 'maxanswers', 'maxattempts', 'review', 'nextpagedefault', 'feedback', 'minquestions',
@@ -68,7 +68,7 @@ class mod_lesson_external extends external_api {
                 'progressbar');
 
             foreach ($fields as $field) {
-                unset($lessonrecord->{$field});
+                unset($opendsa_activityrecord->{$field});
             }
         }
 
@@ -78,19 +78,19 @@ class mod_lesson_external extends external_api {
                             'timemodified', 'completionendreached', 'completiontimespent');
 
             foreach ($fields as $field) {
-                unset($lessonrecord->{$field});
+                unset($opendsa_activityrecord->{$field});
             }
         }
-        return $lessonrecord;
+        return $opendsa_activityrecord;
     }
 
     /**
-     * Describes the parameters for get_lessons_by_courses.
+     * Describes the parameters for get_opendsa_activitys_by_courses.
      *
      * @return external_function_parameters
      * @since Moodle 3.3
      */
-    public static function get_lessons_by_courses_parameters() {
+    public static function get_opendsa_activitys_by_courses_parameters() {
         return new external_function_parameters (
             array(
                 'courseids' => new external_multiple_structure(
@@ -101,23 +101,23 @@ class mod_lesson_external extends external_api {
     }
 
     /**
-     * Returns a list of lessons in a provided list of courses,
-     * if no list is provided all lessons that the user can view will be returned.
+     * Returns a list of opendsa_activitys in a provided list of courses,
+     * if no list is provided all opendsa_activitys that the user can view will be returned.
      *
      * @param array $courseids Array of course ids
-     * @return array of lessons details
+     * @return array of opendsa_activitys details
      * @since Moodle 3.3
      */
-    public static function get_lessons_by_courses($courseids = array()) {
+    public static function get_opendsa_activitys_by_courses($courseids = array()) {
         global $PAGE;
 
         $warnings = array();
-        $returnedlessons = array();
+        $returnedopendsa_activitys = array();
 
         $params = array(
             'courseids' => $courseids,
         );
-        $params = self::validate_parameters(self::get_lessons_by_courses_parameters(), $params);
+        $params = self::validate_parameters(self::get_opendsa_activitys_by_courses_parameters(), $params);
 
         $mycourses = array();
         if (empty($params['courseids'])) {
@@ -130,41 +130,41 @@ class mod_lesson_external extends external_api {
 
             list($courses, $warnings) = external_util::validate_courses($params['courseids'], $mycourses);
 
-            // Get the lessons in this course, this function checks users visibility permissions.
+            // Get the opendsa_activitys in this course, this function checks users visibility permissions.
             // We can avoid then additional validate_context calls.
-            $lessons = get_all_instances_in_courses("lesson", $courses);
-            foreach ($lessons as $lessonrecord) {
-                $context = context_module::instance($lessonrecord->coursemodule);
+            $opendsa_activitys = get_all_instances_in_courses("opendsa_activity", $courses);
+            foreach ($opendsa_activitys as $opendsa_activityrecord) {
+                $context = context_module::instance($opendsa_activityrecord->coursemodule);
 
                 // Remove fields added by get_all_instances_in_courses.
-                unset($lessonrecord->coursemodule, $lessonrecord->section, $lessonrecord->visible, $lessonrecord->groupmode,
-                    $lessonrecord->groupingid);
+                unset($opendsa_activityrecord->coursemodule, $opendsa_activityrecord->section, $opendsa_activityrecord->visible, $opendsa_activityrecord->groupmode,
+                    $opendsa_activityrecord->groupingid);
 
-                $lessonrecord = self::get_lesson_summary_for_exporter($lessonrecord);
+                $opendsa_activityrecord = self::get_opendsa_activity_summary_for_exporter($opendsa_activityrecord);
 
-                $exporter = new lesson_summary_exporter($lessonrecord, array('context' => $context));
-                $lesson = $exporter->export($PAGE->get_renderer('core'));
-                $lesson->name = external_format_string($lesson->name, $context);
-                $returnedlessons[] = $lesson;
+                $exporter = new opendsa_activity_summary_exporter($opendsa_activityrecord, array('context' => $context));
+                $opendsa_activity = $exporter->export($PAGE->get_renderer('core'));
+                $opendsa_activity->name = external_format_string($opendsa_activity->name, $context);
+                $returnedopendsa_activitys[] = $opendsa_activity;
             }
         }
         $result = array();
-        $result['lessons'] = $returnedlessons;
+        $result['opendsa_activitys'] = $returnedopendsa_activitys;
         $result['warnings'] = $warnings;
         return $result;
     }
 
     /**
-     * Describes the get_lessons_by_courses return value.
+     * Describes the get_opendsa_activitys_by_courses return value.
      *
      * @return external_single_structure
      * @since Moodle 3.3
      */
-    public static function get_lessons_by_courses_returns() {
+    public static function get_opendsa_activitys_by_courses_returns() {
         return new external_single_structure(
             array(
-                'lessons' => new external_multiple_structure(
-                    lesson_summary_exporter::get_read_structure()
+                'opendsa_activitys' => new external_multiple_structure(
+                    opendsa_activity_summary_exporter::get_read_structure()
                 ),
                 'warnings' => new external_warnings(),
             )
@@ -172,124 +172,124 @@ class mod_lesson_external extends external_api {
     }
 
     /**
-     * Utility function for validating a lesson.
+     * Utility function for validating a opendsa_activity.
      *
-     * @param int $opendsa_activity_id lesson instance id
-     * @return array array containing the lesson, course, context and course module objects
+     * @param int $opendsa_activity_id opendsa_activity instance id
+     * @return array array containing the opendsa_activity, course, context and course module objects
      * @since  Moodle 3.3
      */
-    protected static function validate_lesson($opendsa_activity_id) {
+    protected static function validate_opendsa_activity($opendsa_activity_id) {
         global $DB, $USER;
 
         // Request and permission validation.
-        $lessonrecord = $DB->get_record('lesson', array('id' => $opendsa_activity_id), '*', MUST_EXIST);
-        list($course, $cm) = get_course_and_cm_from_instance($lessonrecord, 'lesson');
+        $opendsa_activityrecord = $DB->get_record('opendsa_activity', array('id' => $opendsa_activity_id), '*', MUST_EXIST);
+        list($course, $cm) = get_course_and_cm_from_instance($opendsa_activityrecord, 'opendsa_activity');
 
-        $lesson = new lesson($lessonrecord, $cm, $course);
-        $lesson->update_effective_access($USER->id);
+        $opendsa_activity = new opendsa_activity($opendsa_activityrecord, $cm, $course);
+        $opendsa_activity->update_effective_access($USER->id);
 
-        $context = $lesson->context;
+        $context = $opendsa_activity->context;
         self::validate_context($context);
 
-        return array($lesson, $course, $cm, $context, $lessonrecord);
+        return array($opendsa_activity, $course, $cm, $context, $opendsa_activityrecord);
     }
 
     /**
      * Validates a new attempt.
      *
-     * @param  lesson  $lesson lesson instance
+     * @param  opendsa_activity  $opendsa_activity opendsa_activity instance
      * @param  array   $params request parameters
      * @param  boolean $return whether to return the errors or throw exceptions
      * @return array          the errors (if return set to true)
      * @since  Moodle 3.3
      */
-    protected static function validate_attempt(lesson $lesson, $params, $return = false) {
+    protected static function validate_attempt(opendsa_activity $opendsa_activity, $params, $return = false) {
         global $USER, $CFG;
 
         $errors = array();
 
         // Avoid checkings for managers.
-        if ($lesson->can_manage()) {
+        if ($opendsa_activity->can_manage()) {
             return [];
         }
 
         // Dead line.
-        if ($timerestriction = $lesson->get_time_restriction_status()) {
+        if ($timerestriction = $opendsa_activity->get_time_restriction_status()) {
             $error = ["$timerestriction->reason" => userdate($timerestriction->time)];
             if (!$return) {
-                throw new moodle_exception(key($error), 'lesson', '', current($error));
+                throw new moodle_exception(key($error), 'opendsa_activity', '', current($error));
             }
             $errors[key($error)] = current($error);
         }
 
-        // Password protected lesson code.
-        if ($passwordrestriction = $lesson->get_password_restriction_status($params['password'])) {
-            $error = ["passwordprotectedlesson" => external_format_string($lesson->name, $lesson->context->id)];
+        // Password protected opendsa_activity code.
+        if ($passwordrestriction = $opendsa_activity->get_password_restriction_status($params['password'])) {
+            $error = ["passwordprotectedopendsa_activity" => external_format_string($opendsa_activity->name, $opendsa_activity->context->id)];
             if (!$return) {
-                throw new moodle_exception(key($error), 'lesson', '', current($error));
+                throw new moodle_exception(key($error), 'opendsa_activity', '', current($error));
             }
             $errors[key($error)] = current($error);
         }
 
         // Check for dependencies.
-        if ($dependenciesrestriction = $lesson->get_dependencies_restriction_status()) {
-            $errorhtmllist = implode(get_string('and', 'lesson') . ', ', $dependenciesrestriction->errors);
-            $error = ["completethefollowingconditions" => $dependenciesrestriction->dependentlesson->name . $errorhtmllist];
+        if ($dependenciesrestriction = $opendsa_activity->get_dependencies_restriction_status()) {
+            $errorhtmllist = implode(get_string('and', 'opendsa_activity') . ', ', $dependenciesrestriction->errors);
+            $error = ["completethefollowingconditions" => $dependenciesrestriction->dependentopendsa_activity->name . $errorhtmllist];
             if (!$return) {
-                throw new moodle_exception(key($error), 'lesson', '', current($error));
+                throw new moodle_exception(key($error), 'opendsa_activity', '', current($error));
             }
             $errors[key($error)] = current($error);
         }
 
-        // To check only when no page is set (starting or continuing a lesson).
+        // To check only when no page is set (starting or continuing a opendsa_activity).
         if (empty($params['pageid'])) {
             // To avoid multiple calls, store the magic property firstpage.
-            $lessonfirstpage = $lesson->firstpage;
-            $lessonfirstpageid = $lessonfirstpage ? $lessonfirstpage->id : false;
+            $opendsa_activityfirstpage = $opendsa_activity->firstpage;
+            $opendsa_activityfirstpageid = $opendsa_activityfirstpage ? $opendsa_activityfirstpage->id : false;
 
-            // Check if the lesson does not have pages.
-            if (!$lessonfirstpageid) {
-                $error = ["lessonnotready2" => null];
+            // Check if the opendsa_activity does not have pages.
+            if (!$opendsa_activityfirstpageid) {
+                $error = ["opendsa_activitynotready2" => null];
                 if (!$return) {
-                    throw new moodle_exception(key($error), 'lesson');
+                    throw new moodle_exception(key($error), 'opendsa_activity');
                 }
                 $errors[key($error)] = current($error);
             }
 
             // Get the number of retries (also referenced as attempts), and the last page seen.
-            $attemptscount = $lesson->count_user_retries($USER->id);
-            $lastpageseen = $lesson->get_last_page_seen($attemptscount);
+            $attemptscount = $opendsa_activity->count_user_retries($USER->id);
+            $lastpageseen = $opendsa_activity->get_last_page_seen($attemptscount);
 
             // Check if the user left a timed session with no retakes.
-            if ($lastpageseen !== false && $lastpageseen != LESSON_EOL) {
-                if ($lesson->left_during_timed_session($attemptscount) && $lesson->timelimit && !$lesson->retake) {
+            if ($lastpageseen !== false && $lastpageseen != OPENDSA_ACTIVITY_EOL) {
+                if ($opendsa_activity->left_during_timed_session($attemptscount) && $opendsa_activity->timelimit && !$opendsa_activity->retake) {
                     $error = ["leftduringtimednoretake" => null];
                     if (!$return) {
-                        throw new moodle_exception(key($error), 'lesson');
+                        throw new moodle_exception(key($error), 'opendsa_activity');
                     }
                     $errors[key($error)] = current($error);
                 }
-            } else if ($attemptscount > 0 && !$lesson->retake) {
-                // The user finished the lesson and no retakes are allowed.
+            } else if ($attemptscount > 0 && !$opendsa_activity->retake) {
+                // The user finished the opendsa_activity and no retakes are allowed.
                 $error = ["noretake" => null];
                 if (!$return) {
-                    throw new moodle_exception(key($error), 'lesson');
+                    throw new moodle_exception(key($error), 'opendsa_activity');
                 }
                 $errors[key($error)] = current($error);
             }
         } else {
-            if (!$timers = $lesson->get_user_timers($USER->id, 'starttime DESC', '*', 0, 1)) {
+            if (!$timers = $opendsa_activity->get_user_timers($USER->id, 'starttime DESC', '*', 0, 1)) {
                 $error = ["cannotfindtimer" => null];
                 if (!$return) {
-                    throw new moodle_exception(key($error), 'lesson');
+                    throw new moodle_exception(key($error), 'opendsa_activity');
                 }
                 $errors[key($error)] = current($error);
             } else {
                 $timer = current($timers);
-                if (!$lesson->check_time($timer)) {
+                if (!$opendsa_activity->check_time($timer)) {
                     $error = ["eolstudentoutoftime" => null];
                     if (!$return) {
-                        throw new moodle_exception(key($error), 'lesson');
+                        throw new moodle_exception(key($error), 'opendsa_activity');
                     }
                     $errors[key($error)] = current($error);
                 }
@@ -297,26 +297,26 @@ class mod_lesson_external extends external_api {
                 // Check if the user want to review an attempt he just finished.
                 if (!empty($params['review'])) {
                     // Allow review only for attempts during active session time.
-                    if ($timer->lessontime + $CFG->sessiontimeout > time()) {
-                        $ntries = $lesson->count_user_retries($USER->id);
+                    if ($timer->opendsa_activitytime + $CFG->sessiontimeout > time()) {
+                        $ntries = $opendsa_activity->count_user_retries($USER->id);
                         $ntries--;  // Need to look at the old attempts.
-                        if ($params['pageid'] == LESSON_EOL) {
-                            if ($attempts = $lesson->get_attempts($ntries)) {
+                        if ($params['pageid'] == OPENDSA_ACTIVITY_EOL) {
+                            if ($attempts = $opendsa_activity->get_attempts($ntries)) {
                                 $lastattempt = end($attempts);
-                                $USER->modattempts[$lesson->id] = $lastattempt->pageid;
+                                $USER->modattempts[$opendsa_activity->id] = $lastattempt->pageid;
                             }
                         } else {
-                            if ($attempts = $lesson->get_attempts($ntries, false, $params['pageid'])) {
+                            if ($attempts = $opendsa_activity->get_attempts($ntries, false, $params['pageid'])) {
                                 $lastattempt = end($attempts);
-                                $USER->modattempts[$lesson->id] = $lastattempt;
+                                $USER->modattempts[$opendsa_activity->id] = $lastattempt;
                             }
                         }
                     }
 
-                    if (!isset($USER->modattempts[$lesson->id])) {
+                    if (!isset($USER->modattempts[$opendsa_activity->id])) {
                         $error = ["studentoutoftimeforreview" => null];
                         if (!$return) {
-                            throw new moodle_exception(key($error), 'lesson');
+                            throw new moodle_exception(key($error), 'opendsa_activity');
                         }
                         $errors[key($error)] = current($error);
                     }
@@ -328,28 +328,28 @@ class mod_lesson_external extends external_api {
     }
 
     /**
-     * Describes the parameters for get_lesson_access_information.
+     * Describes the parameters for get_opendsa_activity_access_information.
      *
      * @return external_function_parameters
      * @since Moodle 3.3
      */
-    public static function get_lesson_access_information_parameters() {
+    public static function get_opendsa_activity_access_information_parameters() {
         return new external_function_parameters (
             array(
-                'opendsa_activity_id' => new external_value(PARAM_INT, 'lesson instance id')
+                'opendsa_activity_id' => new external_value(PARAM_INT, 'opendsa_activity instance id')
             )
         );
     }
 
     /**
-     * Return access information for a given lesson.
+     * Return access information for a given opendsa_activity.
      *
-     * @param int $opendsa_activity_id lesson instance id
+     * @param int $opendsa_activity_id opendsa_activity instance id
      * @return array of warnings and the access information
      * @since Moodle 3.3
      * @throws  moodle_exception
      */
-    public static function get_lesson_access_information($opendsa_activity_id) {
+    public static function get_opendsa_activity_access_information($opendsa_activity_id) {
         global $DB, $USER;
 
         $warnings = array();
@@ -357,34 +357,34 @@ class mod_lesson_external extends external_api {
         $params = array(
             'opendsa_activity_id' => $opendsa_activity_id
         );
-        $params = self::validate_parameters(self::get_lesson_access_information_parameters(), $params);
+        $params = self::validate_parameters(self::get_opendsa_activity_access_information_parameters(), $params);
 
-        list($lesson, $course, $cm, $context, $lessonrecord) = self::validate_lesson($params['opendsa_activity_id']);
+        list($opendsa_activity, $course, $cm, $context, $opendsa_activityrecord) = self::validate_opendsa_activity($params['opendsa_activity_id']);
 
         $result = array();
         // Capabilities first.
-        $result['canmanage'] = $lesson->can_manage();
-        $result['cangrade'] = has_capability('mod/lesson:grade', $context);
-        $result['canviewreports'] = has_capability('mod/lesson:viewreports', $context);
+        $result['canmanage'] = $opendsa_activity->can_manage();
+        $result['cangrade'] = has_capability('mod/opendsa_activity:grade', $context);
+        $result['canviewreports'] = has_capability('mod/opendsa_activity:viewreports', $context);
 
         // Status information.
-        $result['reviewmode'] = $lesson->is_in_review_mode();
-        $result['attemptscount'] = $lesson->count_user_retries($USER->id);
-        $lastpageseen = $lesson->get_last_page_seen($result['attemptscount']);
+        $result['reviewmode'] = $opendsa_activity->is_in_review_mode();
+        $result['attemptscount'] = $opendsa_activity->count_user_retries($USER->id);
+        $lastpageseen = $opendsa_activity->get_last_page_seen($result['attemptscount']);
         $result['lastpageseen'] = ($lastpageseen !== false) ? $lastpageseen : 0;
-        $result['leftduringtimedsession'] = $lesson->left_during_timed_session($result['attemptscount']);
+        $result['leftduringtimedsession'] = $opendsa_activity->left_during_timed_session($result['attemptscount']);
         // To avoid multiple calls, store the magic property firstpage.
-        $lessonfirstpage = $lesson->firstpage;
-        $result['firstpageid'] = $lessonfirstpage ? $lessonfirstpage->id : 0;
+        $opendsa_activityfirstpage = $opendsa_activity->firstpage;
+        $result['firstpageid'] = $opendsa_activityfirstpage ? $opendsa_activityfirstpage->id : 0;
 
         // Access restrictions now, we emulate a new attempt access to get the possible warnings.
         $result['preventaccessreasons'] = [];
-        $validationerrors = self::validate_attempt($lesson, ['password' => ''], true);
+        $validationerrors = self::validate_attempt($opendsa_activity, ['password' => ''], true);
         foreach ($validationerrors as $reason => $data) {
             $result['preventaccessreasons'][] = [
                 'reason' => $reason,
                 'data' => $data,
-                'message' => get_string($reason, 'lesson', $data),
+                'message' => get_string($reason, 'opendsa_activity', $data),
             ];
         }
         $result['warnings'] = $warnings;
@@ -392,22 +392,22 @@ class mod_lesson_external extends external_api {
     }
 
     /**
-     * Describes the get_lesson_access_information return value.
+     * Describes the get_opendsa_activity_access_information return value.
      *
      * @return external_single_structure
      * @since Moodle 3.3
      */
-    public static function get_lesson_access_information_returns() {
+    public static function get_opendsa_activity_access_information_returns() {
         return new external_single_structure(
             array(
-                'canmanage' => new external_value(PARAM_BOOL, 'Whether the user can manage the lesson or not.'),
-                'cangrade' => new external_value(PARAM_BOOL, 'Whether the user can grade the lesson or not.'),
-                'canviewreports' => new external_value(PARAM_BOOL, 'Whether the user can view the lesson reports or not.'),
-                'reviewmode' => new external_value(PARAM_BOOL, 'Whether the lesson is in review mode for the current user.'),
+                'canmanage' => new external_value(PARAM_BOOL, 'Whether the user can manage the opendsa_activity or not.'),
+                'cangrade' => new external_value(PARAM_BOOL, 'Whether the user can grade the opendsa_activity or not.'),
+                'canviewreports' => new external_value(PARAM_BOOL, 'Whether the user can view the opendsa_activity reports or not.'),
+                'reviewmode' => new external_value(PARAM_BOOL, 'Whether the opendsa_activity is in review mode for the current user.'),
                 'attemptscount' => new external_value(PARAM_INT, 'The number of attempts done by the user.'),
                 'lastpageseen' => new external_value(PARAM_INT, 'The last page seen id.'),
                 'leftduringtimedsession' => new external_value(PARAM_BOOL, 'Whether the user left during a timed session.'),
-                'firstpageid' => new external_value(PARAM_INT, 'The lesson first page id.'),
+                'firstpageid' => new external_value(PARAM_INT, 'The opendsa_activity first page id.'),
                 'preventaccessreasons' => new external_multiple_structure(
                     new external_single_structure(
                         array(
@@ -415,7 +415,7 @@ class mod_lesson_external extends external_api {
                             'data' => new external_value(PARAM_RAW, 'Additional data'),
                             'message' => new external_value(PARAM_RAW, 'Complete html message'),
                         ),
-                        'The reasons why the user cannot attempt the lesson'
+                        'The reasons why the user cannot attempt the opendsa_activity'
                     )
                 ),
                 'warnings' => new external_warnings(),
@@ -424,16 +424,16 @@ class mod_lesson_external extends external_api {
     }
 
     /**
-     * Describes the parameters for view_lesson.
+     * Describes the parameters for view_opendsa_activity.
      *
      * @return external_function_parameters
      * @since Moodle 3.3
      */
-    public static function view_lesson_parameters() {
+    public static function view_opendsa_activity_parameters() {
         return new external_function_parameters (
             array(
-                'opendsa_activity_id' => new external_value(PARAM_INT, 'lesson instance id'),
-                'password' => new external_value(PARAM_RAW, 'lesson password', VALUE_DEFAULT, ''),
+                'opendsa_activity_id' => new external_value(PARAM_INT, 'opendsa_activity instance id'),
+                'password' => new external_value(PARAM_RAW, 'opendsa_activity password', VALUE_DEFAULT, ''),
             )
         );
     }
@@ -441,23 +441,23 @@ class mod_lesson_external extends external_api {
     /**
      * Trigger the course module viewed event and update the module completion status.
      *
-     * @param int $opendsa_activity_id lesson instance id
-     * @param string $password optional password (the lesson may be protected)
+     * @param int $opendsa_activity_id opendsa_activity instance id
+     * @param string $password optional password (the opendsa_activity may be protected)
      * @return array of warnings and status result
      * @since Moodle 3.3
      * @throws moodle_exception
      */
-    public static function view_lesson($opendsa_activity_id, $password = '') {
+    public static function view_opendsa_activity($opendsa_activity_id, $password = '') {
         global $DB;
 
         $params = array('opendsa_activity_id' => $opendsa_activity_id, 'password' => $password);
-        $params = self::validate_parameters(self::view_lesson_parameters(), $params);
+        $params = self::validate_parameters(self::view_opendsa_activity_parameters(), $params);
         $warnings = array();
 
-        list($lesson, $course, $cm, $context, $lessonrecord) = self::validate_lesson($params['opendsa_activity_id']);
-        self::validate_attempt($lesson, $params);
+        list($opendsa_activity, $course, $cm, $context, $opendsa_activityrecord) = self::validate_opendsa_activity($params['opendsa_activity_id']);
+        self::validate_attempt($opendsa_activity, $params);
 
-        $lesson->set_module_viewed();
+        $opendsa_activity->set_module_viewed();
 
         $result = array();
         $result['status'] = true;
@@ -466,12 +466,12 @@ class mod_lesson_external extends external_api {
     }
 
     /**
-     * Describes the view_lesson return value.
+     * Describes the view_opendsa_activity return value.
      *
      * @return external_single_structure
      * @since Moodle 3.3
      */
-    public static function view_lesson_returns() {
+    public static function view_opendsa_activity_returns() {
         return new external_single_structure(
             array(
                 'status' => new external_value(PARAM_BOOL, 'status: true if success'),
@@ -481,7 +481,7 @@ class mod_lesson_external extends external_api {
     }
 
     /**
-     * Check if the current user can retrieve lesson information (grades, attempts) about the given user.
+     * Check if the current user can retrieve opendsa_activity information (grades, attempts) about the given user.
      *
      * @param int $userid the user to check
      * @param stdClass $course course object
@@ -494,7 +494,7 @@ class mod_lesson_external extends external_api {
         $user = core_user::get_user($userid, '*', MUST_EXIST);
         core_user::require_active_user($user);
         // Check permissions and that if users share group (if groups enabled).
-        require_capability('mod/lesson:viewreports', $context);
+        require_capability('mod/opendsa_activity:viewreports', $context);
         if (!groups_user_groups_visible($course, $user->id, $cm)) {
             throw new moodle_exception('notingroup');
         }
@@ -509,8 +509,8 @@ class mod_lesson_external extends external_api {
     public static function get_questions_attempts_parameters() {
         return new external_function_parameters (
             array(
-                'opendsa_activity_id' => new external_value(PARAM_INT, 'lesson instance id'),
-                'attempt' => new external_value(PARAM_INT, 'lesson attempt number'),
+                'opendsa_activity_id' => new external_value(PARAM_INT, 'opendsa_activity instance id'),
+                'attempt' => new external_value(PARAM_INT, 'opendsa_activity attempt number'),
                 'correct' => new external_value(PARAM_BOOL, 'only fetch correct attempts', VALUE_DEFAULT, false),
                 'pageid' => new external_value(PARAM_INT, 'only fetch attempts at the given page', VALUE_DEFAULT, null),
                 'userid' => new external_value(PARAM_INT, 'only fetch attempts of the given user', VALUE_DEFAULT, null),
@@ -519,10 +519,10 @@ class mod_lesson_external extends external_api {
     }
 
     /**
-     * Return the list of page question attempts in a given lesson.
+     * Return the list of page question attempts in a given opendsa_activity.
      *
-     * @param int $opendsa_activity_id lesson instance id
-     * @param int $attempt the lesson attempt number
+     * @param int $opendsa_activity_id opendsa_activity instance id
+     * @param int $attempt the opendsa_activity attempt number
      * @param bool $correct only fetch correct attempts
      * @param int $pageid only fetch attempts at the given page
      * @param int $userid only fetch attempts of the given user
@@ -543,7 +543,7 @@ class mod_lesson_external extends external_api {
         $params = self::validate_parameters(self::get_questions_attempts_parameters(), $params);
         $warnings = array();
 
-        list($lesson, $course, $cm, $context, $lessonrecord) = self::validate_lesson($params['opendsa_activity_id']);
+        list($opendsa_activity, $course, $cm, $context, $opendsa_activityrecord) = self::validate_opendsa_activity($params['opendsa_activity_id']);
 
         // Default value for userid.
         if (empty($params['userid'])) {
@@ -556,7 +556,7 @@ class mod_lesson_external extends external_api {
         }
 
         $result = array();
-        $result['attempts'] = $lesson->get_attempts($params['attempt'], $params['correct'], $params['pageid'], $params['userid']);
+        $result['attempts'] = $opendsa_activity->get_attempts($params['attempt'], $params['correct'], $params['pageid'], $params['userid']);
         $result['warnings'] = $warnings;
         return $result;
     }
@@ -578,7 +578,7 @@ class mod_lesson_external extends external_api {
                             'pageid' => new external_value(PARAM_INT, 'The attempt pageid'),
                             'userid' => new external_value(PARAM_INT, 'The user who did the attempt'),
                             'answerid' => new external_value(PARAM_INT, 'The attempt answerid'),
-                            'retry' => new external_value(PARAM_INT, 'The lesson attempt number'),
+                            'retry' => new external_value(PARAM_INT, 'The opendsa_activity attempt number'),
                             'correct' => new external_value(PARAM_INT, 'If it was the correct answer'),
                             'useranswer' => new external_value(PARAM_RAW, 'The complete user answer'),
                             'timeseen' => new external_value(PARAM_INT, 'The time the question was seen'),
@@ -600,16 +600,16 @@ class mod_lesson_external extends external_api {
     public static function get_user_grade_parameters() {
         return new external_function_parameters (
             array(
-                'opendsa_activity_id' => new external_value(PARAM_INT, 'lesson instance id'),
+                'opendsa_activity_id' => new external_value(PARAM_INT, 'opendsa_activity instance id'),
                 'userid' => new external_value(PARAM_INT, 'the user id (empty for current user)', VALUE_DEFAULT, null),
             )
         );
     }
 
     /**
-     * Return the final grade in the lesson for the given user.
+     * Return the final grade in the opendsa_activity for the given user.
      *
-     * @param int $opendsa_activity_id lesson instance id
+     * @param int $opendsa_activity_id opendsa_activity instance id
      * @param int $userid only fetch grades of this user
      * @return array of warnings and page attempts
      * @since Moodle 3.3
@@ -626,7 +626,7 @@ class mod_lesson_external extends external_api {
         $params = self::validate_parameters(self::get_user_grade_parameters(), $params);
         $warnings = array();
 
-        list($lesson, $course, $cm, $context, $lessonrecord) = self::validate_lesson($params['opendsa_activity_id']);
+        list($opendsa_activity, $course, $cm, $context, $opendsa_activityrecord) = self::validate_opendsa_activity($params['opendsa_activity_id']);
 
         // Default value for userid.
         if (empty($params['userid'])) {
@@ -640,13 +640,13 @@ class mod_lesson_external extends external_api {
 
         $grade = null;
         $formattedgrade = null;
-        $grades = lesson_get_user_grades($lesson, $params['userid']);
+        $grades = opendsa_activity_get_user_grades($opendsa_activity, $params['userid']);
         if (!empty($grades)) {
             $grade = $grades[$params['userid']]->rawgrade;
             $params = array(
                 'itemtype' => 'mod',
-                'itemmodule' => 'lesson',
-                'iteminstance' => $lesson->id,
+                'itemmodule' => 'opendsa_activity',
+                'iteminstance' => $opendsa_activity->id,
                 'courseid' => $course->id,
                 'itemnumber' => 0
             );
@@ -670,8 +670,8 @@ class mod_lesson_external extends external_api {
     public static function get_user_grade_returns() {
         return new external_single_structure(
             array(
-                'grade' => new external_value(PARAM_FLOAT, 'The lesson final raw grade'),
-                'formattedgrade' => new external_value(PARAM_RAW, 'The lesson final grade formatted'),
+                'grade' => new external_value(PARAM_FLOAT, 'The opendsa_activity final raw grade'),
+                'formattedgrade' => new external_value(PARAM_RAW, 'The opendsa_activity final grade formatted'),
                 'warnings' => new external_warnings(),
             )
         );
@@ -708,8 +708,8 @@ class mod_lesson_external extends external_api {
     public static function get_user_attempt_grade_parameters() {
         return new external_function_parameters (
             array(
-                'opendsa_activity_id' => new external_value(PARAM_INT, 'lesson instance id'),
-                'lessonattempt' => new external_value(PARAM_INT, 'lesson attempt number'),
+                'opendsa_activity_id' => new external_value(PARAM_INT, 'opendsa_activity instance id'),
+                'opendsa_activityattempt' => new external_value(PARAM_INT, 'opendsa_activity attempt number'),
                 'userid' => new external_value(PARAM_INT, 'the user id (empty for current user)', VALUE_DEFAULT, null),
             )
         );
@@ -718,26 +718,26 @@ class mod_lesson_external extends external_api {
     /**
      * Return grade information in the attempt for a given user.
      *
-     * @param int $opendsa_activity_id lesson instance id
-     * @param int $lessonattempt lesson attempt number
+     * @param int $opendsa_activity_id opendsa_activity instance id
+     * @param int $opendsa_activityattempt opendsa_activity attempt number
      * @param int $userid only fetch attempts of the given user
      * @return array of warnings and page attempts
      * @since Moodle 3.3
      * @throws moodle_exception
      */
-    public static function get_user_attempt_grade($opendsa_activity_id, $lessonattempt, $userid = null) {
+    public static function get_user_attempt_grade($opendsa_activity_id, $opendsa_activityattempt, $userid = null) {
         global $CFG, $USER;
         require_once($CFG->libdir . '/gradelib.php');
 
         $params = array(
             'opendsa_activity_id' => $opendsa_activity_id,
-            'lessonattempt' => $lessonattempt,
+            'opendsa_activityattempt' => $opendsa_activityattempt,
             'userid' => $userid,
         );
         $params = self::validate_parameters(self::get_user_attempt_grade_parameters(), $params);
         $warnings = array();
 
-        list($lesson, $course, $cm, $context, $lessonrecord) = self::validate_lesson($params['opendsa_activity_id']);
+        list($opendsa_activity, $course, $cm, $context, $opendsa_activityrecord) = self::validate_opendsa_activity($params['opendsa_activity_id']);
 
         // Default value for userid.
         if (empty($params['userid'])) {
@@ -750,7 +750,7 @@ class mod_lesson_external extends external_api {
         }
 
         $result = array();
-        $result['grade'] = (array) lesson_grade($lesson, $params['lessonattempt'], $params['userid']);
+        $result['grade'] = (array) opendsa_activity_grade($opendsa_activity, $params['opendsa_activityattempt'], $params['userid']);
         $result['warnings'] = $warnings;
         return $result;
     }
@@ -779,35 +779,35 @@ class mod_lesson_external extends external_api {
     public static function get_content_pages_viewed_parameters() {
         return new external_function_parameters (
             array(
-                'opendsa_activity_id' => new external_value(PARAM_INT, 'lesson instance id'),
-                'lessonattempt' => new external_value(PARAM_INT, 'lesson attempt number'),
+                'opendsa_activity_id' => new external_value(PARAM_INT, 'opendsa_activity instance id'),
+                'opendsa_activityattempt' => new external_value(PARAM_INT, 'opendsa_activity attempt number'),
                 'userid' => new external_value(PARAM_INT, 'the user id (empty for current user)', VALUE_DEFAULT, null),
             )
         );
     }
 
     /**
-     * Return the list of content pages viewed by a user during a lesson attempt.
+     * Return the list of content pages viewed by a user during a opendsa_activity attempt.
      *
-     * @param int $opendsa_activity_id lesson instance id
-     * @param int $lessonattempt lesson attempt number
+     * @param int $opendsa_activity_id opendsa_activity instance id
+     * @param int $opendsa_activityattempt opendsa_activity attempt number
      * @param int $userid only fetch attempts of the given user
      * @return array of warnings and page attempts
      * @since Moodle 3.3
      * @throws moodle_exception
      */
-    public static function get_content_pages_viewed($opendsa_activity_id, $lessonattempt, $userid = null) {
+    public static function get_content_pages_viewed($opendsa_activity_id, $opendsa_activityattempt, $userid = null) {
         global $USER;
 
         $params = array(
             'opendsa_activity_id' => $opendsa_activity_id,
-            'lessonattempt' => $lessonattempt,
+            'opendsa_activityattempt' => $opendsa_activityattempt,
             'userid' => $userid,
         );
         $params = self::validate_parameters(self::get_content_pages_viewed_parameters(), $params);
         $warnings = array();
 
-        list($lesson, $course, $cm, $context, $lessonrecord) = self::validate_lesson($params['opendsa_activity_id']);
+        list($opendsa_activity, $course, $cm, $context, $opendsa_activityrecord) = self::validate_opendsa_activity($params['opendsa_activity_id']);
 
         // Default value for userid.
         if (empty($params['userid'])) {
@@ -819,7 +819,7 @@ class mod_lesson_external extends external_api {
             self::check_can_view_user_data($params['userid'], $course, $cm, $context);
         }
 
-        $pages = $lesson->get_content_pages_viewed($params['lessonattempt'], $params['userid']);
+        $pages = $opendsa_activity->get_content_pages_viewed($params['opendsa_activityattempt'], $params['userid']);
 
         $result = array();
         $result['pages'] = $pages;
@@ -840,10 +840,10 @@ class mod_lesson_external extends external_api {
                     new external_single_structure(
                         array(
                             'id' => new external_value(PARAM_INT, 'The attempt id.'),
-                            'opendsa_activity_id' => new external_value(PARAM_INT, 'The lesson id.'),
+                            'opendsa_activity_id' => new external_value(PARAM_INT, 'The opendsa_activity id.'),
                             'pageid' => new external_value(PARAM_INT, 'The page id.'),
                             'userid' => new external_value(PARAM_INT, 'The user who viewed the page.'),
-                            'retry' => new external_value(PARAM_INT, 'The lesson attempt number.'),
+                            'retry' => new external_value(PARAM_INT, 'The opendsa_activity attempt number.'),
                             'flag' => new external_value(PARAM_INT, '1 if the next page was calculated randomly.'),
                             'timeseen' => new external_value(PARAM_INT, 'The time the page was seen.'),
                             'nextpageid' => new external_value(PARAM_INT, 'The next page chosen id.'),
@@ -865,16 +865,16 @@ class mod_lesson_external extends external_api {
     public static function get_user_timers_parameters() {
         return new external_function_parameters (
             array(
-                'opendsa_activity_id' => new external_value(PARAM_INT, 'lesson instance id'),
+                'opendsa_activity_id' => new external_value(PARAM_INT, 'opendsa_activity instance id'),
                 'userid' => new external_value(PARAM_INT, 'the user id (empty for current user)', VALUE_DEFAULT, null),
             )
         );
     }
 
     /**
-     * Return the timers in the current lesson for the given user.
+     * Return the timers in the current opendsa_activity for the given user.
      *
-     * @param int $opendsa_activity_id lesson instance id
+     * @param int $opendsa_activity_id opendsa_activity instance id
      * @param int $userid only fetch timers of the given user
      * @return array of warnings and timers
      * @since Moodle 3.3
@@ -890,7 +890,7 @@ class mod_lesson_external extends external_api {
         $params = self::validate_parameters(self::get_user_timers_parameters(), $params);
         $warnings = array();
 
-        list($lesson, $course, $cm, $context, $lessonrecord) = self::validate_lesson($params['opendsa_activity_id']);
+        list($opendsa_activity, $course, $cm, $context, $opendsa_activityrecord) = self::validate_opendsa_activity($params['opendsa_activity_id']);
 
         // Default value for userid.
         if (empty($params['userid'])) {
@@ -902,7 +902,7 @@ class mod_lesson_external extends external_api {
             self::check_can_view_user_data($params['userid'], $course, $cm, $context);
         }
 
-        $timers = $lesson->get_user_timers($params['userid']);
+        $timers = $opendsa_activity->get_user_timers($params['userid']);
 
         $result = array();
         $result['timers'] = $timers;
@@ -923,11 +923,11 @@ class mod_lesson_external extends external_api {
                     new external_single_structure(
                         array(
                             'id' => new external_value(PARAM_INT, 'The attempt id'),
-                            'opendsa_activity_id' => new external_value(PARAM_INT, 'The lesson id'),
+                            'opendsa_activity_id' => new external_value(PARAM_INT, 'The opendsa_activity id'),
                             'userid' => new external_value(PARAM_INT, 'The user id'),
                             'starttime' => new external_value(PARAM_INT, 'First access time for a new timer session'),
-                            'lessontime' => new external_value(PARAM_INT, 'Last access time to the lesson during the timer session'),
-                            'completed' => new external_value(PARAM_INT, 'If the lesson for this timer was completed'),
+                            'opendsa_activitytime' => new external_value(PARAM_INT, 'Last access time to the opendsa_activity during the timer session'),
+                            'completed' => new external_value(PARAM_INT, 'If the opendsa_activity for this timer was completed'),
                             'timemodifiedoffline' => new external_value(PARAM_INT, 'Last modified time via webservices.'),
                         ),
                         'The timers'
@@ -939,7 +939,7 @@ class mod_lesson_external extends external_api {
     }
 
     /**
-     * Describes the external structure for a lesson page.
+     * Describes the external structure for a opendsa_activity page.
      *
      * @return external_single_structure
      * @since Moodle 3.3
@@ -947,8 +947,8 @@ class mod_lesson_external extends external_api {
     protected static function get_page_structure($required = VALUE_REQUIRED) {
         return new external_single_structure(
             array(
-                'id' => new external_value(PARAM_INT, 'The id of this lesson page'),
-                'opendsa_activity_id' => new external_value(PARAM_INT, 'The id of the lesson this page belongs to'),
+                'id' => new external_value(PARAM_INT, 'The id of this opendsa_activity page'),
+                'opendsa_activity_id' => new external_value(PARAM_INT, 'The id of the opendsa_activity this page belongs to'),
                 'prevpageid' => new external_value(PARAM_INT, 'The id of the page before this one'),
                 'nextpageid' => new external_value(PARAM_INT, 'The id of the next page in the page sequence'),
                 'qtype' => new external_value(PARAM_INT, 'Identifies the page type of this page'),
@@ -971,14 +971,14 @@ class mod_lesson_external extends external_api {
 
     /**
      * Returns the fields of a page object
-     * @param lesson_page $page the lesson page
+     * @param opendsa_activity_page $page the opendsa_activity page
      * @param bool $returncontents whether to return the page title and contents
      * @return stdClass          the fields matching the external page structure
      * @since Moodle 3.3
      */
-    protected static function get_page_fields(lesson_page $page, $returncontents = false) {
-        $lesson = $page->lesson;
-        $context = $lesson->context;
+    protected static function get_page_fields(opendsa_activity_page $page, $returncontents = false) {
+        $opendsa_activity = $page->opendsa_activity;
+        $context = $opendsa_activity->context;
 
         $pagedata = new stdClass; // Contains the data that will be returned by the WS.
 
@@ -990,14 +990,14 @@ class mod_lesson_external extends external_api {
         }
 
         // Check if we can see title (contents required custom rendering, we won't returning it here @see get_page_data).
-        $canmanage = $lesson->can_manage();
+        $canmanage = $opendsa_activity->can_manage();
         // If we are managers or the menu block is enabled and is a content page visible always return contents.
-        if ($returncontents || $canmanage || (lesson_displayleftif($lesson) && $page->displayinmenublock && $page->display)) {
+        if ($returncontents || $canmanage || (opendsa_activity_displayleftif($opendsa_activity) && $page->displayinmenublock && $page->display)) {
             $pagedata->title = external_format_string($page->title, $context->id);
 
             $options = array('noclean' => true);
             list($pagedata->contents, $pagedata->contentsformat) =
-                external_format_text($page->contents, $page->contentsformat, $context->id, 'mod_lesson', 'page_contents', $page->id,
+                external_format_text($page->contents, $page->contentsformat, $context->id, 'mod_opendsa_activity', 'page_contents', $page->id,
                     $options);
 
         }
@@ -1013,17 +1013,17 @@ class mod_lesson_external extends external_api {
     public static function get_pages_parameters() {
         return new external_function_parameters (
             array(
-                'opendsa_activity_id' => new external_value(PARAM_INT, 'lesson instance id'),
-                'password' => new external_value(PARAM_RAW, 'optional password (the lesson may be protected)', VALUE_DEFAULT, ''),
+                'opendsa_activity_id' => new external_value(PARAM_INT, 'opendsa_activity instance id'),
+                'password' => new external_value(PARAM_RAW, 'optional password (the opendsa_activity may be protected)', VALUE_DEFAULT, ''),
             )
         );
     }
 
     /**
-     * Return the list of pages in a lesson (based on the user permissions).
+     * Return the list of pages in a opendsa_activity (based on the user permissions).
      *
-     * @param int $opendsa_activity_id lesson instance id
-     * @param string $password optional password (the lesson may be protected)
+     * @param int $opendsa_activity_id opendsa_activity instance id
+     * @param string $password optional password (the opendsa_activity may be protected)
      * @return array of warnings and status result
      * @since Moodle 3.3
      * @throws moodle_exception
@@ -1034,19 +1034,19 @@ class mod_lesson_external extends external_api {
         $params = self::validate_parameters(self::get_pages_parameters(), $params);
         $warnings = array();
 
-        list($lesson, $course, $cm, $context, $lessonrecord) = self::validate_lesson($params['opendsa_activity_id']);
-        self::validate_attempt($lesson, $params);
+        list($opendsa_activity, $course, $cm, $context, $opendsa_activityrecord) = self::validate_opendsa_activity($params['opendsa_activity_id']);
+        self::validate_attempt($opendsa_activity, $params);
 
-        $lessonpages = $lesson->load_all_pages();
+        $opendsa_activitypages = $opendsa_activity->load_all_pages();
         $pages = array();
 
-        foreach ($lessonpages as $page) {
+        foreach ($opendsa_activitypages as $page) {
             $pagedata = new stdClass();
 
             // Get the page object fields.
             $pagedata->page = self::get_page_fields($page);
 
-            // Now, calculate the file area files (maybe we need to download a lesson for offline usage).
+            // Now, calculate the file area files (maybe we need to download a opendsa_activity for offline usage).
             $pagedata->filescount = 0;
             $pagedata->filessizetotal = 0;
             $files = $page->get_files(false);   // Get files excluding directories.
@@ -1099,7 +1099,7 @@ class mod_lesson_external extends external_api {
                             'filescount' => new external_value(PARAM_INT, 'The total number of files attached to the page'),
                             'filessizetotal' => new external_value(PARAM_INT, 'The total size of the files'),
                         ),
-                        'The lesson pages'
+                        'The opendsa_activity pages'
                     )
                 ),
                 'warnings' => new external_warnings(),
@@ -1116,8 +1116,8 @@ class mod_lesson_external extends external_api {
     public static function launch_attempt_parameters() {
         return new external_function_parameters (
             array(
-                'opendsa_activity_id' => new external_value(PARAM_INT, 'lesson instance id'),
-                'password' => new external_value(PARAM_RAW, 'optional password (the lesson may be protected)', VALUE_DEFAULT, ''),
+                'opendsa_activity_id' => new external_value(PARAM_INT, 'opendsa_activity instance id'),
+                'password' => new external_value(PARAM_RAW, 'optional password (the opendsa_activity may be protected)', VALUE_DEFAULT, ''),
                 'pageid' => new external_value(PARAM_INT, 'page id to continue from (only when continuing an attempt)', VALUE_DEFAULT, 0),
                 'review' => new external_value(PARAM_BOOL, 'if we want to review just after finishing', VALUE_DEFAULT, false),
             )
@@ -1125,15 +1125,15 @@ class mod_lesson_external extends external_api {
     }
 
     /**
-     * Return lesson messages formatted according the external_messages structure
+     * Return opendsa_activity messages formatted according the external_messages structure
      *
-     * @param  lesson $lesson lesson instance
+     * @param  opendsa_activity $opendsa_activity opendsa_activity instance
      * @return array          messages formatted
      * @since Moodle 3.3
      */
-    protected static function format_lesson_messages($lesson) {
+    protected static function format_opendsa_activity_messages($opendsa_activity) {
         $messages = array();
-        foreach ($lesson->messages as $message) {
+        foreach ($opendsa_activity->messages as $message) {
             $messages[] = array(
                 'message' => $message[0],
                 'type' => $message[1],
@@ -1155,7 +1155,7 @@ class mod_lesson_external extends external_api {
                     'message' => new external_value(PARAM_RAW, 'Message.'),
                     'type' => new external_value(PARAM_ALPHANUMEXT, 'Message type: usually a CSS identifier like:
                                 success, info, warning, error, notifyproblem, notifyerror, notifytiny, notifysuccess')
-                ), 'The lesson generated messages'
+                ), 'The opendsa_activity generated messages'
             )
         );
     }
@@ -1163,8 +1163,8 @@ class mod_lesson_external extends external_api {
     /**
      * Starts a new attempt or continues an existing one.
      *
-     * @param int $opendsa_activity_id lesson instance id
-     * @param string $password optional password (the lesson may be protected)
+     * @param int $opendsa_activity_id opendsa_activity instance id
+     * @param string $password optional password (the opendsa_activity may be protected)
      * @param int $pageid page id to continue from (only when continuing an attempt)
      * @param bool $review if we want to review just after finishing
      * @return array of warnings and status result
@@ -1178,34 +1178,34 @@ class mod_lesson_external extends external_api {
         $params = self::validate_parameters(self::launch_attempt_parameters(), $params);
         $warnings = array();
 
-        list($lesson, $course, $cm, $context, $lessonrecord) = self::validate_lesson($params['opendsa_activity_id']);
-        self::validate_attempt($lesson, $params);
+        list($opendsa_activity, $course, $cm, $context, $opendsa_activityrecord) = self::validate_opendsa_activity($params['opendsa_activity_id']);
+        self::validate_attempt($opendsa_activity, $params);
 
         $newpageid = 0;
-        // Starting a new lesson attempt.
+        // Starting a new opendsa_activity attempt.
         if (empty($params['pageid'])) {
             // Check if there is a recent timer created during the active session.
             $alreadystarted = false;
-            if ($timers = $lesson->get_user_timers($USER->id, 'starttime DESC', '*', 0, 1)) {
+            if ($timers = $opendsa_activity->get_user_timers($USER->id, 'starttime DESC', '*', 0, 1)) {
                 $timer = array_shift($timers);
-                $endtime = $lesson->timelimit > 0 ? min($CFG->sessiontimeout, $lesson->timelimit) : $CFG->sessiontimeout;
+                $endtime = $opendsa_activity->timelimit > 0 ? min($CFG->sessiontimeout, $opendsa_activity->timelimit) : $CFG->sessiontimeout;
                 if (!$timer->completed && $timer->starttime > time() - $endtime) {
                     $alreadystarted = true;
                 }
             }
-            if (!$alreadystarted && !$lesson->can_manage()) {
-                $lesson->start_timer();
+            if (!$alreadystarted && !$opendsa_activity->can_manage()) {
+                $opendsa_activity->start_timer();
             }
         } else {
-            if ($params['pageid'] == LESSON_EOL) {
-                throw new moodle_exception('endoflesson', 'lesson');
+            if ($params['pageid'] == OPENDSA_ACTIVITY_EOL) {
+                throw new moodle_exception('endofopendsa_activity', 'opendsa_activity');
             }
-            $timer = $lesson->update_timer(true, true);
-            if (!$lesson->check_time($timer)) {
-                throw new moodle_exception('eolstudentoutoftime', 'lesson');
+            $timer = $opendsa_activity->update_timer(true, true);
+            if (!$opendsa_activity->check_time($timer)) {
+                throw new moodle_exception('eolstudentoutoftime', 'opendsa_activity');
             }
         }
-        $messages = self::format_lesson_messages($lesson);
+        $messages = self::format_opendsa_activity_messages($opendsa_activity);
 
         $result = array(
             'status' => true,
@@ -1239,9 +1239,9 @@ class mod_lesson_external extends external_api {
     public static function get_page_data_parameters() {
         return new external_function_parameters (
             array(
-                'opendsa_activity_id' => new external_value(PARAM_INT, 'lesson instance id'),
+                'opendsa_activity_id' => new external_value(PARAM_INT, 'opendsa_activity instance id'),
                 'pageid' => new external_value(PARAM_INT, 'the page id'),
-                'password' => new external_value(PARAM_RAW, 'optional password (the lesson may be protected)', VALUE_DEFAULT, ''),
+                'password' => new external_value(PARAM_RAW, 'optional password (the opendsa_activity may be protected)', VALUE_DEFAULT, ''),
                 'review' => new external_value(PARAM_BOOL, 'if we want to review just after finishing (1 hour margin)',
                     VALUE_DEFAULT, false),
                 'returncontents' => new external_value(PARAM_BOOL, 'if we must return the complete page contents once rendered',
@@ -1253,9 +1253,9 @@ class mod_lesson_external extends external_api {
     /**
      * Return information of a given page, including its contents.
      *
-     * @param int $opendsa_activity_id lesson instance id
+     * @param int $opendsa_activity_id opendsa_activity instance id
      * @param int $pageid page id
-     * @param string $password optional password (the lesson may be protected)
+     * @param string $password optional password (the opendsa_activity may be protected)
      * @param bool $review if we want to review just after finishing (1 hour margin)
      * @param bool $returncontents if we must return the complete page contents once rendered
      * @return array of warnings and status result
@@ -1273,28 +1273,28 @@ class mod_lesson_external extends external_api {
         $pagecontent = $ongoingscore = '';
         $progress = $pagedata = null;
 
-        list($lesson, $course, $cm, $context, $lessonrecord) = self::validate_lesson($params['opendsa_activity_id']);
-        self::validate_attempt($lesson, $params);
+        list($opendsa_activity, $course, $cm, $context, $opendsa_activityrecord) = self::validate_opendsa_activity($params['opendsa_activity_id']);
+        self::validate_attempt($opendsa_activity, $params);
 
         $pageid = $params['pageid'];
 
-        // This is called if a student leaves during a lesson.
-        if ($pageid == LESSON_UNSEENBRANCHPAGE) {
-            $pageid = lesson_unseen_question_jump($lesson, $USER->id, $pageid);
+        // This is called if a student leaves during a opendsa_activity.
+        if ($pageid == OPENDSA_ACTIVITY_UNSEENBRANCHPAGE) {
+            $pageid = opendsa_activity_unseen_question_jump($opendsa_activity, $USER->id, $pageid);
         }
 
-        if ($pageid != LESSON_EOL) {
-            $reviewmode = $lesson->is_in_review_mode();
-            $lessonoutput = $PAGE->get_renderer('mod_lesson');
+        if ($pageid != OPENDSA_ACTIVITY_EOL) {
+            $reviewmode = $opendsa_activity->is_in_review_mode();
+            $opendsa_activityoutput = $PAGE->get_renderer('mod_opendsa_activity');
             // Prepare page contents avoiding redirections.
-            list($pageid, $page, $pagecontent) = $lesson->prepare_page_and_contents($pageid, $lessonoutput, $reviewmode, false);
+            list($pageid, $page, $pagecontent) = $opendsa_activity->prepare_page_and_contents($pageid, $opendsa_activityoutput, $reviewmode, false);
 
             if ($pageid > 0) {
 
                 $pagedata = self::get_page_fields($page, true);
 
                 // Files.
-                $contentfiles = external_util::get_area_files($context->id, 'mod_lesson', 'page_contents', $page->id);
+                $contentfiles = external_util::get_area_files($context->id, 'mod_opendsa_activity', 'page_contents', $page->id);
 
                 // Answers.
                 $answers = array();
@@ -1302,12 +1302,12 @@ class mod_lesson_external extends external_api {
                 foreach ($pageanswers as $a) {
                     $answer = array(
                         'id' => $a->id,
-                        'answerfiles' => external_util::get_area_files($context->id, 'mod_lesson', 'page_answers', $a->id),
-                        'responsefiles' => external_util::get_area_files($context->id, 'mod_lesson', 'page_responses', $a->id),
+                        'answerfiles' => external_util::get_area_files($context->id, 'mod_opendsa_activity', 'page_answers', $a->id),
+                        'responsefiles' => external_util::get_area_files($context->id, 'mod_opendsa_activity', 'page_responses', $a->id),
                     );
                     // For managers, return all the information (including correct answers, jumps).
                     // If the teacher enabled offline attempts, this information will be downloaded too.
-                    if ($lesson->can_manage() || $lesson->allowofflineattempts) {
+                    if ($opendsa_activity->can_manage() || $opendsa_activity->allowofflineattempts) {
                         $extraproperties = array('jumpto', 'grade', 'score', 'flags', 'timecreated', 'timemodified');
                         foreach ($extraproperties as $prop) {
                             $answer[$prop] = $a->{$prop};
@@ -1315,28 +1315,28 @@ class mod_lesson_external extends external_api {
 
                         $options = array('noclean' => true);
                         list($answer['answer'], $answer['answerformat']) =
-                            external_format_text($a->answer, $a->answerformat, $context->id, 'mod_lesson', 'page_answers', $a->id,
+                            external_format_text($a->answer, $a->answerformat, $context->id, 'mod_opendsa_activity', 'page_answers', $a->id,
                                 $options);
                         list($answer['response'], $answer['responseformat']) =
-                            external_format_text($a->response, $a->responseformat, $context->id, 'mod_lesson', 'page_responses',
+                            external_format_text($a->response, $a->responseformat, $context->id, 'mod_opendsa_activity', 'page_responses',
                                 $a->id, $options);
                     }
                     $answers[] = $answer;
                 }
 
-                // Additional lesson information.
-                if (!$lesson->can_manage()) {
-                    if ($lesson->ongoing && !$reviewmode) {
-                        $ongoingscore = $lesson->get_ongoing_score_message();
+                // Additional opendsa_activity information.
+                if (!$opendsa_activity->can_manage()) {
+                    if ($opendsa_activity->ongoing && !$reviewmode) {
+                        $ongoingscore = $opendsa_activity->get_ongoing_score_message();
                     }
-                    if ($lesson->progressbar) {
-                        $progress = $lesson->calculate_progress();
+                    if ($opendsa_activity->progressbar) {
+                        $progress = $opendsa_activity->calculate_progress();
                     }
                 }
             }
         }
 
-        $messages = self::format_lesson_messages($lesson);
+        $messages = self::format_opendsa_activity_messages($opendsa_activity);
 
         $result = array(
             'newpageid' => $pageid,
@@ -1346,7 +1346,7 @@ class mod_lesson_external extends external_api {
             'answers' => $answers,
             'messages' => $messages,
             'warnings' => $warnings,
-            'displaymenu' => !empty(lesson_displayleftif($lesson)),
+            'displaymenu' => !empty(opendsa_activity_displayleftif($opendsa_activity)),
         );
 
         if (!empty($pagedata)) {
@@ -1372,7 +1372,7 @@ class mod_lesson_external extends external_api {
                 'newpageid' => new external_value(PARAM_INT, 'New page id (if a jump was made)'),
                 'pagecontent' => new external_value(PARAM_RAW, 'Page html content', VALUE_OPTIONAL),
                 'ongoingscore' => new external_value(PARAM_TEXT, 'The ongoing score message'),
-                'progress' => new external_value(PARAM_INT, 'Progress percentage in the lesson'),
+                'progress' => new external_value(PARAM_INT, 'Progress percentage in the opendsa_activity'),
                 'contentfiles' => new external_files(),
                 'answers' => new external_multiple_structure(
                     new external_single_structure(
@@ -1411,7 +1411,7 @@ class mod_lesson_external extends external_api {
     public static function process_page_parameters() {
         return new external_function_parameters (
             array(
-                'opendsa_activity_id' => new external_value(PARAM_INT, 'lesson instance id'),
+                'opendsa_activity_id' => new external_value(PARAM_INT, 'opendsa_activity instance id'),
                 'pageid' => new external_value(PARAM_INT, 'the page id'),
                 'data' => new external_multiple_structure(
                     new external_single_structure(
@@ -1421,7 +1421,7 @@ class mod_lesson_external extends external_api {
                         )
                     ), 'the data to be saved'
                 ),
-                'password' => new external_value(PARAM_RAW, 'optional password (the lesson may be protected)', VALUE_DEFAULT, ''),
+                'password' => new external_value(PARAM_RAW, 'optional password (the opendsa_activity may be protected)', VALUE_DEFAULT, ''),
                 'review' => new external_value(PARAM_BOOL, 'if we want to review just after finishing (1 hour margin)',
                     VALUE_DEFAULT, false),
             )
@@ -1431,10 +1431,10 @@ class mod_lesson_external extends external_api {
     /**
      * Processes page responses
      *
-     * @param int $opendsa_activity_id lesson instance id
+     * @param int $opendsa_activity_id opendsa_activity instance id
      * @param int $pageid page id
      * @param array $data the data to be saved
-     * @param string $password optional password (the lesson may be protected)
+     * @param string $password optional password (the opendsa_activity may be protected)
      * @param bool $review if we want to review just after finishing (1 hour margin)
      * @return array of warnings and status result
      * @since Moodle 3.3
@@ -1451,13 +1451,13 @@ class mod_lesson_external extends external_api {
         $pagecontent = $ongoingscore = '';
         $progress = null;
 
-        list($lesson, $course, $cm, $context, $lessonrecord) = self::validate_lesson($params['opendsa_activity_id']);
+        list($opendsa_activity, $course, $cm, $context, $opendsa_activityrecord) = self::validate_opendsa_activity($params['opendsa_activity_id']);
 
         // Update timer so the validation can check the time restrictions.
-        $timer = $lesson->update_timer();
-        self::validate_attempt($lesson, $params);
+        $timer = $opendsa_activity->update_timer();
+        self::validate_attempt($opendsa_activity, $params);
 
-        // Create the $_POST object required by the lesson question engine.
+        // Create the $_POST object required by the opendsa_activity question engine.
         $_POST = array();
         foreach ($data as $element) {
             // First check if we are handling editor fields like answer[text].
@@ -1472,20 +1472,20 @@ class mod_lesson_external extends external_api {
         $USER->ignoresesskey = true;
 
         // Process page.
-        $page = $lesson->load_page($params['pageid']);
-        $result = $lesson->process_page_responses($page);
+        $page = $opendsa_activity->load_page($params['pageid']);
+        $result = $opendsa_activity->process_page_responses($page);
 
         // Prepare messages.
-        $reviewmode = $lesson->is_in_review_mode();
-        $lesson->add_messages_on_page_process($page, $result, $reviewmode);
+        $reviewmode = $opendsa_activity->is_in_review_mode();
+        $opendsa_activity->add_messages_on_page_process($page, $result, $reviewmode);
 
-        // Additional lesson information.
-        if (!$lesson->can_manage()) {
-            if ($lesson->ongoing && !$reviewmode) {
-                $ongoingscore = $lesson->get_ongoing_score_message();
+        // Additional opendsa_activity information.
+        if (!$opendsa_activity->can_manage()) {
+            if ($opendsa_activity->ongoing && !$reviewmode) {
+                $ongoingscore = $opendsa_activity->get_ongoing_score_message();
             }
-            if ($lesson->progressbar) {
-                $progress = $lesson->calculate_progress();
+            if ($opendsa_activity->progressbar) {
+                $progress = $opendsa_activity->calculate_progress();
             }
         }
 
@@ -1506,8 +1506,8 @@ class mod_lesson_external extends external_api {
             'reviewmode'        => $reviewmode,
             'ongoingscore'      => $ongoingscore,
             'progress'          => $progress,
-            'displaymenu'       => !empty(lesson_displayleftif($lesson)),
-            'messages'          => self::format_lesson_messages($lesson),
+            'displaymenu'       => !empty(opendsa_activity_displayleftif($opendsa_activity)),
+            'messages'          => self::format_opendsa_activity_messages($opendsa_activity),
             'warnings'          => $warnings,
         );
         return $result;
@@ -1536,7 +1536,7 @@ class mod_lesson_external extends external_api {
                 'userresponse' => new external_value(PARAM_RAW, 'The user response.'),
                 'reviewmode' => new external_value(PARAM_BOOL, 'Whether the user is reviewing.'),
                 'ongoingscore' => new external_value(PARAM_TEXT, 'The ongoing message.'),
-                'progress' => new external_value(PARAM_INT, 'Progress percentage in the lesson.'),
+                'progress' => new external_value(PARAM_INT, 'Progress percentage in the opendsa_activity.'),
                 'displaymenu' => new external_value(PARAM_BOOL, 'Whether we should display the menu or not in this page.'),
                 'messages' => self::external_messages(),
                 'warnings' => new external_warnings(),
@@ -1554,7 +1554,7 @@ class mod_lesson_external extends external_api {
         return new external_function_parameters (
             array(
                 'opendsa_activity_id' => new external_value(PARAM_INT, 'Lesson instance id.'),
-                'password' => new external_value(PARAM_RAW, 'Optional password (the lesson may be protected).', VALUE_DEFAULT, ''),
+                'password' => new external_value(PARAM_RAW, 'Optional password (the opendsa_activity may be protected).', VALUE_DEFAULT, ''),
                 'outoftime' => new external_value(PARAM_BOOL, 'If the user run out of time.', VALUE_DEFAULT, false),
                 'review' => new external_value(PARAM_BOOL, 'If we want to review just after finishing (1 hour margin).',
                     VALUE_DEFAULT, false),
@@ -1565,8 +1565,8 @@ class mod_lesson_external extends external_api {
     /**
      * Finishes the current attempt.
      *
-     * @param int $opendsa_activity_id lesson instance id
-     * @param string $password optional password (the lesson may be protected)
+     * @param int $opendsa_activity_id opendsa_activity instance id
+     * @param string $password optional password (the opendsa_activity may be protected)
      * @param bool $outoftime optional if the user run out of time
      * @param bool $review if we want to review just after finishing (1 hour margin)
      * @return array of warnings and information about the finished attempt
@@ -1580,14 +1580,14 @@ class mod_lesson_external extends external_api {
 
         $warnings = array();
 
-        list($lesson, $course, $cm, $context, $lessonrecord) = self::validate_lesson($params['opendsa_activity_id']);
+        list($opendsa_activity, $course, $cm, $context, $opendsa_activityrecord) = self::validate_opendsa_activity($params['opendsa_activity_id']);
 
         // Update timer so the validation can check the time restrictions.
-        $timer = $lesson->update_timer();
+        $timer = $opendsa_activity->update_timer();
 
         // Return the validation to avoid exceptions in case the user is out of time.
-        $params['pageid'] = LESSON_EOL;
-        $validation = self::validate_attempt($lesson, $params, true);
+        $params['pageid'] = OPENDSA_ACTIVITY_EOL;
+        $validation = self::validate_attempt($opendsa_activity, $params, true);
 
         if (array_key_exists('eolstudentoutoftime', $validation)) {
             // Maybe we run out of time just now.
@@ -1597,12 +1597,12 @@ class mod_lesson_external extends external_api {
         // Check if there are more errors.
         if (!empty($validation)) {
             reset($validation);
-            throw new moodle_exception(key($validation), 'lesson', '', current($validation));   // Throw first error.
+            throw new moodle_exception(key($validation), 'opendsa_activity', '', current($validation));   // Throw first error.
         }
 
         // Set out of time to normal (it is the only existing mode).
         $outoftimemode = $params['outoftime'] ? 'normal' : '';
-        $result = $lesson->process_eol_page($outoftimemode);
+        $result = $opendsa_activity->process_eol_page($outoftimemode);
 
         // Return the data.
          $validmessages = array(
@@ -1616,7 +1616,7 @@ class mod_lesson_external extends external_api {
                 $message = '';
                 if (in_array($el, $validmessages)) { // Check if the data comes with an informative message.
                     $a = (is_bool($value)) ? null : $value;
-                    $message = get_string($el, 'lesson', $a);
+                    $message = get_string($el, 'opendsa_activity', $a);
                 }
                 // Return the data.
                 $data[] = array(
@@ -1629,7 +1629,7 @@ class mod_lesson_external extends external_api {
 
         $result = array(
             'data'     => $data,
-            'messages' => self::format_lesson_messages($lesson),
+            'messages' => self::format_opendsa_activity_messages($opendsa_activity),
             'warnings' => $warnings,
         );
         return $result;
@@ -1668,7 +1668,7 @@ class mod_lesson_external extends external_api {
     public static function get_attempts_overview_parameters() {
         return new external_function_parameters (
             array(
-                'opendsa_activity_id' => new external_value(PARAM_INT, 'lesson instance id'),
+                'opendsa_activity_id' => new external_value(PARAM_INT, 'opendsa_activity instance id'),
                 'groupid' => new external_value(PARAM_INT, 'group id, 0 means that the function will determine the user group',
                                                 VALUE_DEFAULT, 0),
             )
@@ -1676,9 +1676,9 @@ class mod_lesson_external extends external_api {
     }
 
     /**
-     * Get a list of all the attempts made by users in a lesson.
+     * Get a list of all the attempts made by users in a opendsa_activity.
      *
-     * @param int $opendsa_activity_id lesson instance id
+     * @param int $opendsa_activity_id opendsa_activity instance id
      * @param int $groupid group id, 0 means that the function will determine the user group
      * @return array of warnings and status result
      * @since Moodle 3.3
@@ -1690,8 +1690,8 @@ class mod_lesson_external extends external_api {
         $params = self::validate_parameters(self::get_attempts_overview_parameters(), $params);
         $warnings = array();
 
-        list($lesson, $course, $cm, $context, $lessonrecord) = self::validate_lesson($params['opendsa_activity_id']);
-        require_capability('mod/lesson:viewreports', $context);
+        list($opendsa_activity, $course, $cm, $context, $opendsa_activityrecord) = self::validate_opendsa_activity($params['opendsa_activity_id']);
+        require_capability('mod/opendsa_activity:viewreports', $context);
 
         if (!empty($params['groupid'])) {
             $groupid = $params['groupid'];
@@ -1716,7 +1716,7 @@ class mod_lesson_external extends external_api {
             'warnings' => $warnings
         );
 
-        list($table, $data) = lesson_get_overview_report_table_and_data($lesson, $groupid);
+        list($table, $data) = opendsa_activity_get_overview_report_table_and_data($opendsa_activity, $groupid);
         if ($data !== false) {
             $result['data'] = $data;
         }
@@ -1735,12 +1735,12 @@ class mod_lesson_external extends external_api {
             array(
                 'data' => new external_single_structure(
                     array(
-                        'lessonscored' => new external_value(PARAM_BOOL, 'True if the lesson was scored.'),
+                        'opendsa_activityscored' => new external_value(PARAM_BOOL, 'True if the opendsa_activity was scored.'),
                         'numofattempts' => new external_value(PARAM_INT, 'Number of attempts.'),
                         'avescore' => new external_value(PARAM_FLOAT, 'Average score.'),
                         'highscore' => new external_value(PARAM_FLOAT, 'High score.'),
                         'lowscore' => new external_value(PARAM_FLOAT, 'Low score.'),
-                        'avetime' => new external_value(PARAM_INT, 'Average time (spent in taking the lesson).'),
+                        'avetime' => new external_value(PARAM_INT, 'Average time (spent in taking the opendsa_activity).'),
                         'hightime' => new external_value(PARAM_INT, 'High time.'),
                         'lowtime' => new external_value(PARAM_INT, 'Low time.'),
                         'students' => new external_multiple_structure(
@@ -1782,7 +1782,7 @@ class mod_lesson_external extends external_api {
             array(
                 'opendsa_activity_id' => new external_value(PARAM_INT, 'Lesson instance id.'),
                 'userid' => new external_value(PARAM_INT, 'The user id. 0 for current user.'),
-                'lessonattempt' => new external_value(PARAM_INT, 'The attempt number.'),
+                'opendsa_activityattempt' => new external_value(PARAM_INT, 'The attempt number.'),
             )
         );
     }
@@ -1790,25 +1790,25 @@ class mod_lesson_external extends external_api {
     /**
      * Return information about the given user attempt (including answers).
      *
-     * @param int $opendsa_activity_id lesson instance id
+     * @param int $opendsa_activity_id opendsa_activity instance id
      * @param int $userid the user id
-     * @param int $lessonattempt the attempt number
+     * @param int $opendsa_activityattempt the attempt number
      * @return array of warnings and page attempts
      * @since Moodle 3.3
      * @throws moodle_exception
      */
-    public static function get_user_attempt($opendsa_activity_id, $userid, $lessonattempt) {
+    public static function get_user_attempt($opendsa_activity_id, $userid, $opendsa_activityattempt) {
         global $USER;
 
         $params = array(
             'opendsa_activity_id' => $opendsa_activity_id,
             'userid' => $userid,
-            'lessonattempt' => $lessonattempt,
+            'opendsa_activityattempt' => $opendsa_activityattempt,
         );
         $params = self::validate_parameters(self::get_user_attempt_parameters(), $params);
         $warnings = array();
 
-        list($lesson, $course, $cm, $context, $lessonrecord) = self::validate_lesson($params['opendsa_activity_id']);
+        list($opendsa_activity, $course, $cm, $context, $opendsa_activityrecord) = self::validate_opendsa_activity($params['opendsa_activity_id']);
 
         // Default value for userid.
         if (empty($params['userid'])) {
@@ -1820,7 +1820,7 @@ class mod_lesson_external extends external_api {
             self::check_can_view_user_data($params['userid'], $course, $cm, $context);
         }
 
-        list($answerpages, $userstats) = lesson_get_user_detailed_report_data($lesson, $userid, $params['lessonattempt']);
+        list($answerpages, $userstats) = opendsa_activity_get_user_detailed_report_data($opendsa_activity, $userid, $params['opendsa_activityattempt']);
         // Convert page object to page record.
         foreach ($answerpages as $answerp) {
             $answerp->page = self::get_page_fields($answerp->page);
@@ -1888,17 +1888,17 @@ class mod_lesson_external extends external_api {
     public static function get_pages_possible_jumps_parameters() {
         return new external_function_parameters (
             array(
-                'opendsa_activity_id' => new external_value(PARAM_INT, 'lesson instance id'),
+                'opendsa_activity_id' => new external_value(PARAM_INT, 'opendsa_activity instance id'),
             )
         );
     }
 
     /**
-     * Return all the possible jumps for the pages in a given lesson.
+     * Return all the possible jumps for the pages in a given opendsa_activity.
      *
-     * You may expect different results on consecutive executions due to the random nature of the lesson module.
+     * You may expect different results on consecutive executions due to the random nature of the opendsa_activity module.
      *
-     * @param int $opendsa_activity_id lesson instance id
+     * @param int $opendsa_activity_id opendsa_activity instance id
      * @return array of warnings and possible jumps
      * @since Moodle 3.3
      * @throws moodle_exception
@@ -1911,13 +1911,13 @@ class mod_lesson_external extends external_api {
 
         $warnings = $jumps = array();
 
-        list($lesson, $course, $cm, $context) = self::validate_lesson($params['opendsa_activity_id']);
+        list($opendsa_activity, $course, $cm, $context) = self::validate_opendsa_activity($params['opendsa_activity_id']);
 
         // Only return for managers or if offline attempts are enabled.
-        if ($lesson->can_manage() || $lesson->allowofflineattempts) {
+        if ($opendsa_activity->can_manage() || $opendsa_activity->allowofflineattempts) {
 
-            $lessonpages = $lesson->load_all_pages();
-            foreach ($lessonpages as $page) {
+            $opendsa_activitypages = $opendsa_activity->load_all_pages();
+            foreach ($opendsa_activitypages as $page) {
                 $jump = array();
                 $jump['pageid'] = $page->id;
 
@@ -1926,18 +1926,18 @@ class mod_lesson_external extends external_api {
                     foreach ($answers as $answer) {
                         $jump['answerid'] = $answer->id;
                         $jump['jumpto'] = $answer->jumpto;
-                        $jump['calculatedjump'] = $lesson->calculate_new_page_on_jump($page, $answer->jumpto);
+                        $jump['calculatedjump'] = $opendsa_activity->calculate_new_page_on_jump($page, $answer->jumpto);
                         // Special case, only applies to branch/end of branch.
-                        if ($jump['calculatedjump'] == LESSON_RANDOMBRANCH) {
-                            $jump['calculatedjump'] = lesson_unseen_branch_jump($lesson, $USER->id);
+                        if ($jump['calculatedjump'] == OPENDSA_ACTIVITY_RANDOMBRANCH) {
+                            $jump['calculatedjump'] = opendsa_activity_unseen_branch_jump($opendsa_activity, $USER->id);
                         }
                         $jumps[] = $jump;
                     }
                 } else {
-                    // Imported lessons from 1.x.
+                    // Imported opendsa_activitys from 1.x.
                     $jump['answerid'] = 0;
                     $jump['jumpto'] = $page->nextpageid;
-                    $jump['calculatedjump'] = $lesson->calculate_new_page_on_jump($page, $page->nextpageid);
+                    $jump['calculatedjump'] = $opendsa_activity->calculate_new_page_on_jump($page, $page->nextpageid);
                     $jumps[] = $jump;
                 }
             }
@@ -1975,57 +1975,57 @@ class mod_lesson_external extends external_api {
     }
 
     /**
-     * Describes the parameters for get_lesson.
+     * Describes the parameters for get_opendsa_activity.
      *
      * @return external_function_parameters
      * @since Moodle 3.3
      */
-    public static function get_lesson_parameters() {
+    public static function get_opendsa_activity_parameters() {
         return new external_function_parameters (
             array(
-                'opendsa_activity_id' => new external_value(PARAM_INT, 'lesson instance id'),
-                'password' => new external_value(PARAM_RAW, 'lesson password', VALUE_DEFAULT, ''),
+                'opendsa_activity_id' => new external_value(PARAM_INT, 'opendsa_activity instance id'),
+                'password' => new external_value(PARAM_RAW, 'opendsa_activity password', VALUE_DEFAULT, ''),
             )
         );
     }
 
     /**
-     * Return information of a given lesson.
+     * Return information of a given opendsa_activity.
      *
-     * @param int $opendsa_activity_id lesson instance id
-     * @param string $password optional password (the lesson may be protected)
+     * @param int $opendsa_activity_id opendsa_activity instance id
+     * @param string $password optional password (the opendsa_activity may be protected)
      * @return array of warnings and status result
      * @since Moodle 3.3
      * @throws moodle_exception
      */
-    public static function get_lesson($opendsa_activity_id, $password = '') {
+    public static function get_opendsa_activity($opendsa_activity_id, $password = '') {
         global $PAGE;
 
         $params = array('opendsa_activity_id' => $opendsa_activity_id, 'password' => $password);
-        $params = self::validate_parameters(self::get_lesson_parameters(), $params);
+        $params = self::validate_parameters(self::get_opendsa_activity_parameters(), $params);
         $warnings = array();
 
-        list($lesson, $course, $cm, $context, $lessonrecord) = self::validate_lesson($params['opendsa_activity_id']);
+        list($opendsa_activity, $course, $cm, $context, $opendsa_activityrecord) = self::validate_opendsa_activity($params['opendsa_activity_id']);
 
-        $lessonrecord = self::get_lesson_summary_for_exporter($lessonrecord, $params['password']);
-        $exporter = new lesson_summary_exporter($lessonrecord, array('context' => $context));
+        $opendsa_activityrecord = self::get_opendsa_activity_summary_for_exporter($opendsa_activityrecord, $params['password']);
+        $exporter = new opendsa_activity_summary_exporter($opendsa_activityrecord, array('context' => $context));
 
         $result = array();
-        $result['lesson'] = $exporter->export($PAGE->get_renderer('core'));
+        $result['opendsa_activity'] = $exporter->export($PAGE->get_renderer('core'));
         $result['warnings'] = $warnings;
         return $result;
     }
 
     /**
-     * Describes the get_lesson return value.
+     * Describes the get_opendsa_activity return value.
      *
      * @return external_single_structure
      * @since Moodle 3.3
      */
-    public static function get_lesson_returns() {
+    public static function get_opendsa_activity_returns() {
         return new external_single_structure(
             array(
-                'lesson' => lesson_summary_exporter::get_read_structure(),
+                'opendsa_activity' => opendsa_activity_summary_exporter::get_read_structure(),
                 'warnings' => new external_warnings(),
             )
         );

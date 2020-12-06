@@ -15,21 +15,21 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Search area for mod_lesson activities.
+ * Search area for mod_opendsa_activity activities.
  *
- * @package    mod_lesson
+ * @package    mod_opendsa_activity
  * @copyright  2015 David Monllao {@link http://www.davidmonllao.com}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_lesson\search;
+namespace mod_opendsa_activity\search;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Search area for mod_lesson activities.
+ * Search area for mod_opendsa_activity activities.
  *
- * @package    mod_lesson
+ * @package    mod_opendsa_activity
  * @copyright  2015 David Monllao {@link http://www.davidmonllao.com}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

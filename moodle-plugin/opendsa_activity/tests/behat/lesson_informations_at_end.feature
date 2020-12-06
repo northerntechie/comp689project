@@ -1,8 +1,8 @@
-@mod @mod_lesson
-Feature: In a lesson activity, if custom scoring is not enabled, student should see
-  some informations at the end of lesson: questions answered, correct answers, grade, score
+@mod @mod_opendsa_activity
+Feature: In a opendsa_activity activity, if custom scoring is not enabled, student should see
+  some informations at the end of opendsa_activity: questions answered, correct answers, grade, score
 
-  Scenario: Informations at end of lesson if custom scoring not enabled
+  Scenario: Informations at end of opendsa_activity if custom scoring not enabled
     Given the following "users" exist:
       | username | firstname | lastname | email |
       | teacher1 | Teacher | 1 | teacher1@example.com |
@@ -17,10 +17,10 @@ Feature: In a lesson activity, if custom scoring is not enabled, student should 
     And I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
     And I add a "Lesson" to section "1" and I fill the form with:
-      | Name | Test lesson name |
-      | Description | Test lesson description |
+      | Name | Test opendsa_activity name |
+      | Description | Test opendsa_activity description |
       | Custom scoring | No |
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
     And I follow "Add a content page"
     And I set the following fields to these values:
       | Page title | First page name |
@@ -44,7 +44,7 @@ Feature: In a lesson activity, if custom scoring is not enabled, student should 
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    When I follow "Test lesson name"
+    When I follow "Test opendsa_activity name"
     Then I should see "First page contents"
     And I press "Next page"
     And I should see "1 + 1?"
@@ -53,7 +53,7 @@ Feature: In a lesson activity, if custom scoring is not enabled, student should 
     And I press "Submit"
     And I should see "Incorrect answer"
     And I press "Continue"
-    And I should see "Congratulations - end of lesson reached"
+    And I should see "Congratulations - end of opendsa_activity reached"
     And I should see "Number of questions answered: 1"
     And I should see "Number of correct answers: 0"
     And I should see "Your score is 0 (out of 1)."

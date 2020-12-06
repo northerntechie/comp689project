@@ -17,7 +17,7 @@
 /**
  * locallib tests.
  *
- * @package    mod_lesson
+ * @package    mod_opendsa_activity
  * @category   test
  * @copyright  2016 Adrian Greeve <adrian@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -27,20 +27,20 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 
-require_once($CFG->dirroot.'/mod/lesson/locallib.php');
+require_once($CFG->dirroot.'/mod/opendsa_activity/locallib.php');
 
 /**
  * locallib testcase.
  *
- * @package    mod_lesson
+ * @package    mod_opendsa_activity
  * @category   test
  * @copyright  2016 Adrian Greeve <adrian@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class mod_lesson_locallib_testcase extends advanced_testcase {
+class mod_opendsa_activity_locallib_testcase extends advanced_testcase {
 
     /**
-     * Test duplicating a lesson page element.
+     * Test duplicating a opendsa_activity page element.
      */
     public function test_duplicate_page() {
         global $DB;
@@ -48,26 +48,26 @@ class mod_lesson_locallib_testcase extends advanced_testcase {
         $this->resetAfterTest();
         $this->setAdminUser();
         $course = $this->getDataGenerator()->create_course();
-        $lessonmodule = $this->getDataGenerator()->create_module('lesson', array('course' => $course->id));
-        // Convert to a lesson object.
-        $lesson = new lesson($lessonmodule);
+        $opendsa_activitymodule = $this->getDataGenerator()->create_module('opendsa_activity', array('course' => $course->id));
+        // Convert to a opendsa_activity object.
+        $opendsa_activity = new opendsa_activity($opendsa_activitymodule);
 
         // Set up a generator to create content.
-        $generator = $this->getDataGenerator()->get_plugin_generator('mod_lesson');
-        $tfrecord = $generator->create_question_truefalse($lesson);
-        $lesson->duplicate_page($tfrecord->id);
+        $generator = $this->getDataGenerator()->get_plugin_generator('mod_opendsa_activity');
+        $tfrecord = $generator->create_question_truefalse($opendsa_activity);
+        $opendsa_activity->duplicate_page($tfrecord->id);
 
         // Lesson pages.
-        $records = $DB->get_records('lesson_pages', array('qtype' => 2));
+        $records = $DB->get_records('opendsa_activity_pages', array('qtype' => 2));
         $sameelements = array('opendsa_activity_id', 'qtype', 'qoption', 'layout', 'display', 'title', 'contents', 'contentsformat');
         $baserecord = array_shift($records);
         $secondrecord = array_shift($records);
         foreach ($sameelements as $element) {
             $this->assertEquals($baserecord->$element, $secondrecord->$element);
         }
-        // Need lesson answers as well.
-        $baserecordanswers = array_values($DB->get_records('lesson_answers', array('pageid' => $baserecord->id)));
-        $secondrecordanswers = array_values($DB->get_records('lesson_answers', array('pageid' => $secondrecord->id)));
+        // Need opendsa_activity answers as well.
+        $baserecordanswers = array_values($DB->get_records('opendsa_activity_answers', array('pageid' => $baserecord->id)));
+        $secondrecordanswers = array_values($DB->get_records('opendsa_activity_answers', array('pageid' => $secondrecord->id)));
         $sameanswerelements = array('opendsa_activity_id', 'jumpto', 'grade', 'score', 'flags', 'answer', 'answerformat', 'response',
                 'responseformat');
         foreach ($baserecordanswers as $key => $baseanswer) {
@@ -78,9 +78,9 @@ class mod_lesson_locallib_testcase extends advanced_testcase {
     }
 
     /**
-     * Test test_lesson_get_user_deadline().
+     * Test test_opendsa_activity_get_user_deadline().
      */
-    public function test_lesson_get_user_deadline() {
+    public function test_opendsa_activity_get_user_deadline() {
         global $DB;
 
         $this->resetAfterTest();
@@ -88,17 +88,17 @@ class mod_lesson_locallib_testcase extends advanced_testcase {
 
         $basetimestamp = time(); // The timestamp we will base the enddates on.
 
-        // Create generator, course and lessons.
+        // Create generator, course and opendsa_activitys.
         $student1 = $this->getDataGenerator()->create_user();
         $student2 = $this->getDataGenerator()->create_user();
         $student3 = $this->getDataGenerator()->create_user();
         $teacher = $this->getDataGenerator()->create_user();
         $course = $this->getDataGenerator()->create_course();
-        $lessongenerator = $this->getDataGenerator()->get_plugin_generator('mod_lesson');
+        $opendsa_activitygenerator = $this->getDataGenerator()->get_plugin_generator('mod_opendsa_activity');
 
-        // Both lessons close in two hours.
-        $lesson1 = $lessongenerator->create_instance(array('course' => $course->id, 'deadline' => $basetimestamp + 7200));
-        $lesson2 = $lessongenerator->create_instance(array('course' => $course->id, 'deadline' => $basetimestamp + 7200));
+        // Both opendsa_activitys close in two hours.
+        $opendsa_activity1 = $opendsa_activitygenerator->create_instance(array('course' => $course->id, 'deadline' => $basetimestamp + 7200));
+        $opendsa_activity2 = $opendsa_activitygenerator->create_instance(array('course' => $course->id, 'deadline' => $basetimestamp + 7200));
         $group1 = $this->getDataGenerator()->create_group(array('courseid' => $course->id));
         $group2 = $this->getDataGenerator()->create_group(array('courseid' => $course->id));
 
@@ -123,98 +123,98 @@ class mod_lesson_locallib_testcase extends advanced_testcase {
         $this->getDataGenerator()->create_group_member(array('userid' => $student1id, 'groupid' => $group1id));
         $this->getDataGenerator()->create_group_member(array('userid' => $student2id, 'groupid' => $group2id));
 
-        // Group 1 gets an group override for lesson 1 to close in three hours.
+        // Group 1 gets an group override for opendsa_activity 1 to close in three hours.
         $record1 = (object) [
-            'opendsa_activity_id' => $lesson1->id,
+            'opendsa_activity_id' => $opendsa_activity1->id,
             'groupid' => $group1id,
             'deadline' => $basetimestamp + 10800 // In three hours.
         ];
-        $DB->insert_record('lesson_overrides', $record1);
+        $DB->insert_record('opendsa_activity_overrides', $record1);
 
-        // Let's test lesson 1 closes in three hours for user student 1 since member of group 1.
-        // lesson 2 closes in two hours.
+        // Let's test opendsa_activity 1 closes in three hours for user student 1 since member of group 1.
+        // opendsa_activity 2 closes in two hours.
         $this->setUser($student1id);
         $params = new stdClass();
 
         $comparearray = array();
         $object = new stdClass();
-        $object->id = $lesson1->id;
-        $object->userdeadline = $basetimestamp + 10800; // The overriden deadline for lesson 1.
+        $object->id = $opendsa_activity1->id;
+        $object->userdeadline = $basetimestamp + 10800; // The overriden deadline for opendsa_activity 1.
 
-        $comparearray[$lesson1->id] = $object;
+        $comparearray[$opendsa_activity1->id] = $object;
 
         $object = new stdClass();
-        $object->id = $lesson2->id;
-        $object->userdeadline = $basetimestamp + 7200; // The unchanged deadline for lesson 2.
+        $object->id = $opendsa_activity2->id;
+        $object->userdeadline = $basetimestamp + 7200; // The unchanged deadline for opendsa_activity 2.
 
-        $comparearray[$lesson2->id] = $object;
+        $comparearray[$opendsa_activity2->id] = $object;
 
-        $this->assertEquals($comparearray, lesson_get_user_deadline($course->id));
+        $this->assertEquals($comparearray, opendsa_activity_get_user_deadline($course->id));
 
-        // Let's test lesson 1 closes in two hours (the original value) for user student 3 since member of no group.
+        // Let's test opendsa_activity 1 closes in two hours (the original value) for user student 3 since member of no group.
         $this->setUser($student3id);
         $params = new stdClass();
 
         $comparearray = array();
         $object = new stdClass();
-        $object->id = $lesson1->id;
-        $object->userdeadline = $basetimestamp + 7200; // The original deadline for lesson 1.
+        $object->id = $opendsa_activity1->id;
+        $object->userdeadline = $basetimestamp + 7200; // The original deadline for opendsa_activity 1.
 
-        $comparearray[$lesson1->id] = $object;
+        $comparearray[$opendsa_activity1->id] = $object;
 
         $object = new stdClass();
-        $object->id = $lesson2->id;
-        $object->userdeadline = $basetimestamp + 7200; // The original deadline for lesson 2.
+        $object->id = $opendsa_activity2->id;
+        $object->userdeadline = $basetimestamp + 7200; // The original deadline for opendsa_activity 2.
 
-        $comparearray[$lesson2->id] = $object;
+        $comparearray[$opendsa_activity2->id] = $object;
 
-        $this->assertEquals($comparearray, lesson_get_user_deadline($course->id));
+        $this->assertEquals($comparearray, opendsa_activity_get_user_deadline($course->id));
 
-        // User 2 gets an user override for lesson 1 to close in four hours.
+        // User 2 gets an user override for opendsa_activity 1 to close in four hours.
         $record2 = (object) [
-            'opendsa_activity_id' => $lesson1->id,
+            'opendsa_activity_id' => $opendsa_activity1->id,
             'userid' => $student2id,
             'deadline' => $basetimestamp + 14400 // In four hours.
         ];
-        $DB->insert_record('lesson_overrides', $record2);
+        $DB->insert_record('opendsa_activity_overrides', $record2);
 
-        // Let's test lesson 1 closes in four hours for user student 2 since personally overriden.
-        // lesson 2 closes in two hours.
+        // Let's test opendsa_activity 1 closes in four hours for user student 2 since personally overriden.
+        // opendsa_activity 2 closes in two hours.
         $this->setUser($student2id);
 
         $comparearray = array();
         $object = new stdClass();
-        $object->id = $lesson1->id;
-        $object->userdeadline = $basetimestamp + 14400; // The overriden deadline for lesson 1.
+        $object->id = $opendsa_activity1->id;
+        $object->userdeadline = $basetimestamp + 14400; // The overriden deadline for opendsa_activity 1.
 
-        $comparearray[$lesson1->id] = $object;
+        $comparearray[$opendsa_activity1->id] = $object;
 
         $object = new stdClass();
-        $object->id = $lesson2->id;
-        $object->userdeadline = $basetimestamp + 7200; // The unchanged deadline for lesson 2.
+        $object->id = $opendsa_activity2->id;
+        $object->userdeadline = $basetimestamp + 7200; // The unchanged deadline for opendsa_activity 2.
 
-        $comparearray[$lesson2->id] = $object;
+        $comparearray[$opendsa_activity2->id] = $object;
 
-        $this->assertEquals($comparearray, lesson_get_user_deadline($course->id));
+        $this->assertEquals($comparearray, opendsa_activity_get_user_deadline($course->id));
 
         // Let's test a teacher sees the original times.
-        // lesson 1 and lesson 2 close in two hours.
+        // opendsa_activity 1 and opendsa_activity 2 close in two hours.
         $this->setUser($teacherid);
 
         $comparearray = array();
         $object = new stdClass();
-        $object->id = $lesson1->id;
-        $object->userdeadline = $basetimestamp + 7200; // The unchanged deadline for lesson 1.
+        $object->id = $opendsa_activity1->id;
+        $object->userdeadline = $basetimestamp + 7200; // The unchanged deadline for opendsa_activity 1.
 
-        $comparearray[$lesson1->id] = $object;
+        $comparearray[$opendsa_activity1->id] = $object;
 
         $object = new stdClass();
-        $object->id = $lesson2->id;
-        $object->userdeadline = $basetimestamp + 7200; // The unchanged deadline for lesson 2.
+        $object->id = $opendsa_activity2->id;
+        $object->userdeadline = $basetimestamp + 7200; // The unchanged deadline for opendsa_activity 2.
 
-        $comparearray[$lesson2->id] = $object;
+        $comparearray[$opendsa_activity2->id] = $object;
 
-        $this->assertEquals($comparearray, lesson_get_user_deadline($course->id));
+        $this->assertEquals($comparearray, opendsa_activity_get_user_deadline($course->id));
     }
 
     public function test_is_participant() {
@@ -224,31 +224,31 @@ class mod_lesson_locallib_testcase extends advanced_testcase {
         $course = $this->getDataGenerator()->create_course();
         $student = $this->getDataGenerator()->create_and_enrol($course, 'student');
         $student2 = $this->getDataGenerator()->create_and_enrol($course, 'student', [], 'manual', 0, 0, ENROL_USER_SUSPENDED);
-        $lessonmodule = $this->getDataGenerator()->create_module('lesson', array('course' => $course->id));
+        $opendsa_activitymodule = $this->getDataGenerator()->create_module('opendsa_activity', array('course' => $course->id));
 
         // Login as student.
         $this->setUser($student);
-        // Convert to a lesson object.
-        $lesson = new lesson($lessonmodule);
-        $this->assertEquals(true, $lesson->is_participant($student->id),
+        // Convert to a opendsa_activity object.
+        $opendsa_activity = new opendsa_activity($opendsa_activitymodule);
+        $this->assertEquals(true, $opendsa_activity->is_participant($student->id),
             'Student is enrolled, active and can participate');
 
         // Login as student2.
         $this->setUser($student2);
-        $this->assertEquals(false, $lesson->is_participant($student2->id),
+        $this->assertEquals(false, $opendsa_activity->is_participant($student2->id),
             'Student is enrolled, suspended and can NOT participate');
 
         // Login as an admin.
         $this->setAdminUser();
-        $this->assertEquals(false, $lesson->is_participant($USER->id),
+        $this->assertEquals(false, $opendsa_activity->is_participant($USER->id),
             'Admin is not enrolled and can NOT participate');
 
         $this->getDataGenerator()->enrol_user(2, $course->id);
-        $this->assertEquals(true, $lesson->is_participant($USER->id),
+        $this->assertEquals(true, $opendsa_activity->is_participant($USER->id),
             'Admin is enrolled and can participate');
 
         $this->getDataGenerator()->enrol_user(2, $course->id, [], 'manual', 0, 0, ENROL_USER_SUSPENDED);
-        $this->assertEquals(true, $lesson->is_participant($USER->id),
+        $this->assertEquals(true, $opendsa_activity->is_participant($USER->id),
             'Admin is enrolled, suspended and can participate');
     }
 }

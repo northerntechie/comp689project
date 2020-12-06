@@ -18,7 +18,7 @@
 /**
  * Essay
  *
- * @package mod_lesson
+ * @package mod_opendsa_activity
  * @copyright  2009 Sam Hemelryk
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  **/
@@ -26,13 +26,13 @@
 defined('MOODLE_INTERNAL') || die();
 
 /** Essay question type */
-define("LESSON_PAGE_ESSAY", "10");
+define("OPENDSA_ACTIVITY_PAGE_ESSAY", "10");
 
-class lesson_page_type_essay extends lesson_page {
+class opendsa_activity_page_type_essay extends opendsa_activity_page {
 
-    protected $type = lesson_page::TYPE_QUESTION;
+    protected $type = opendsa_activity_page::TYPE_QUESTION;
     protected $typeidstring = 'essay';
-    protected $typeid = LESSON_PAGE_ESSAY;
+    protected $typeid = OPENDSA_ACTIVITY_PAGE_ESSAY;
     protected $string = null;
 
     public function get_typeid() {
@@ -40,7 +40,7 @@ class lesson_page_type_essay extends lesson_page {
     }
     public function get_typestring() {
         if ($this->string===null) {
-            $this->string = get_string($this->typeidstring, 'lesson');
+            $this->string = get_string($this->typeidstring, 'opendsa_activity');
         }
         return $this->string;
     }
@@ -70,7 +70,7 @@ class lesson_page_type_essay extends lesson_page {
         $context = context_module::instance($PAGE->cm->id);
         $options = array(
             'contents' => $this->get_contents(),
-            'opendsa_activity_id' => $this->lesson->id,
+            'opendsa_activity_id' => $this->opendsa_activity->id,
             'attemptid' => $attempt ? $attempt->id : null,
             'editoroptions' => array(
                 'maxbytes' => $PAGE->course->maxbytes,
@@ -80,18 +80,18 @@ class lesson_page_type_essay extends lesson_page {
                 'enable_filemanagement' => false
             )
         );
-        $mform = new lesson_display_answer_form_essay($CFG->wwwroot.'/mod/lesson/continue.php', $options);
+        $mform = new opendsa_activity_display_answer_form_essay($CFG->wwwroot.'/mod/opendsa_activity/continue.php', $options);
 
         $data = new stdClass;
         $data->id = $PAGE->cm->id;
         $data->pageid = $this->properties->id;
-        if (isset($USER->modattempts[$this->lesson->id])) {
+        if (isset($USER->modattempts[$this->opendsa_activity->id])) {
             $essayinfo = self::extract_useranswer($attempt->useranswer);
             $data->answer = $essayinfo->answer;
         }
 
         $data = file_prepare_standard_editor($data, 'answer', $options['editoroptions'],
-            $context, 'mod_lesson', 'essay_answers');
+            $context, 'mod_opendsa_activity', 'essay_answers');
         $mform->set_data($data);
 
         // Trigger an event question viewed.
@@ -103,7 +103,7 @@ class lesson_page_type_essay extends lesson_page {
                 )
             );
 
-        $event = \mod_lesson\event\question_viewed::create($eventparams);
+        $event = \mod_opendsa_activity\event\question_viewed::create($eventparams);
         $event->trigger();
         return $mform->display();
     }
@@ -111,7 +111,7 @@ class lesson_page_type_essay extends lesson_page {
         global $DB;
         // now add the answers
         $newanswer = new stdClass;
-        $newanswer->opendsa_activity_id = $this->lesson->id;
+        $newanswer->opendsa_activity_id = $this->opendsa_activity->id;
         $newanswer->pageid = $this->properties->id;
         $newanswer->timecreated = $this->properties->timecreated;
 
@@ -121,8 +121,8 @@ class lesson_page_type_essay extends lesson_page {
         if (isset($properties->score[0])) {
             $newanswer->score = $properties->score[0];
         }
-        $newanswer->id = $DB->insert_record("lesson_answers", $newanswer);
-        $answers = array($newanswer->id => new lesson_page_answer($newanswer));
+        $newanswer->id = $DB->insert_record("opendsa_activity_answers", $newanswer);
+        $answers = array($newanswer->id => new opendsa_activity_page_answer($newanswer));
         $this->answers = $answers;
         return $answers;
     }
@@ -147,7 +147,7 @@ class lesson_page_type_essay extends lesson_page {
             );
 
             $formdata = file_postupdate_standard_editor($formdata, 'answer', $editoroptions,
-                $editoroptions['context'], 'mod_lesson', 'essay_answers', $attempt->id);
+                $editoroptions['context'], 'mod_opendsa_activity', 'essay_answers', $attempt->id);
 
             // Update the student response to have the modified link.
             $useranswer = unserialize($attempt->useranswer);
@@ -174,7 +174,7 @@ class lesson_page_type_essay extends lesson_page {
      */
     public function format_answer($answer, $context, $answerformat, $options = []) {
         $answer = file_rewrite_pluginfile_urls($answer, 'pluginfile.php', $context->id,
-            'mod_lesson', 'essay_answers', $options->attemptid);
+            'mod_opendsa_activity', 'essay_answers', $options->attemptid);
         return parent::format_answer($answer, $context, $answerformat, $options);
     }
 
@@ -193,7 +193,7 @@ class lesson_page_type_essay extends lesson_page {
                 'enable_filemanagement' => false,
             )
         );
-        $mform = new lesson_display_answer_form_essay($CFG->wwwroot.'/mod/lesson/continue.php', $options);
+        $mform = new opendsa_activity_display_answer_form_essay($CFG->wwwroot.'/mod/opendsa_activity/continue.php', $options);
         $data = $mform->get_data();
         require_sesskey();
 
@@ -240,17 +240,17 @@ class lesson_page_type_essay extends lesson_page {
         global $DB, $PAGE;
         $answers  = $this->get_answers();
         $properties->id = $this->properties->id;
-        $properties->opendsa_activity_id = $this->lesson->id;
+        $properties->opendsa_activity_id = $this->opendsa_activity->id;
         $properties->timemodified = time();
-        $properties = file_postupdate_standard_editor($properties, 'contents', array('noclean'=>true, 'maxfiles'=>EDITOR_UNLIMITED_FILES, 'maxbytes'=>$PAGE->course->maxbytes), context_module::instance($PAGE->cm->id), 'mod_lesson', 'page_contents', $properties->id);
-        $DB->update_record("lesson_pages", $properties);
+        $properties = file_postupdate_standard_editor($properties, 'contents', array('noclean'=>true, 'maxfiles'=>EDITOR_UNLIMITED_FILES, 'maxbytes'=>$PAGE->course->maxbytes), context_module::instance($PAGE->cm->id), 'mod_opendsa_activity', 'page_contents', $properties->id);
+        $DB->update_record("opendsa_activity_pages", $properties);
 
         // Trigger an event: page updated.
-        \mod_lesson\event\page_updated::create_from_lesson_page($this, $context)->trigger();
+        \mod_opendsa_activity\event\page_updated::create_from_opendsa_activity_page($this, $context)->trigger();
 
         if (!array_key_exists(0, $this->answers)) {
             $this->answers[0] = new stdClass;
-            $this->answers[0]->opendsa_activity_id = $this->lesson->id;
+            $this->answers[0]->opendsa_activity_id = $this->opendsa_activity->id;
             $this->answers[0]->pageid = $this->id;
             $this->answers[0]->timecreated = $this->timecreated;
         }
@@ -261,16 +261,16 @@ class lesson_page_type_essay extends lesson_page {
             $this->answers[0]->score = $properties->score[0];
         }
         if (!isset($this->answers[0]->id)) {
-            $this->answers[0]->id =  $DB->insert_record("lesson_answers", $this->answers[0]);
+            $this->answers[0]->id =  $DB->insert_record("opendsa_activity_answers", $this->answers[0]);
         } else {
-            $DB->update_record("lesson_answers", $this->answers[0]->properties());
+            $DB->update_record("opendsa_activity_answers", $this->answers[0]->properties());
         }
 
         return true;
     }
     public function stats(array &$pagestats, $tries) {
-        if(count($tries) > $this->lesson->maxattempts) { // if there are more tries than the max that is allowed, grab the last "legal" attempt
-            $temp = $tries[$this->lesson->maxattempts - 1];
+        if(count($tries) > $this->opendsa_activity->maxattempts) { // if there are more tries than the max that is allowed, grab the last "legal" attempt
+            $temp = $tries[$this->opendsa_activity->maxattempts - 1];
         } else {
             // else, user attempted the question less than the max, so grab the last one
             $temp = end($tries);
@@ -301,43 +301,43 @@ class lesson_page_type_essay extends lesson_page {
         $answers = $this->get_answers();
         $context = context_module::instance($PAGE->cm->id);
         foreach ($answers as $answer) {
-            $hasattempts = $DB->record_exists('lesson_attempts', ['answerid' => $answer->id]);
+            $hasattempts = $DB->record_exists('opendsa_activity_attempts', ['answerid' => $answer->id]);
             if ($useranswer != null) {
                 $essayinfo = self::extract_useranswer($useranswer->useranswer);
                 $essayinfo->answer = file_rewrite_pluginfile_urls($essayinfo->answer, 'pluginfile.php',
-                    $context->id, 'mod_lesson', 'essay_answers', $useranswer->id);
+                    $context->id, 'mod_opendsa_activity', 'essay_answers', $useranswer->id);
 
                 if ($essayinfo->response == null) {
-                    $answerdata->response = get_string("nocommentyet", "lesson");
+                    $answerdata->response = get_string("nocommentyet", "opendsa_activity");
                 } else {
                     $essayinfo->response = file_rewrite_pluginfile_urls($essayinfo->response, 'pluginfile.php',
-                            $answerpage->context->id, 'mod_lesson', 'essay_responses', $useranswer->id);
+                            $answerpage->context->id, 'mod_opendsa_activity', 'essay_responses', $useranswer->id);
                     $answerdata->response  = format_text($essayinfo->response, $essayinfo->responseformat, $formattextdefoptions);
                 }
                 if (isset($pagestats[$this->properties->id])) {
                     $percent = $pagestats[$this->properties->id]->totalscore / $pagestats[$this->properties->id]->total * 100;
                     $percent = round($percent, 2);
-                    $percent = get_string("averagescore", "lesson").": ". $percent ."%";
+                    $percent = get_string("averagescore", "opendsa_activity").": ". $percent ."%";
                 } else {
                     // dont think this should ever be reached....
-                    $percent = get_string("nooneansweredthisquestion", "lesson");
+                    $percent = get_string("nooneansweredthisquestion", "opendsa_activity");
                 }
                 if ($essayinfo->graded) {
-                    if ($this->lesson->custom) {
-                        $answerdata->score = get_string("pointsearned", "lesson").": " . $essayinfo->score;
+                    if ($this->opendsa_activity->custom) {
+                        $answerdata->score = get_string("pointsearned", "opendsa_activity").": " . $essayinfo->score;
                     } elseif ($essayinfo->score) {
-                        $answerdata->score = get_string("receivedcredit", "lesson");
+                        $answerdata->score = get_string("receivedcredit", "opendsa_activity");
                     } else {
-                        $answerdata->score = get_string("didnotreceivecredit", "lesson");
+                        $answerdata->score = get_string("didnotreceivecredit", "opendsa_activity");
                     }
                 } else {
-                    $answerdata->score = get_string("havenotgradedyet", "lesson");
+                    $answerdata->score = get_string("havenotgradedyet", "opendsa_activity");
                 }
             } else {
                 $essayinfo = new stdClass();
-                if ($hasattempts && has_capability('mod/lesson:grade', $answerpage->context)) {
-                    $essayinfo->answer = html_writer::link(new moodle_url("/mod/lesson/essay.php",
-                        ['id' => $PAGE->cm->id]), get_string("viewessayanswers", "lesson"));
+                if ($hasattempts && has_capability('mod/opendsa_activity:grade', $answerpage->context)) {
+                    $essayinfo->answer = html_writer::link(new moodle_url("/mod/opendsa_activity/essay.php",
+                        ['id' => $PAGE->cm->id]), get_string("viewessayanswers", "opendsa_activity"));
                 } else {
                     $essayinfo->answer = "";
                 }
@@ -348,10 +348,10 @@ class lesson_page_type_essay extends lesson_page {
             if (isset($pagestats[$this->properties->id])) {
                 $avescore = $pagestats[$this->properties->id]->totalscore / $pagestats[$this->properties->id]->total;
                 $avescore = round($avescore, 2);
-                $avescore = get_string("averagescore", "lesson").": ". $avescore ;
+                $avescore = get_string("averagescore", "opendsa_activity").": ". $avescore ;
             } else {
-                $avescore = $hasattempts ? get_string("essaynotgradedyet", "lesson") :
-                        get_string("nooneansweredthisquestion", "lesson");
+                $avescore = $hasattempts ? get_string("essaynotgradedyet", "opendsa_activity") :
+                        get_string("nooneansweredthisquestion", "opendsa_activity");
             }
             // This is the student's answer so it should be cleaned.
             $answerdata->answers[] = array(format_text($essayinfo->answer, $essayinfo->answerformat,
@@ -362,7 +362,7 @@ class lesson_page_type_essay extends lesson_page {
     }
     public function is_unanswered($nretakes) {
         global $DB, $USER;
-        if (!$DB->count_records("lesson_attempts", array('pageid'=>$this->properties->id, 'userid'=>$USER->id, 'retry'=>$nretakes))) {
+        if (!$DB->count_records("opendsa_activity_attempts", array('pageid'=>$this->properties->id, 'userid'=>$USER->id, 'retry'=>$nretakes))) {
             return true;
         }
         return false;
@@ -376,7 +376,7 @@ class lesson_page_type_essay extends lesson_page {
     }
 }
 
-class lesson_add_page_form_essay extends lesson_add_page_form_base {
+class opendsa_activity_add_page_form_essay extends opendsa_activity_add_page_form_base {
 
     public $qtype = 'essay';
     public $qtypestring = 'essay';
@@ -389,7 +389,7 @@ class lesson_add_page_form_essay extends lesson_add_page_form_base {
     }
 }
 
-class lesson_display_answer_form_essay extends moodleform {
+class opendsa_activity_display_answer_form_essay extends moodleform {
 
     public function definition() {
         global $USER, $OUTPUT;
@@ -406,7 +406,7 @@ class lesson_display_answer_form_essay extends moodleform {
             if (isset($USER->modattempts[$opendsa_activity_id]->useranswer) && !empty($USER->modattempts[$opendsa_activity_id]->useranswer)) {
                 $attrs = array('disabled' => 'disabled');
                 $hasattempt = true;
-                $useranswertemp = lesson_page_type_essay::extract_useranswer($USER->modattempts[$opendsa_activity_id]->useranswer);
+                $useranswertemp = opendsa_activity_page_type_essay::extract_useranswer($USER->modattempts[$opendsa_activity_id]->useranswer);
                 $useranswer = htmlspecialchars_decode($useranswertemp->answer, ENT_QUOTES);
                 $useranswerraw = $useranswertemp->answer;
             }
@@ -432,15 +432,15 @@ class lesson_display_answer_form_essay extends moodleform {
         if ($hasattempt) {
             $mform->addElement('hidden', 'answer', $useranswerraw);
             $mform->setType('answer', PARAM_RAW);
-            $mform->addElement('html', $OUTPUT->container(get_string('youranswer', 'lesson'), 'youranswer'));
+            $mform->addElement('html', $OUTPUT->container(get_string('youranswer', 'opendsa_activity'), 'youranswer'));
             $useranswer = file_rewrite_pluginfile_urls($useranswer, 'pluginfile.php', $editoroptions['context']->id,
-                'mod_lesson', 'essay_answers', $this->_customdata['attemptid']);
+                'mod_opendsa_activity', 'essay_answers', $this->_customdata['attemptid']);
             $mform->addElement('html', $OUTPUT->container($useranswer, 'reviewessay'));
-            $this->add_action_buttons(null, get_string("nextpage", "lesson"));
+            $this->add_action_buttons(null, get_string("nextpage", "opendsa_activity"));
         } else {
-            $mform->addElement('editor', 'answer_editor', get_string('youranswer', 'lesson'), null, $editoroptions);
+            $mform->addElement('editor', 'answer_editor', get_string('youranswer', 'opendsa_activity'), null, $editoroptions);
             $mform->setType('answer_editor', PARAM_RAW);
-            $this->add_action_buttons(null, get_string("submit", "lesson"));
+            $this->add_action_buttons(null, get_string("submit", "opendsa_activity"));
         }
     }
 }

@@ -15,35 +15,35 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This page handles listing of lesson overrides
+ * This page handles listing of opendsa_activity overrides
  *
- * @package    mod_lesson
+ * @package    mod_opendsa_activity
  * @copyright  2015 Jean-Michel Vedrine
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 
 require_once(__DIR__ . '/../../config.php');
-require_once($CFG->dirroot.'/mod/lesson/lib.php');
-require_once($CFG->dirroot.'/mod/lesson/locallib.php');
-require_once($CFG->dirroot.'/mod/lesson/override_form.php');
+require_once($CFG->dirroot.'/mod/opendsa_activity/lib.php');
+require_once($CFG->dirroot.'/mod/opendsa_activity/locallib.php');
+require_once($CFG->dirroot.'/mod/opendsa_activity/override_form.php');
 
 
 $cmid = required_param('cmid', PARAM_INT);
 $mode = optional_param('mode', '', PARAM_ALPHA); // One of 'user' or 'group', default is 'group'.
 
-list($course, $cm) = get_course_and_cm_from_cmid($cmid, 'lesson');
-$lesson = $DB->get_record('lesson', array('id' => $cm->instance), '*', MUST_EXIST);
+list($course, $cm) = get_course_and_cm_from_cmid($cmid, 'opendsa_activity');
+$opendsa_activity = $DB->get_record('opendsa_activity', array('id' => $cm->instance), '*', MUST_EXIST);
 
 require_login($course, false, $cm);
 
 $context = context_module::instance($cm->id);
 
 // Check the user has the required capabilities to list overrides.
-require_capability('mod/lesson:manageoverrides', $context);
+require_capability('mod/opendsa_activity:manageoverrides', $context);
 
-$lessongroupmode = groups_get_activity_groupmode($cm);
-$accessallgroups = ($lessongroupmode == NOGROUPS) || has_capability('moodle/site:accessallgroups', $context);
+$opendsa_activitygroupmode = groups_get_activity_groupmode($cm);
+$accessallgroups = ($opendsa_activitygroupmode == NOGROUPS) || has_capability('moodle/site:accessallgroups', $context);
 
 // Get the course groups that the current user can access.
 $groups = $accessallgroups ? groups_get_all_groups($cm->course) : groups_get_activity_allowed_groups($cm);
@@ -58,28 +58,28 @@ if ($mode != "user" and $mode != "group") {
 }
 $groupmode = ($mode == "group");
 
-$url = new moodle_url('/mod/lesson/overrides.php', array('cmid' => $cm->id, 'mode' => $mode));
+$url = new moodle_url('/mod/opendsa_activity/overrides.php', array('cmid' => $cm->id, 'mode' => $mode));
 
 $PAGE->set_url($url);
 
 // Display a list of overrides.
 $PAGE->set_pagelayout('admin');
-$PAGE->set_title(get_string('overrides', 'lesson'));
+$PAGE->set_title(get_string('overrides', 'opendsa_activity'));
 $PAGE->set_heading($course->fullname);
 echo $OUTPUT->header();
-echo $OUTPUT->heading(format_string($lesson->name, true, array('context' => $context)));
+echo $OUTPUT->heading(format_string($opendsa_activity->name, true, array('context' => $context)));
 
 // Delete orphaned group overrides.
 $sql = 'SELECT o.id
-          FROM {lesson_overrides} o
+          FROM {opendsa_activity_overrides} o
      LEFT JOIN {groups} g ON o.groupid = g.id
          WHERE o.groupid IS NOT NULL
                AND g.id IS NULL
                AND o.opendsa_activity_id = ?';
-$params = array($lesson->id);
+$params = array($opendsa_activity->id);
 $orphaned = $DB->get_records_sql($sql, $params);
 if (!empty($orphaned)) {
-    $DB->delete_records_list('lesson_overrides', 'id', array_keys($orphaned));
+    $DB->delete_records_list('opendsa_activity_overrides', 'id', array_keys($orphaned));
 }
 
 $overrides = [];
@@ -89,12 +89,12 @@ if ($groupmode) {
     $colname = get_string('group');
     // To filter the result by the list of groups that the current user has access to.
     if ($groups) {
-        $params = ['opendsa_activity_id' => $lesson->id];
+        $params = ['opendsa_activity_id' => $opendsa_activity->id];
         list($insql, $inparams) = $DB->get_in_or_equal(array_keys($groups), SQL_PARAMS_NAMED);
         $params += $inparams;
 
         $sql = "SELECT o.*, g.name
-                  FROM {lesson_overrides} o
+                  FROM {opendsa_activity_overrides} o
                   JOIN {groups} g ON o.groupid = g.id
                  WHERE o.opendsa_activity_id = :opendsa_activity_id AND g.id $insql
               ORDER BY g.name";
@@ -104,11 +104,11 @@ if ($groupmode) {
 } else {
     $colname = get_string('user');
     list($sort, $params) = users_order_by_sql('u');
-    $params['opendsa_activity_id'] = $lesson->id;
+    $params['opendsa_activity_id'] = $opendsa_activity->id;
 
     if ($accessallgroups) {
         $sql = 'SELECT o.*, ' . get_all_user_name_fields(true, 'u') . '
-                  FROM {lesson_overrides} o
+                  FROM {opendsa_activity_overrides} o
                   JOIN {user} u ON o.userid = u.id
                  WHERE o.opendsa_activity_id = :opendsa_activity_id
               ORDER BY ' . $sort;
@@ -119,7 +119,7 @@ if ($groupmode) {
         $params += $inparams;
 
         $sql = 'SELECT o.*, ' . get_all_user_name_fields(true, 'u') . '
-                  FROM {lesson_overrides} o
+                  FROM {opendsa_activity_overrides} o
                   JOIN {user} u ON o.userid = u.id
                   JOIN {groups_members} gm ON u.id = gm.userid
                  WHERE o.opendsa_activity_id = :opendsa_activity_id AND gm.groupid ' . $insql . '
@@ -137,15 +137,15 @@ $table->headspan = array(1, 2, 1);
 $table->colclasses = array('colname', 'colsetting', 'colvalue', 'colaction');
 $table->head = array(
         $colname,
-        get_string('overrides', 'lesson'),
+        get_string('overrides', 'opendsa_activity'),
         get_string('action'),
 );
 
 $userurl = new moodle_url('/user/view.php', array());
 $groupurl = new moodle_url('/group/overview.php', array('id' => $cm->course));
 
-$overridedeleteurl = new moodle_url('/mod/lesson/overridedelete.php');
-$overrideediturl = new moodle_url('/mod/lesson/overrideedit.php');
+$overridedeleteurl = new moodle_url('/mod/opendsa_activity/overridedelete.php');
+$overrideediturl = new moodle_url('/mod/opendsa_activity/overrideedit.php');
 
 $hasinactive = false; // Whether there are any inactive overrides.
 
@@ -168,51 +168,51 @@ foreach ($overrides as $override) {
 
     // Format available.
     if (isset($override->available)) {
-        $fields[] = get_string('lessonopens', 'lesson');
+        $fields[] = get_string('opendsa_activityopens', 'opendsa_activity');
         $values[] = $override->available > 0 ?
-                userdate($override->available) : get_string('noopen', 'lesson');
+                userdate($override->available) : get_string('noopen', 'opendsa_activity');
     }
 
     // Format deadline.
     if (isset($override->deadline)) {
-        $fields[] = get_string('lessoncloses', 'lesson');
+        $fields[] = get_string('opendsa_activitycloses', 'opendsa_activity');
         $values[] = $override->deadline > 0 ?
-                userdate($override->deadline) : get_string('noclose', 'lesson');
+                userdate($override->deadline) : get_string('noclose', 'opendsa_activity');
     }
 
     // Format timelimit.
     if (isset($override->timelimit)) {
-        $fields[] = get_string('timelimit', 'lesson');
+        $fields[] = get_string('timelimit', 'opendsa_activity');
         $values[] = $override->timelimit > 0 ?
-                format_time($override->timelimit) : get_string('none', 'lesson');
+                format_time($override->timelimit) : get_string('none', 'opendsa_activity');
     }
 
     // Format option to try a question again.
     if (isset($override->review)) {
-        $fields[] = get_string('displayreview', 'lesson');
+        $fields[] = get_string('displayreview', 'opendsa_activity');
         $values[] = $override->review ?
                 get_string('yes') : get_string('no');
     }
 
     // Format number of attempts.
     if (isset($override->maxattempts)) {
-        $fields[] = get_string('maximumnumberofattempts', 'lesson');
+        $fields[] = get_string('maximumnumberofattempts', 'opendsa_activity');
         $values[] = $override->maxattempts > 0 ?
                 $override->maxattempts : get_string('unlimited');
     }
 
     // Format retake allowed.
     if (isset($override->retake)) {
-        $fields[] = get_string('retakesallowed', 'lesson');
+        $fields[] = get_string('retakesallowed', 'opendsa_activity');
         $values[] = $override->retake ?
                 get_string('yes') : get_string('no');
     }
 
     // Format password.
     if (isset($override->password)) {
-        $fields[] = get_string('usepassword', 'lesson');
+        $fields[] = get_string('usepassword', 'opendsa_activity');
         $values[] = $override->password !== '' ?
-                get_string('enabled', 'lesson') : get_string('none', 'lesson');
+                get_string('enabled', 'opendsa_activity') : get_string('none', 'opendsa_activity');
     }
 
     // Icons.
@@ -275,12 +275,12 @@ foreach ($overrides as $override) {
 }
 
 // Output the table and button.
-echo html_writer::start_tag('div', array('id' => 'lessonoverrides'));
+echo html_writer::start_tag('div', array('id' => 'opendsa_activityoverrides'));
 if (count($table->data)) {
     echo html_writer::table($table);
 }
 if ($hasinactive) {
-    echo $OUTPUT->notification(get_string('inactiveoverridehelp', 'lesson'), 'dimmed_text');
+    echo $OUTPUT->notification(get_string('inactiveoverridehelp', 'opendsa_activity'), 'dimmed_text');
 }
 
 echo html_writer::start_tag('div', array('class' => 'buttons'));
@@ -288,18 +288,18 @@ $options = array();
 if ($groupmode) {
     if (empty($groups)) {
         // There are no groups.
-        echo $OUTPUT->notification(get_string('groupsnone', 'lesson'), 'error');
+        echo $OUTPUT->notification(get_string('groupsnone', 'opendsa_activity'), 'error');
         $options['disabled'] = true;
     }
     echo $OUTPUT->single_button($overrideediturl->out(true,
             array('action' => 'addgroup', 'cmid' => $cm->id)),
-            get_string('addnewgroupoverride', 'lesson'), 'post', $options);
+            get_string('addnewgroupoverride', 'opendsa_activity'), 'post', $options);
 } else {
     $users = array();
-    // See if there are any users in the lesson.
+    // See if there are any users in the opendsa_activity.
     if ($accessallgroups) {
         $users = get_enrolled_users($context, '', 0, 'u.id');
-        $nousermessage = get_string('usersnone', 'lesson');
+        $nousermessage = get_string('usersnone', 'opendsa_activity');
     } else if ($groups) {
         $enrolledjoin = get_enrolled_join($context, 'u.id');
         list($ingroupsql, $ingroupparams) = $DB->get_in_or_equal(array_keys($groups), SQL_PARAMS_NAMED);
@@ -312,9 +312,9 @@ if ($groupmode) {
                        AND {$enrolledjoin->wheres}
               ORDER BY $sort";
         $users = $DB->get_records_sql($sql, $params);
-        $nousermessage = get_string('usersnone', 'lesson');
+        $nousermessage = get_string('usersnone', 'opendsa_activity');
     } else {
-        $nousermessage = get_string('groupsnone', 'lesson');
+        $nousermessage = get_string('groupsnone', 'opendsa_activity');
     }
     $info = new \core_availability\info_module($cm);
     $users = $info->filter_user_list($users);
@@ -326,7 +326,7 @@ if ($groupmode) {
     }
     echo $OUTPUT->single_button($overrideediturl->out(true,
             array('action' => 'adduser', 'cmid' => $cm->id)),
-            get_string('addnewuseroverride', 'lesson'), 'get', $options);
+            get_string('addnewuseroverride', 'opendsa_activity'), 'get', $options);
 }
 echo html_writer::end_tag('div');
 echo html_writer::end_tag('div');

@@ -15,9 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Add event handlers for the lesson
+ * Add event handlers for the opendsa_activity
  *
- * @package    mod_lesson
+ * @package    mod_opendsa_activity
  * @category   event
  * @copyright  2015 Jean-Michel Vedrine
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -30,14 +30,14 @@ $observers = array(
 
     array(
         'eventname' => '\core\event\course_reset_started',
-        'callback' => '\mod_lesson\group_observers::course_reset_started',
+        'callback' => '\mod_opendsa_activity\group_observers::course_reset_started',
     ),
     array(
         'eventname' => '\core\event\course_reset_ended',
-        'callback' => '\mod_lesson\group_observers::course_reset_ended',
+        'callback' => '\mod_opendsa_activity\group_observers::course_reset_ended',
     ),
     array(
         'eventname' => '\core\event\group_deleted',
-        'callback' => '\mod_lesson\group_observers::group_deleted'
+        'callback' => '\mod_opendsa_activity\group_observers::group_deleted'
     ),
 );

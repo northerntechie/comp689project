@@ -15,28 +15,28 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The mod_lesson essay assessed event.
+ * The mod_opendsa_activity essay assessed event.
  *
- * @package    mod_lesson
+ * @package    mod_opendsa_activity
  * @copyright  2014 Adrian Greeve <adrian@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_lesson\event;
+namespace mod_opendsa_activity\event;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * The mod_lesson essay assessed event class.
+ * The mod_opendsa_activity essay assessed event class.
  *
  * @property-read array $other {
  *     Extra information about the event.
  *
- *     - int opendsa_activity_id: The ID of the lesson.
+ *     - int opendsa_activity_id: The ID of the opendsa_activity.
  *     - int attemptid: The ID for the attempt.
  * }
  *
- * @package    mod_lesson
+ * @package    mod_opendsa_activity
  * @since      Moodle 2.7
  * @copyright  2014 Adrian Greeve <adrian@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -51,7 +51,7 @@ class essay_assessed extends \core\event\base {
     protected function init() {
         $this->data['crud'] = 'u';
         $this->data['edulevel'] = self::LEVEL_TEACHING;
-        $this->data['objecttable'] = 'lesson_grades';
+        $this->data['objecttable'] = 'opendsa_activity_grades';
     }
 
     /**
@@ -61,7 +61,7 @@ class essay_assessed extends \core\event\base {
      */
     public function get_description() {
         return "The user with id '$this->userid' has marked the essay with id '{$this->other['attemptid']}' and " .
-            "recorded a mark '$this->objectid' in the lesson with course module id '$this->contextinstanceid'.";
+            "recorded a mark '$this->objectid' in the opendsa_activity with course module id '$this->contextinstanceid'.";
     }
 
     /**
@@ -70,9 +70,9 @@ class essay_assessed extends \core\event\base {
      * @return array
      */
     protected function get_legacy_logdata() {
-        $lesson = $this->get_record_snapshot('lesson', $this->other['opendsa_activity_id']);
-        return array($this->courseid, 'lesson', 'update grade', 'essay.php?id=' .
-                $this->contextinstanceid, $lesson->name, $this->contextinstanceid);
+        $opendsa_activity = $this->get_record_snapshot('opendsa_activity', $this->other['opendsa_activity_id']);
+        return array($this->courseid, 'opendsa_activity', 'update grade', 'essay.php?id=' .
+                $this->contextinstanceid, $opendsa_activity->name, $this->contextinstanceid);
     }
 
     /**
@@ -81,7 +81,7 @@ class essay_assessed extends \core\event\base {
      * @return string
      */
     public static function get_name() {
-        return get_string('eventessayassessed', 'mod_lesson');
+        return get_string('eventessayassessed', 'mod_opendsa_activity');
     }
 
     /**
@@ -90,7 +90,7 @@ class essay_assessed extends \core\event\base {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url('/mod/lesson/essay.php', array('id' => $this->contextinstanceid));
+        return new \moodle_url('/mod/opendsa_activity/essay.php', array('id' => $this->contextinstanceid));
     }
 
     /**
@@ -113,13 +113,13 @@ class essay_assessed extends \core\event\base {
     }
 
     public static function get_objectid_mapping() {
-        return array('db' => 'lesson_grades', 'restore' => 'lesson_grade');
+        return array('db' => 'opendsa_activity_grades', 'restore' => 'opendsa_activity_grade');
     }
 
     public static function get_other_mapping() {
         $othermapped = array();
-        $othermapped['opendsa_activity_id'] = array('db' => 'lesson', 'restore' => 'lesson');
-        $othermapped['attemptid'] = array('db' => 'lesson_attempts', 'restore' => 'lesson_attept');
+        $othermapped['opendsa_activity_id'] = array('db' => 'opendsa_activity', 'restore' => 'opendsa_activity');
+        $othermapped['attemptid'] = array('db' => 'opendsa_activity_attempts', 'restore' => 'opendsa_activity_attept');
 
         return $othermapped;
     }

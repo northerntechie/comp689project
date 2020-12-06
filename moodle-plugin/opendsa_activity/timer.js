@@ -5,13 +5,13 @@
 //
 // The original script displayed a clock.
 // Mark Nielsen modified it to be a countdown timer
-// for the lesson module in moodle.
+// for the opendsa_activity module in moodle.
 //
 //    Below is the code that is used to call this page.
 //    echo "<script type=\"text/javascript\">\n";
 //        echo "var starttime = ". $timer->starttime . ";\n";
 //        echo "var servertime = ". time() . ";\n";
-//        echo "var testlength = ". $lesson->timelimit .";\n";
+//        echo "var testlength = ". $opendsa_activity->timelimit .";\n";
 //        echo "document.write('<script type=\"text/javascript\" src=\"liveclock_lite.js\"><\/script>');\n";
 //        echo "window.onload = function () { show_clock(); }";
 //    echo "</script>\n";
@@ -52,9 +52,9 @@
         current = Math.floor(current / 1000);
 
         var mytime = '',
-            myclock = document.getElementById("lesson-timer");
+            myclock = document.getElementById("opendsa_activity-timer");
         if (current > starttime + testlength) {
-            mytime += M.util.get_string('timeisup', 'lesson');
+            mytime += M.util.get_string('timeisup', 'opendsa_activity');
             stopclock = 1;
         } else {
             timeleft = starttime + testlength - current;

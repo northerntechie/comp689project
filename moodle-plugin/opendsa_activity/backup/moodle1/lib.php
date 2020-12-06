@@ -18,7 +18,7 @@
 /**
  * Provides support for the conversion of moodle1 backup to the moodle2 format
  *
- * @package mod_lesson
+ * @package mod_opendsa_activity
  * @copyright  2011 Rossiani Wijaya <rwijaya@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -28,7 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Lesson conversion handler
  */
-class moodle1_mod_lesson_handler extends moodle1_mod_handler {
+class moodle1_mod_opendsa_activity_handler extends moodle1_mod_handler {
     // @var array of answers, when there are more that 4 answers, we need to fix <jumpto>.
     protected $answers;
 
@@ -52,7 +52,7 @@ class moodle1_mod_lesson_handler extends moodle1_mod_handler {
      * For each path returned, the corresponding conversion method must be
      * defined.
      *
-     * Note that the path /MOODLE_BACKUP/COURSE/MODULES/MOD/LESSON does not
+     * Note that the path /MOODLE_BACKUP/COURSE/MODULES/MOD/OPENDSA_ACTIVITY does not
      * actually exist in the file. The last element with the module name was
      * appended by the moodle1_converter class.
      *
@@ -61,7 +61,7 @@ class moodle1_mod_lesson_handler extends moodle1_mod_handler {
     public function get_paths() {
         return array(
             new convert_path(
-                'lesson', '/MOODLE_BACKUP/COURSE/MODULES/MOD/LESSON',
+                'opendsa_activity', '/MOODLE_BACKUP/COURSE/MODULES/MOD/OPENDSA_ACTIVITY',
                 array(
                     'renamefields' => array(
                         'usegrademax' => 'usemaxgrade',
@@ -69,20 +69,20 @@ class moodle1_mod_lesson_handler extends moodle1_mod_handler {
                 )
             ),
             new convert_path(
-                'lesson_page', '/MOODLE_BACKUP/COURSE/MODULES/MOD/LESSON/PAGES/PAGE',
+                'opendsa_activity_page', '/MOODLE_BACKUP/COURSE/MODULES/MOD/OPENDSA_ACTIVITY/PAGES/PAGE',
                 array(
                     'newfields' => array(
                         'contentsformat' => FORMAT_MOODLE,
-                        'nextpageid' => 0, //set to default to the next sequencial page in process_lesson_page()
+                        'nextpageid' => 0, //set to default to the next sequencial page in process_opendsa_activity_page()
                         'prevpageid' => 0
                     ),
                 )
             ),
             new convert_path(
-                'lesson_pages', '/MOODLE_BACKUP/COURSE/MODULES/MOD/LESSON/PAGES'
+                'opendsa_activity_pages', '/MOODLE_BACKUP/COURSE/MODULES/MOD/OPENDSA_ACTIVITY/PAGES'
             ),
             new convert_path(
-                'lesson_answer', '/MOODLE_BACKUP/COURSE/MODULES/MOD/LESSON/PAGES/PAGE/ANSWERS/ANSWER',
+                'opendsa_activity_answer', '/MOODLE_BACKUP/COURSE/MODULES/MOD/OPENDSA_ACTIVITY/PAGES/PAGE/ANSWERS/ANSWER',
                 array(
                     'newfields' => array(
                         'answerformat' => 0,
@@ -97,10 +97,10 @@ class moodle1_mod_lesson_handler extends moodle1_mod_handler {
     }
 
     /**
-     * This is executed every time we have one /MOODLE_BACKUP/COURSE/MODULES/MOD/LESSON
+     * This is executed every time we have one /MOODLE_BACKUP/COURSE/MODULES/MOD/OPENDSA_ACTIVITY
      * data available
      */
-    public function process_lesson($data) {
+    public function process_opendsa_activity($data) {
 
         // get the course module id and context id
         $instanceid     = $data['id'];
@@ -109,7 +109,7 @@ class moodle1_mod_lesson_handler extends moodle1_mod_handler {
         $contextid      = $this->converter->get_contextid(CONTEXT_MODULE, $this->moduleid);
 
         // get a fresh new file manager for this instance
-        $this->fileman = $this->converter->get_file_manager($contextid, 'mod_lesson');
+        $this->fileman = $this->converter->get_file_manager($contextid, 'mod_opendsa_activity');
 
         // migrate referenced local media files
         if (!empty($data['mediafile']) and strpos($data['mediafile'], '://') === false) {
@@ -119,15 +119,15 @@ class moodle1_mod_lesson_handler extends moodle1_mod_handler {
                 $this->fileman->migrate_file('course_files/'.$data['mediafile']);
             } catch (moodle1_convert_exception $e) {
                 // the file probably does not exist
-                $this->log('error migrating lesson mediafile', backup::LOG_WARNING, 'course_files/'.$data['mediafile']);
+                $this->log('error migrating opendsa_activity mediafile', backup::LOG_WARNING, 'course_files/'.$data['mediafile']);
             }
         }
 
-        // start writing lesson.xml
-        $this->open_xml_writer("activities/lesson_{$this->moduleid}/lesson.xml");
+        // start writing opendsa_activity.xml
+        $this->open_xml_writer("activities/opendsa_activity_{$this->moduleid}/opendsa_activity.xml");
         $this->xmlwriter->begin_tag('activity', array('id' => $instanceid, 'moduleid' => $this->moduleid,
-            'modulename' => 'lesson', 'contextid' => $contextid));
-        $this->xmlwriter->begin_tag('lesson', array('id' => $instanceid));
+            'modulename' => 'opendsa_activity', 'contextid' => $contextid));
+        $this->xmlwriter->begin_tag('opendsa_activity', array('id' => $instanceid));
 
         foreach ($data as $field => $value) {
             if ($field <> 'id') {
@@ -138,15 +138,15 @@ class moodle1_mod_lesson_handler extends moodle1_mod_handler {
         return $data;
     }
 
-    public function on_lesson_pages_start() {
+    public function on_opendsa_activity_pages_start() {
         $this->xmlwriter->begin_tag('pages');
     }
 
     /**
-     * This is executed every time we have one /MOODLE_BACKUP/COURSE/MODULES/MOD/LESSON/PAGES/PAGE
+     * This is executed every time we have one /MOODLE_BACKUP/COURSE/MODULES/MOD/OPENDSA_ACTIVITY/PAGES/PAGE
      * data available
      */
-    public function process_lesson_page($data) {
+    public function process_opendsa_activity_page($data) {
         global $CFG;
 
         // replay the upgrade step 2009120801
@@ -163,10 +163,10 @@ class moodle1_mod_lesson_handler extends moodle1_mod_handler {
     }
 
     /**
-     * This is executed every time we have one /MOODLE_BACKUP/COURSE/MODULES/MOD/LESSON/PAGES/PAGE/ANSWERS/ANSWER
+     * This is executed every time we have one /MOODLE_BACKUP/COURSE/MODULES/MOD/OPENDSA_ACTIVITY/PAGES/PAGE/ANSWERS/ANSWER
      * data available
      */
-    public function process_lesson_answer($data) {
+    public function process_opendsa_activity_answer($data) {
 
         // replay the upgrade step 2010072003
         $flags = intval($data['flags']);
@@ -180,11 +180,11 @@ class moodle1_mod_lesson_handler extends moodle1_mod_handler {
         }
 
         // buffer for conversion of <jumpto> in line with
-        // upgrade step 2010121400 from mod/lesson/db/upgrade.php
+        // upgrade step 2010121400 from mod/opendsa_activity/db/upgrade.php
         $this->answers[] = $data;
     }
 
-    public function on_lesson_page_end() {
+    public function on_opendsa_activity_page_end() {
         $this->page->answers = $this->answers;
         $this->pages[] = $this->page;
 
@@ -193,7 +193,7 @@ class moodle1_mod_lesson_handler extends moodle1_mod_handler {
 
         if ( $firstbatch || $nextbatch ) { //we can write out 1 page atleast
             if ($this->prevpageid == 0) {
-                // start writing with n-2 page (relative to this on_lesson_page_end() call)
+                // start writing with n-2 page (relative to this on_opendsa_activity_page_end() call)
                 $pg1 = $this->pages[1];
                 $pg0 = $this->pages[0];
                 $this->write_single_page_xml($pg0, 0, $pg1->id);
@@ -212,7 +212,7 @@ class moodle1_mod_lesson_handler extends moodle1_mod_handler {
         $this->page = null;
     }
 
-    public function on_lesson_pages_end() {
+    public function on_opendsa_activity_pages_end() {
         if ($this->pages) {
             if (isset($this->pages[1])) { // write the case of only 2 pages.
                 $this->write_single_page_xml($this->pages[0], $this->prevpageid, $this->pages[1]->id);
@@ -230,19 +230,19 @@ class moodle1_mod_lesson_handler extends moodle1_mod_handler {
     }
 
     /**
-     * This is executed when we reach the closing </MOD> tag of our 'lesson' path
+     * This is executed when we reach the closing </MOD> tag of our 'opendsa_activity' path
      */
-    public function on_lesson_end() {
+    public function on_opendsa_activity_end() {
         // Append empty <overrides> subpath element.
         $this->write_xml('overrides', array());
 
-        // finish writing lesson.xml
-        $this->xmlwriter->end_tag('lesson');
+        // finish writing opendsa_activity.xml
+        $this->xmlwriter->end_tag('opendsa_activity');
         $this->xmlwriter->end_tag('activity');
         $this->close_xml_writer();
 
         // write inforef.xml
-        $this->open_xml_writer("activities/lesson_{$this->moduleid}/inforef.xml");
+        $this->open_xml_writer("activities/opendsa_activity_{$this->moduleid}/inforef.xml");
         $this->xmlwriter->begin_tag('inforef');
         $this->xmlwriter->begin_tag('fileref');
         foreach ($this->fileman->get_fileids() as $fileid) {
@@ -271,7 +271,7 @@ class moodle1_mod_lesson_handler extends moodle1_mod_handler {
             $this->xmlwriter->full_tag($field, $value);
         }
 
-        //effectively on_lesson_answers_end(), where we write out answers for current page.
+        //effectively on_opendsa_activity_answers_end(), where we write out answers for current page.
         $answers = $page->answers;
 
         $this->xmlwriter->begin_tag('answers');

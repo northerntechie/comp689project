@@ -18,7 +18,7 @@
 /**
  * Defines message providers (types of messages being sent)
  *
- * @package mod_lesson
+ * @package mod_opendsa_activity
  * @copyright 2010 Andrew Davis
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

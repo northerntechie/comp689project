@@ -15,33 +15,33 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The mod_lesson lesson ended event.
+ * The mod_opendsa_activity opendsa_activity ended event.
  *
- * @package    mod_lesson
+ * @package    mod_opendsa_activity
  * @copyright  2013 Mark Nelson <markn@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 
-namespace mod_lesson\event;
+namespace mod_opendsa_activity\event;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * The mod_lesson lesson ended event class.
+ * The mod_opendsa_activity opendsa_activity ended event class.
  *
- * @package    mod_lesson
+ * @package    mod_opendsa_activity
  * @since      Moodle 2.7
  * @copyright  2013 Mark Nelson <markn@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 
-class lesson_ended extends \core\event\base {
+class opendsa_activity_ended extends \core\event\base {
 
     /**
      * Set basic properties for the event.
      */
     protected function init() {
-        $this->data['objecttable'] = 'lesson';
+        $this->data['objecttable'] = 'opendsa_activity';
         $this->data['crud'] = 'r';
         $this->data['edulevel'] = self::LEVEL_PARTICIPATING;
     }
@@ -52,7 +52,7 @@ class lesson_ended extends \core\event\base {
      * @return string
      */
     public static function get_name() {
-        return get_string('eventlessonended', 'mod_lesson');
+        return get_string('eventopendsa_activityended', 'mod_opendsa_activity');
     }
 
     /**
@@ -61,7 +61,7 @@ class lesson_ended extends \core\event\base {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url('/mod/lesson/view.php', array('id' => $this->contextinstanceid));
+        return new \moodle_url('/mod/opendsa_activity/view.php', array('id' => $this->contextinstanceid));
     }
 
     /**
@@ -70,7 +70,7 @@ class lesson_ended extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        return "The user with id '$this->userid' ended the lesson with course module id '$this->contextinstanceid'.";
+        return "The user with id '$this->userid' ended the opendsa_activity with course module id '$this->contextinstanceid'.";
     }
 
     /**
@@ -79,11 +79,11 @@ class lesson_ended extends \core\event\base {
      * @return array of parameters to be passed to legacy add_to_log() function.
      */
     protected function get_legacy_logdata() {
-        return array($this->courseid, 'lesson', 'end', 'view.php?id=' . $this->contextinstanceid, $this->objectid,
+        return array($this->courseid, 'opendsa_activity', 'end', 'view.php?id=' . $this->contextinstanceid, $this->objectid,
             $this->contextinstanceid);
     }
 
     public static function get_objectid_mapping() {
-        return array('db' => 'lesson', 'restore' => 'lesson');
+        return array('db' => 'opendsa_activity', 'restore' => 'opendsa_activity');
     }
 }

@@ -1,7 +1,7 @@
-@mod @mod_lesson
-Feature: In a lesson activity, students can exit and re-enter the activity when it consists only of cluster pages
+@mod @mod_opendsa_activity
+Feature: In a opendsa_activity activity, students can exit and re-enter the activity when it consists only of cluster pages
   As a student
-  I need to exit and re-enter a lesson out and into clusters.
+  I need to exit and re-enter a opendsa_activity out and into clusters.
 
   Background:
     Given the following "users" exist:
@@ -19,7 +19,7 @@ Feature: In a lesson activity, students can exit and re-enter the activity when 
     And I am on "Course 1" course homepage with editing mode on
     And I add a "Lesson" to section "1" and I fill the form with:
       | Name | Lesson with cluster |
-      | Description | Cluster lesson description |
+      | Description | Cluster opendsa_activity description |
     And I follow "Lesson with cluster"
     And I follow "Add a content page"
     And I set the following fields to these values:
@@ -148,7 +148,7 @@ Feature: In a lesson activity, students can exit and re-enter the activity when 
       | Page contents | Question 1 from C cluster |
       | id_answer_editor_0 | Correct answer |
       | id_response_editor_0 | Good |
-      | id_jumpto_0 | End of lesson |
+      | id_jumpto_0 | End of opendsa_activity |
       | id_score_0 | 1 |
       | id_answer_editor_1 | Incorrect answer |
       | id_response_editor_1 | Bad |
@@ -163,7 +163,7 @@ Feature: In a lesson activity, students can exit and re-enter the activity when 
       | Page contents | Question 2 from C cluster |
       | id_answer_editor_0 | Correct answer |
       | id_response_editor_0 | Good |
-      | id_jumpto_0 | End of lesson |
+      | id_jumpto_0 | End of opendsa_activity |
       | id_score_0 | 1 |
       | id_answer_editor_1 | Incorrect answer |
       | id_response_editor_1 | Bad |
@@ -177,7 +177,7 @@ Feature: In a lesson activity, students can exit and re-enter the activity when 
       | Page contents | Question 3 from C cluster |
       | id_answer_editor_0 | Correct answer |
       | id_response_editor_0 | Good |
-      | id_jumpto_0 | End of lesson |
+      | id_jumpto_0 | End of opendsa_activity |
       | id_score_0 | 1 |
       | id_answer_editor_1 | Incorrect answer |
       | id_response_editor_1 | Bad |
@@ -187,7 +187,7 @@ Feature: In a lesson activity, students can exit and re-enter the activity when 
     And I click on "Add an end of cluster" "link" in the "//div[contains(concat(' ', normalize-space(@class), ' '), ' addlinks ')][16]" "xpath_element"
     And I log out
 
-  Scenario: Accessing as student to a cluster only lesson
+  Scenario: Accessing as student to a cluster only opendsa_activity
     Given I log in as "student1"
     And I am on "Course 1" course homepage
     And I follow "Lesson with cluster"

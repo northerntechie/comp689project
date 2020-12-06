@@ -1,6 +1,6 @@
-@mod @mod_lesson
-Feature: Display the lesson description in the lesson and optionally in the course
-  In order to display the the lesson description description in the course
+@mod @mod_opendsa_activity
+Feature: Display the opendsa_activity description in the opendsa_activity and optionally in the course
+  In order to display the the opendsa_activity description description in the course
   As a teacher
   I need to enable the 'Display description on course page' setting.
 
@@ -18,18 +18,18 @@ Feature: Display the lesson description in the lesson and optionally in the cour
     And I am on "Course 1" course homepage with editing mode on
     And I add a "Lesson" to section "1"
     And I set the following fields to these values:
-      | Name | Test lesson |
-      | Description | Test lesson description |
+      | Name | Test opendsa_activity |
+      | Description | Test opendsa_activity description |
     And I click on "Save and display" "button"
 
   Scenario: Description is displayed in the Lesson
     Given I am on "Course 1" course homepage
-    When I follow "Test lesson"
-    Then I should see "Test lesson description"
+    When I follow "Test opendsa_activity"
+    Then I should see "Test opendsa_activity description"
 
-  Scenario: Show lesson description in the course homepage
+  Scenario: Show opendsa_activity description in the course homepage
     Given I am on "Course 1" course homepage
-    And I follow "Test lesson"
+    And I follow "Test opendsa_activity"
     And I navigate to "Edit settings" in current page administration
     And the following fields match these values:
       | Display description on course page | |
@@ -37,14 +37,14 @@ Feature: Display the lesson description in the lesson and optionally in the cour
       | Display description on course page | 1 |
     And I press "Save and return to course"
     When I am on "Course 1" course homepage
-    Then I should see "Test lesson description"
+    Then I should see "Test opendsa_activity description"
 
-  Scenario: Hide lesson description in the course homepage
+  Scenario: Hide opendsa_activity description in the course homepage
     Given I am on "Course 1" course homepage
-    And I follow "Test lesson"
+    And I follow "Test opendsa_activity"
     And I navigate to "Edit settings" in current page administration
     And the following fields match these values:
       | Display description on course page | |
     And I press "Save and return to course"
     When I am on "Course 1" course homepage
-    Then I should not see "Test lesson description"
+    Then I should not see "Test opendsa_activity description"

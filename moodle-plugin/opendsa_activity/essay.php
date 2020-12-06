@@ -18,29 +18,29 @@
 /**
  * Provides the interface for grading essay questions
  *
- * @package mod_lesson
+ * @package mod_opendsa_activity
  * @copyright  1999 onwards Martin Dougiamas  {@link http://moodle.com}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  **/
 
 require_once('../../config.php');
-require_once($CFG->dirroot.'/mod/lesson/locallib.php');
-require_once($CFG->dirroot.'/mod/lesson/pagetypes/essay.php');
-require_once($CFG->dirroot.'/mod/lesson/essay_form.php');
+require_once($CFG->dirroot.'/mod/opendsa_activity/locallib.php');
+require_once($CFG->dirroot.'/mod/opendsa_activity/pagetypes/essay.php');
+require_once($CFG->dirroot.'/mod/opendsa_activity/essay_form.php');
 
 $id   = required_param('id', PARAM_INT);             // Course Module ID
 $mode = optional_param('mode', 'display', PARAM_ALPHA);
 
-$cm = get_coursemodule_from_id('lesson', $id, 0, false, MUST_EXIST);
+$cm = get_coursemodule_from_id('opendsa_activity', $id, 0, false, MUST_EXIST);
 $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
-$dblesson = $DB->get_record('lesson', array('id' => $cm->instance), '*', MUST_EXIST);
-$lesson = new lesson($dblesson);
+$dbopendsa_activity = $DB->get_record('opendsa_activity', array('id' => $cm->instance), '*', MUST_EXIST);
+$opendsa_activity = new opendsa_activity($dbopendsa_activity);
 
 require_login($course, false, $cm);
 $context = context_module::instance($cm->id);
-require_capability('mod/lesson:grade', $context);
+require_capability('mod/opendsa_activity:grade', $context);
 
-$url = new moodle_url('/mod/lesson/essay.php', array('id'=>$id));
+$url = new moodle_url('/mod/opendsa_activity/essay.php', array('id'=>$id));
 if ($mode !== 'display') {
     $url->param('mode', $mode);
 }
@@ -58,21 +58,21 @@ $formattextdefoptions->para = false;
 $formattextdefoptions->context = $context;
 
 if ($attemptid > 0) {
-    $attempt = $DB->get_record('lesson_attempts', array('id' => $attemptid));
-    $answer = $DB->get_record('lesson_answers', array('opendsa_activity_id' => $lesson->id, 'pageid' => $attempt->pageid));
+    $attempt = $DB->get_record('opendsa_activity_attempts', array('id' => $attemptid));
+    $answer = $DB->get_record('opendsa_activity_answers', array('opendsa_activity_id' => $opendsa_activity->id, 'pageid' => $attempt->pageid));
     $user = $DB->get_record('user', array('id' => $attempt->userid));
     // Apply overrides.
-    $lesson->update_effective_access($user->id);
+    $opendsa_activity->update_effective_access($user->id);
     $scoreoptions = array();
-    if ($lesson->custom) {
+    if ($opendsa_activity->custom) {
         $i = $answer->score;
         while ($i >= 0) {
             $scoreoptions[$i] = (string)$i;
             $i--;
         }
     } else {
-        $scoreoptions[0] = get_string('nocredit', 'lesson');
-        $scoreoptions[1] = get_string('credit', 'lesson');
+        $scoreoptions[0] = get_string('nocredit', 'opendsa_activity');
+        $scoreoptions[1] = get_string('credit', 'opendsa_activity');
     }
 }
 
@@ -83,13 +83,13 @@ switch ($mode) {
         require_sesskey();
 
         if (empty($attempt)) {
-            print_error('cannotfindattempt', 'lesson');
+            print_error('cannotfindattempt', 'opendsa_activity');
         }
         if (empty($user)) {
-            print_error('cannotfinduser', 'lesson');
+            print_error('cannotfinduser', 'opendsa_activity');
         }
         if (empty($answer)) {
-            print_error('cannotfindanswer', 'lesson');
+            print_error('cannotfindanswer', 'opendsa_activity');
         }
         break;
 
@@ -97,35 +97,35 @@ switch ($mode) {
         require_sesskey();
 
         if (empty($attempt)) {
-            print_error('cannotfindattempt', 'lesson');
+            print_error('cannotfindattempt', 'opendsa_activity');
         }
         if (empty($user)) {
-            print_error('cannotfinduser', 'lesson');
+            print_error('cannotfinduser', 'opendsa_activity');
         }
 
         $editoroptions = array('noclean' => true, 'maxfiles' => EDITOR_UNLIMITED_FILES,
                 'maxbytes' => $CFG->maxbytes, 'context' => $context);
-        $essayinfo = lesson_page_type_essay::extract_useranswer($attempt->useranswer);
+        $essayinfo = opendsa_activity_page_type_essay::extract_useranswer($attempt->useranswer);
         $essayinfo = file_prepare_standard_editor($essayinfo, 'response', $editoroptions, $context,
-                'mod_lesson', 'essay_responses', $attempt->id);
+                'mod_opendsa_activity', 'essay_responses', $attempt->id);
         $mform = new essay_grading_form(null, array('scoreoptions' => $scoreoptions, 'user' => $user));
         $mform->set_data($essayinfo);
         if ($mform->is_cancelled()) {
-            redirect("$CFG->wwwroot/mod/lesson/essay.php?id=$cm->id");
+            redirect("$CFG->wwwroot/mod/opendsa_activity/essay.php?id=$cm->id");
         }
         if ($form = $mform->get_data()) {
-            if (!$grades = $DB->get_records('lesson_grades', array("opendsa_activity_id"=>$lesson->id, "userid"=>$attempt->userid), 'completed', '*', $attempt->retry, 1)) {
-                print_error('cannotfindgrade', 'lesson');
+            if (!$grades = $DB->get_records('opendsa_activity_grades', array("opendsa_activity_id"=>$opendsa_activity->id, "userid"=>$attempt->userid), 'completed', '*', $attempt->retry, 1)) {
+                print_error('cannotfindgrade', 'opendsa_activity');
             }
 
             $essayinfo->graded = 1;
             $essayinfo->score = $form->score;
             $form = file_postupdate_standard_editor($form, 'response', $editoroptions, $context,
-                                        'mod_lesson', 'essay_responses', $attempt->id);
+                                        'mod_opendsa_activity', 'essay_responses', $attempt->id);
             $essayinfo->response = $form->response;
             $essayinfo->responseformat = $form->responseformat;
             $essayinfo->sent = 0;
-            if (!$lesson->custom && $essayinfo->score == 1) {
+            if (!$opendsa_activity->custom && $essayinfo->score == 1) {
                 $attempt->correct = 1;
             } else {
                 $attempt->correct = 0;
@@ -133,17 +133,17 @@ switch ($mode) {
 
             $attempt->useranswer = serialize($essayinfo);
 
-            $DB->update_record('lesson_attempts', $attempt);
+            $DB->update_record('opendsa_activity_attempts', $attempt);
 
             // Get grade information
             $grade = current($grades);
-            $gradeinfo = lesson_grade($lesson, $attempt->retry, $attempt->userid);
+            $gradeinfo = opendsa_activity_grade($opendsa_activity, $attempt->retry, $attempt->userid);
 
             // Set and update
             $updategrade = new stdClass();
             $updategrade->id = $grade->id;
             $updategrade->grade = $gradeinfo->grade;
-            $DB->update_record('lesson_grades', $updategrade);
+            $DB->update_record('opendsa_activity_grades', $updategrade);
 
             $params = array(
                 'context' => $context,
@@ -151,20 +151,20 @@ switch ($mode) {
                 'courseid' => $course->id,
                 'relateduserid' => $attempt->userid,
                 'other' => array(
-                    'opendsa_activity_id' => $lesson->id,
+                    'opendsa_activity_id' => $opendsa_activity->id,
                     'attemptid' => $attemptid
                 )
             );
-            $event = \mod_lesson\event\essay_assessed::create($params);
-            $event->add_record_snapshot('lesson', $dblesson);
+            $event = \mod_opendsa_activity\event\essay_assessed::create($params);
+            $event->add_record_snapshot('opendsa_activity', $dbopendsa_activity);
             $event->trigger();
 
-            $lesson->add_message(get_string('changessaved'), 'notifysuccess');
+            $opendsa_activity->add_message(get_string('changessaved'), 'notifysuccess');
 
             // update central gradebook
-            lesson_update_grades($lesson, $grade->userid);
+            opendsa_activity_update_grades($opendsa_activity, $grade->userid);
 
-            redirect(new moodle_url('/mod/lesson/essay.php', array('id'=>$cm->id)));
+            redirect(new moodle_url('/mod/opendsa_activity/essay.php', array('id'=>$cm->id)));
         } else {
             print_error('invalidformdata');
         }
@@ -177,7 +177,7 @@ switch ($mode) {
         if ($userid = optional_param('userid', 0, PARAM_INT)) {
             $queryadd = " AND userid = ?";
             if (! $users = $DB->get_records('user', array('id' => $userid))) {
-                print_error('cannotfinduser', 'lesson');
+                print_error('cannotfinduser', 'opendsa_activity');
             }
         } else {
             $queryadd = '';
@@ -185,7 +185,7 @@ switch ($mode) {
             // If group selected, only send to group members.
             list($esql, $params) = get_enrolled_sql($context, '', $currentgroup, true);
             list($sort, $sortparams) = users_order_by_sql('u');
-            $params['opendsa_activity_id'] = $lesson->id;
+            $params['opendsa_activity_id'] = $opendsa_activity->id;
 
             // Need to use inner view to avoid distinct + text
             if (!$users = $DB->get_records_sql("
@@ -193,18 +193,18 @@ switch ($mode) {
                   FROM {user} u
                   JOIN (
                            SELECT DISTINCT userid
-                             FROM {lesson_attempts}
+                             FROM {opendsa_activity_attempts}
                             WHERE opendsa_activity_id = :opendsa_activity_id
                        ) ui ON u.id = ui.userid
                   JOIN ($esql) ue ON ue.id = u.id
                   ORDER BY $sort", $params)) {
-                print_error('cannotfinduser', 'lesson');
+                print_error('cannotfinduser', 'opendsa_activity');
             }
         }
 
-        $pages = $lesson->load_all_pages();
+        $pages = $opendsa_activity->load_all_pages();
         foreach ($pages as $key=>$page) {
-            if ($page->qtype != LESSON_PAGE_ESSAY) {
+            if ($page->qtype != opendsa_activity_PAGE_ESSAY) {
                 unset($pages[$key]);
             }
         }
@@ -214,31 +214,31 @@ switch ($mode) {
         if (!empty($queryadd)) {
             $params[] = $userid;
         }
-        if (!$attempts = $DB->get_records_select('lesson_attempts', "pageid $usql".$queryadd, $params)) {
-            print_error('nooneansweredthisquestion', 'lesson');
+        if (!$attempts = $DB->get_records_select('opendsa_activity_attempts', "pageid $usql".$queryadd, $params)) {
+            print_error('nooneansweredthisquestion', 'opendsa_activity');
         }
         // Get the answers
         list($answerUsql, $parameters) = $DB->get_in_or_equal(array_keys($pages));
-        array_unshift($parameters, $lesson->id);
-        if (!$answers = $DB->get_records_select('lesson_answers', "opendsa_activity_id = ? AND pageid $answerUsql", $parameters, '', 'pageid, score')) {
-            print_error('cannotfindanswer', 'lesson');
+        array_unshift($parameters, $opendsa_activity->id);
+        if (!$answers = $DB->get_records_select('opendsa_activity_answers', "opendsa_activity_id = ? AND pageid $answerUsql", $parameters, '', 'pageid, score')) {
+            print_error('cannotfindanswer', 'opendsa_activity');
         }
 
         $userpicture = new user_picture($USER);
         $userpicture->size = 1; // Use f1 size.
         foreach ($attempts as $attempt) {
-            $essayinfo = lesson_page_type_essay::extract_useranswer($attempt->useranswer);
+            $essayinfo = opendsa_activity_page_type_essay::extract_useranswer($attempt->useranswer);
             if ($essayinfo->graded && !$essayinfo->sent) {
                 // Holds values for the essayemailsubject string for the email message
                 $a = new stdClass;
 
                 // Set the grade
-                $grades = $DB->get_records('lesson_grades', array("opendsa_activity_id"=>$lesson->id, "userid"=>$attempt->userid), 'completed', '*', $attempt->retry, 1);
+                $grades = $DB->get_records('opendsa_activity_grades', array("opendsa_activity_id"=>$opendsa_activity->id, "userid"=>$attempt->userid), 'completed', '*', $attempt->retry, 1);
                 $grade  = current($grades);
                 $a->newgrade = $grade->grade;
 
                 // Set the points
-                if ($lesson->custom) {
+                if ($opendsa_activity->custom) {
                     $a->earned = $essayinfo->score;
                     $a->outof  = $answers[$attempt->pageid]->score;
                 } else {
@@ -247,34 +247,34 @@ switch ($mode) {
                 }
 
                 // Set rest of the message values
-                $currentpage = $lesson->load_page($attempt->pageid);
+                $currentpage = $opendsa_activity->load_page($attempt->pageid);
                 $a->question = format_text($currentpage->contents, $currentpage->contentsformat, $formattextdefoptions);
                 $answer = file_rewrite_pluginfile_urls($essayinfo->answer, 'pluginfile.php', $context->id,
-                    'mod_lesson', 'essay_answers', $attempt->id);
+                    'mod_opendsa_activity', 'essay_answers', $attempt->id);
                 $a->response = format_text($answer, $essayinfo->answerformat,
                         array('context' => $context, 'para' => true));
                 $a->comment = $essayinfo->response;
                 $a->comment = file_rewrite_pluginfile_urls($a->comment, 'pluginfile.php', $context->id,
-                            'mod_lesson', 'essay_responses', $attempt->id);
+                            'mod_opendsa_activity', 'essay_responses', $attempt->id);
                 $a->comment  = format_text($a->comment, $essayinfo->responseformat, $formattextdefoptions);
-                $a->lesson = format_string($lesson->name, true);
+                $a->opendsa_activity = format_string($opendsa_activity->name, true);
 
                 // Fetch message HTML and plain text formats
-                $message  = get_string('essayemailmessage2', 'lesson', $a);
+                $message  = get_string('essayemailmessage2', 'opendsa_activity', $a);
                 $plaintext = format_text_email($message, FORMAT_HTML);
 
-                $smallmessage = get_string('essayemailmessagesmall', 'lesson', $a);
+                $smallmessage = get_string('essayemailmessagesmall', 'opendsa_activity', $a);
                 $smallmessage = format_text_email($smallmessage, FORMAT_HTML);
 
                 // Subject
-                $subject = get_string('essayemailsubject', 'lesson');
+                $subject = get_string('essayemailsubject', 'opendsa_activity');
 
                 // Context url.
                 $contexturl = new moodle_url('/grade/report/user/index.php', array('id' => $course->id));
 
                 $eventdata = new \core\message\message();
                 $eventdata->courseid         = $course->id;
-                $eventdata->modulename       = 'lesson';
+                $eventdata->modulename       = 'opendsa_activity';
                 $eventdata->userfrom         = $USER;
                 $eventdata->userto           = $users[$attempt->userid];
                 $eventdata->subject          = $subject;
@@ -286,30 +286,30 @@ switch ($mode) {
                 $userpicture->includetoken   = $attempt->userid; // Generate an out-of-session token for the destinatary.
                 $eventdata->customdata       = [
                     'cmid' => $cm->id,
-                    'instance' => $lesson->id,
-                    'retake' => $lesson->id,
+                    'instance' => $opendsa_activity->id,
+                    'retake' => $opendsa_activity->id,
                     'notificationiconurl' => $userpicture->get_url($PAGE)->out(false),
                 ];
 
                 // Required for messaging framework
-                $eventdata->component = 'mod_lesson';
+                $eventdata->component = 'mod_opendsa_activity';
                 $eventdata->name = 'graded_essay';
 
                 message_send($eventdata);
                 $essayinfo->sent = 1;
                 $attempt->useranswer = serialize($essayinfo);
-                $DB->update_record('lesson_attempts', $attempt);
+                $DB->update_record('opendsa_activity_attempts', $attempt);
             }
         }
-        $lesson->add_message(get_string('emailsuccess', 'lesson'), 'notifysuccess');
-        redirect(new moodle_url('/mod/lesson/essay.php', array('id'=>$cm->id)));
+        $opendsa_activity->add_message(get_string('emailsuccess', 'opendsa_activity'), 'notifysuccess');
+        redirect(new moodle_url('/mod/opendsa_activity/essay.php', array('id'=>$cm->id)));
         break;
     case 'display':  // Default view - get the necessary data
     default:
-        // Get lesson pages that are essay
-        $pages = $lesson->load_all_pages();
+        // Get opendsa_activity pages that are essay
+        $pages = $opendsa_activity->load_all_pages();
         foreach ($pages as $key=>$page) {
-            if ($page->qtype != LESSON_PAGE_ESSAY) {
+            if ($page->qtype != opendsa_activity_PAGE_ESSAY) {
                 unset($pages[$key]);
             }
         }
@@ -321,18 +321,18 @@ switch ($mode) {
             $parameters = array_merge($params, $parameters);
 
             $sql = "SELECT a.*
-                        FROM {lesson_attempts} a
+                        FROM {opendsa_activity_attempts} a
                         JOIN ($esql) ue ON a.userid = ue.id
                         WHERE pageid $usql";
             if ($essayattempts = $DB->get_records_sql($sql, $parameters)) {
                 $ufields = user_picture::fields('u');
-                // Get all the users who have taken this lesson.
+                // Get all the users who have taken this opendsa_activity.
                 list($sort, $sortparams) = users_order_by_sql('u');
 
-                $params['opendsa_activity_id'] = $lesson->id;
+                $params['opendsa_activity_id'] = $opendsa_activity->id;
                 $sql = "SELECT DISTINCT $ufields
                         FROM {user} u
-                        JOIN {lesson_attempts} a ON u.id = a.userid
+                        JOIN {opendsa_activity_attempts} a ON u.id = a.userid
                         JOIN ($esql) ue ON ue.id = a.userid
                         WHERE a.opendsa_activity_id = :opendsa_activity_id
                         ORDER BY $sort";
@@ -340,29 +340,29 @@ switch ($mode) {
                     $mode = 'none'; // not displaying anything
                     if (!empty($currentgroup)) {
                         $groupname = groups_get_group_name($currentgroup);
-                        $lesson->add_message(get_string('noonehasansweredgroup', 'lesson', $groupname));
+                        $opendsa_activity->add_message(get_string('noonehasansweredgroup', 'opendsa_activity', $groupname));
                     } else {
-                        $lesson->add_message(get_string('noonehasanswered', 'lesson'));
+                        $opendsa_activity->add_message(get_string('noonehasanswered', 'opendsa_activity'));
                     }
                 }
             } else {
                 $mode = 'none'; // not displaying anything
                 if (!empty($currentgroup)) {
                     $groupname = groups_get_group_name($currentgroup);
-                    $lesson->add_message(get_string('noonehasansweredgroup', 'lesson', $groupname));
+                    $opendsa_activity->add_message(get_string('noonehasansweredgroup', 'opendsa_activity', $groupname));
                 } else {
-                    $lesson->add_message(get_string('noonehasanswered', 'lesson'));
+                    $opendsa_activity->add_message(get_string('noonehasanswered', 'opendsa_activity'));
                 }
             }
         } else {
             $mode = 'none'; // not displaying anything
-            $lesson->add_message(get_string('noessayquestionsfound', 'lesson'));
+            $opendsa_activity->add_message(get_string('noessayquestionsfound', 'opendsa_activity'));
         }
         break;
 }
 
-$lessonoutput = $PAGE->get_renderer('mod_lesson');
-echo $lessonoutput->header($lesson, $cm, 'essay', false, null, get_string('manualgrading', 'lesson'));
+$opendsa_activity_output = $PAGE->get_renderer('mod_opendsa_activity');
+echo $opendsa_activity_output->header($opendsa_activity, $cm, 'essay', false, null, get_string('manualgrading', 'opendsa_activity'));
 
 switch ($mode) {
     case 'display':
@@ -380,8 +380,8 @@ switch ($mode) {
 
         // Setup table
         $table = new html_table();
-        $table->head = array(get_string('name'), get_string('essays', 'lesson'), get_string('status'),
-            get_string('email', 'lesson'));
+        $table->head = array(get_string('name'), get_string('essays', 'opendsa_activity'), get_string('status'),
+            get_string('email', 'opendsa_activity'));
         $table->attributes['class'] = 'standardtable generaltable';
         $table->align = array('left', 'left', 'left');
         $table->wrap = array('nowrap', 'nowrap', '');
@@ -392,8 +392,8 @@ switch ($mode) {
             $essaylinks = array();
             $essaystatuses = array();
 
-            // Number of attempts on the lesson
-            $attempts = $lesson->count_user_retries($userid);
+            // Number of attempts on the opendsa_activity
+            $attempts = $opendsa_activity->count_user_retries($userid);
 
             // Go through each essay page
             foreach ($studentessays[$userid] as $page => $tries) {
@@ -407,30 +407,30 @@ switch ($mode) {
                     $count++;
 
                     // Make sure they didn't answer it more than the max number of attmepts
-                    if (count($try) > $lesson->maxattempts) {
-                        $essay = $try[$lesson->maxattempts-1];
+                    if (count($try) > $opendsa_activity->maxattempts) {
+                        $essay = $try[$opendsa_activity->maxattempts-1];
                     } else {
                         $essay = end($try);
                     }
 
                     // Start processing the attempt
-                    $essayinfo = lesson_page_type_essay::extract_useranswer($essay->useranswer);
+                    $essayinfo = opendsa_activity_page_type_essay::extract_useranswer($essay->useranswer);
 
                     // link for each essay
-                    $url = new moodle_url('/mod/lesson/essay.php', array('id'=>$cm->id,'mode'=>'grade','attemptid'=>$essay->id,'sesskey'=>sesskey()));
+                    $url = new moodle_url('/mod/opendsa_activity/essay.php', array('id'=>$cm->id,'mode'=>'grade','attemptid'=>$essay->id,'sesskey'=>sesskey()));
                     $linktitle = userdate($essay->timeseen, get_string('strftimedatetime')).' '.
                             format_string($pages[$essay->pageid]->title, true);
 
                     // Different colors for all the states of an essay (graded, if sent, not graded)
                     if (!$essayinfo->graded) {
                         $class = "badge badge-warning";
-                        $status = get_string('notgraded', 'lesson');
+                        $status = get_string('notgraded', 'opendsa_activity');
                     } elseif (!$essayinfo->sent) {
                         $class = "badge badge-success";
-                        $status = get_string('graded', 'lesson');
+                        $status = get_string('graded', 'opendsa_activity');
                     } else {
                         $class = "badge badge-success";
-                        $status = get_string('sent', 'lesson');
+                        $status = get_string('sent', 'opendsa_activity');
                     }
                     $attributes = array('tabindex' => 0);
 
@@ -439,16 +439,16 @@ switch ($mode) {
                 }
             }
             // email link for this user
-            $url = new moodle_url('/mod/lesson/essay.php', array('id'=>$cm->id,'mode'=>'email','userid'=>$userid,'sesskey'=>sesskey()));
-            $emaillink = html_writer::link($url, get_string('emailgradedessays', 'lesson'));
+            $url = new moodle_url('/mod/opendsa_activity/essay.php', array('id'=>$cm->id,'mode'=>'email','userid'=>$userid,'sesskey'=>sesskey()));
+            $emaillink = html_writer::link($url, get_string('emailgradedessays', 'opendsa_activity'));
 
             $table->data[] = array($OUTPUT->user_picture($users[$userid], array('courseid' => $course->id)) . $studentname,
                 implode("<br />", $essaylinks), implode("<br />", $essaystatuses), $emaillink);
         }
 
         // email link for all users
-        $url = new moodle_url('/mod/lesson/essay.php', array('id'=>$cm->id,'mode'=>'email','sesskey'=>sesskey()));
-        $emailalllink = html_writer::link($url, get_string('emailallgradedessays', 'lesson'));
+        $url = new moodle_url('/mod/opendsa_activity/essay.php', array('id'=>$cm->id,'mode'=>'email','sesskey'=>sesskey()));
+        $emailalllink = html_writer::link($url, get_string('emailallgradedessays', 'opendsa_activity'));
 
         $table->data[] = array(' ', ' ', ' ', $emailalllink);
 
@@ -456,21 +456,21 @@ switch ($mode) {
         break;
     case 'grade':
         // Trigger the essay grade viewed event.
-        $event = \mod_lesson\event\essay_attempt_viewed::create(array(
+        $event = \mod_opendsa_activity\event\essay_attempt_viewed::create(array(
             'objectid' => $attempt->id,
             'relateduserid' => $attempt->userid,
             'context' => $context,
             'courseid' => $course->id,
         ));
-        $event->add_record_snapshot('lesson_attempts', $attempt);
+        $event->add_record_snapshot('opendsa_activity_attempts', $attempt);
         $event->trigger();
 
         // Grading form
         // Expects the following to be set: $attemptid, $answer, $user, $page, $attempt
-        $essayinfo = lesson_page_type_essay::extract_useranswer($attempt->useranswer);
+        $essayinfo = opendsa_activity_page_type_essay::extract_useranswer($attempt->useranswer);
         $answer = file_rewrite_pluginfile_urls($essayinfo->answer, 'pluginfile.php', $context->id,
-            'mod_lesson', 'essay_answers', $attempt->id);
-        $currentpage = $lesson->load_page($attempt->pageid);
+            'mod_opendsa_activity', 'essay_answers', $attempt->id);
+        $currentpage = $opendsa_activity->load_page($attempt->pageid);
 
         $mform = new essay_grading_form(null, array('scoreoptions'=>$scoreoptions, 'user'=>$user));
         $data = new stdClass;
@@ -485,7 +485,7 @@ switch ($mode) {
         $editoroptions = array('noclean' => true, 'maxfiles' => EDITOR_UNLIMITED_FILES,
                 'maxbytes' => $CFG->maxbytes, 'context' => $context);
         $data = file_prepare_standard_editor($data, 'response', $editoroptions, $context,
-                'mod_lesson', 'essay_responses', $attempt->id);
+                'mod_opendsa_activity', 'essay_responses', $attempt->id);
         $mform->set_data($data);
 
         $mform->display();

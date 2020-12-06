@@ -16,10 +16,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Form to define a new instance of lesson or edit an instance.
+ * Form to define a new instance of opendsa_activity or edit an instance.
  * It is used from /course/modedit.php.
  *
- * @package mod_lesson
+ * @package mod_opendsa_activity
  * @copyright  1999 onwards Martin Dougiamas  {@link http://moodle.com}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or late
  **/
@@ -27,9 +27,9 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/course/moodleform_mod.php');
-require_once($CFG->dirroot.'/mod/lesson/locallib.php');
+require_once($CFG->dirroot.'/mod/opendsa_activity/locallib.php');
 
-class mod_lesson_mod_form extends moodleform_mod {
+class mod_opendsa_activity_mod_form extends moodleform_mod {
 
     protected $course = null;
 
@@ -43,7 +43,7 @@ class mod_lesson_mod_form extends moodleform_mod {
      *
      * @deprecated since Moodle 3.1
      */
-    public function mod_lesson_mod_form($current, $section, $cm, $course) {
+    public function mod_opendsa_activity_mod_form($current, $section, $cm, $course) {
         debugging('Use of class name as constructor is deprecated', DEBUG_DEVELOPER);
         self::__construct($current, $section, $cm, $course);
     }
@@ -53,39 +53,39 @@ class mod_lesson_mod_form extends moodleform_mod {
 
         $mform    = $this->_form;
 
-        $lessonconfig = get_config('mod_lesson');
+        $opendsa_activityconfig = get_config('mod_opendsa_activity');
 
         $mform->addElement('header', 'general', get_string('general', 'form'));
 
         /** Legacy slideshow width element to maintain backwards compatibility */
         $mform->addElement('hidden', 'width');
         $mform->setType('width', PARAM_INT);
-        $mform->setDefault('width', $lessonconfig->slideshowwidth);
+        $mform->setDefault('width', $opendsa_activityconfig->slideshowwidth);
 
         /** Legacy slideshow height element to maintain backwards compatibility */
         $mform->addElement('hidden', 'height');
         $mform->setType('height', PARAM_INT);
-        $mform->setDefault('height', $lessonconfig->slideshowheight);
+        $mform->setDefault('height', $opendsa_activityconfig->slideshowheight);
 
         /** Legacy slideshow background color element to maintain backwards compatibility */
         $mform->addElement('hidden', 'bgcolor');
         $mform->setType('bgcolor', PARAM_TEXT);
-        $mform->setDefault('bgcolor', $lessonconfig->slideshowbgcolor);
+        $mform->setDefault('bgcolor', $opendsa_activityconfig->slideshowbgcolor);
 
         /** Legacy media popup width element to maintain backwards compatibility */
         $mform->addElement('hidden', 'mediawidth');
         $mform->setType('mediawidth', PARAM_INT);
-        $mform->setDefault('mediawidth', $lessonconfig->mediawidth);
+        $mform->setDefault('mediawidth', $opendsa_activityconfig->mediawidth);
 
         /** Legacy media popup height element to maintain backwards compatibility */
         $mform->addElement('hidden', 'mediaheight');
         $mform->setType('mediaheight', PARAM_INT);
-        $mform->setDefault('mediaheight', $lessonconfig->mediaheight);
+        $mform->setDefault('mediaheight', $opendsa_activityconfig->mediaheight);
 
         /** Legacy media popup close button element to maintain backwards compatibility */
         $mform->addElement('hidden', 'mediaclose');
         $mform->setType('mediaclose', PARAM_BOOL);
-        $mform->setDefault('mediaclose', $lessonconfig->mediaclose);
+        $mform->setDefault('mediaclose', $opendsa_activityconfig->mediaclose);
 
         $mform->addElement('text', 'name', get_string('name'), array('size'=>'64'));
         if (!empty($CFG->formatstringstriptags)) {
@@ -106,54 +106,54 @@ class mod_lesson_mod_form extends moodleform_mod {
         $filemanageroptions['subdirs'] = 0;
         $filemanageroptions['maxfiles'] = 1;
 
-        $mform->addElement('filemanager', 'mediafile', get_string('mediafile', 'lesson'), null, $filemanageroptions);
-        $mform->addHelpButton('mediafile', 'mediafile', 'lesson');
-        $mform->setAdvanced('mediafile', $lessonconfig->mediafile_adv);
+        $mform->addElement('filemanager', 'mediafile', get_string('mediafile', 'opendsa_activity'), null, $filemanageroptions);
+        $mform->addHelpButton('mediafile', 'mediafile', 'opendsa_activity');
+        $mform->setAdvanced('mediafile', $opendsa_activityconfig->mediafile_adv);
 
-        $mform->addElement('selectyesno', 'progressbar', get_string('progressbar', 'lesson'));
-        $mform->addHelpButton('progressbar', 'progressbar', 'lesson');
-        $mform->setDefault('progressbar', $lessonconfig->progressbar);
-        $mform->setAdvanced('progressbar', $lessonconfig->progressbar_adv);
+        $mform->addElement('selectyesno', 'progressbar', get_string('progressbar', 'opendsa_activity'));
+        $mform->addHelpButton('progressbar', 'progressbar', 'opendsa_activity');
+        $mform->setDefault('progressbar', $opendsa_activityconfig->progressbar);
+        $mform->setAdvanced('progressbar', $opendsa_activityconfig->progressbar_adv);
 
-        $mform->addElement('selectyesno', 'ongoing', get_string('ongoing', 'lesson'));
-        $mform->addHelpButton('ongoing', 'ongoing', 'lesson');
-        $mform->setDefault('ongoing', $lessonconfig->ongoing);
-        $mform->setAdvanced('ongoing', $lessonconfig->ongoing_adv);
+        $mform->addElement('selectyesno', 'ongoing', get_string('ongoing', 'opendsa_activity'));
+        $mform->addHelpButton('ongoing', 'ongoing', 'opendsa_activity');
+        $mform->setDefault('ongoing', $opendsa_activityconfig->ongoing);
+        $mform->setAdvanced('ongoing', $opendsa_activityconfig->ongoing_adv);
 
-        $mform->addElement('selectyesno', 'displayleft', get_string('displayleftmenu', 'lesson'));
-        $mform->addHelpButton('displayleft', 'displayleftmenu', 'lesson');
-        $mform->setDefault('displayleft', $lessonconfig->displayleftmenu);
-        $mform->setAdvanced('displayleft', $lessonconfig->displayleftmenu_adv);
+        $mform->addElement('selectyesno', 'displayleft', get_string('displayleftmenu', 'opendsa_activity'));
+        $mform->addHelpButton('displayleft', 'displayleftmenu', 'opendsa_activity');
+        $mform->setDefault('displayleft', $opendsa_activityconfig->displayleftmenu);
+        $mform->setAdvanced('displayleft', $opendsa_activityconfig->displayleftmenu_adv);
 
         $options = array();
         for($i = 100; $i >= 0; $i--) {
             $options[$i] = $i.'%';
         }
-        $mform->addElement('select', 'displayleftif', get_string('displayleftif', 'lesson'), $options);
-        $mform->addHelpButton('displayleftif', 'displayleftif', 'lesson');
-        $mform->setDefault('displayleftif', $lessonconfig->displayleftif);
-        $mform->setAdvanced('displayleftif', $lessonconfig->displayleftif_adv);
+        $mform->addElement('select', 'displayleftif', get_string('displayleftif', 'opendsa_activity'), $options);
+        $mform->addHelpButton('displayleftif', 'displayleftif', 'opendsa_activity');
+        $mform->setDefault('displayleftif', $opendsa_activityconfig->displayleftif);
+        $mform->setAdvanced('displayleftif', $opendsa_activityconfig->displayleftif_adv);
 
-        $mform->addElement('selectyesno', 'slideshow', get_string('slideshow', 'lesson'));
-        $mform->addHelpButton('slideshow', 'slideshow', 'lesson');
-        $mform->setDefault('slideshow', $lessonconfig->slideshow);
-        $mform->setAdvanced('slideshow', $lessonconfig->slideshow_adv);
+        $mform->addElement('selectyesno', 'slideshow', get_string('slideshow', 'opendsa_activity'));
+        $mform->addHelpButton('slideshow', 'slideshow', 'opendsa_activity');
+        $mform->setDefault('slideshow', $opendsa_activityconfig->slideshow);
+        $mform->setAdvanced('slideshow', $opendsa_activityconfig->slideshow_adv);
 
         $numbers = array();
         for ($i = 20; $i > 1; $i--) {
             $numbers[$i] = $i;
         }
 
-        $mform->addElement('select', 'maxanswers', get_string('maximumnumberofanswersbranches', 'lesson'), $numbers);
-        $mform->setDefault('maxanswers', $lessonconfig->maxanswers);
-        $mform->setAdvanced('maxanswers', $lessonconfig->maxanswers_adv);
+        $mform->addElement('select', 'maxanswers', get_string('maximumnumberofanswersbranches', 'opendsa_activity'), $numbers);
+        $mform->setDefault('maxanswers', $opendsa_activityconfig->maxanswers);
+        $mform->setAdvanced('maxanswers', $opendsa_activityconfig->maxanswers_adv);
         $mform->setType('maxanswers', PARAM_INT);
-        $mform->addHelpButton('maxanswers', 'maximumnumberofanswersbranches', 'lesson');
+        $mform->addHelpButton('maxanswers', 'maximumnumberofanswersbranches', 'opendsa_activity');
 
-        $mform->addElement('selectyesno', 'feedback', get_string('displaydefaultfeedback', 'lesson'));
-        $mform->addHelpButton('feedback', 'displaydefaultfeedback', 'lesson');
-        $mform->setDefault('feedback', $lessonconfig->defaultfeedback);
-        $mform->setAdvanced('feedback', $lessonconfig->defaultfeedback_adv);
+        $mform->addElement('selectyesno', 'feedback', get_string('displaydefaultfeedback', 'opendsa_activity'));
+        $mform->addHelpButton('feedback', 'displaydefaultfeedback', 'opendsa_activity');
+        $mform->setDefault('feedback', $opendsa_activityconfig->defaultfeedback);
+        $mform->setAdvanced('feedback', $opendsa_activityconfig->defaultfeedback_adv);
 
         // Get the modules.
         if ($mods = get_course_mods($COURSE->id)) {
@@ -161,7 +161,7 @@ class mod_lesson_mod_form extends moodleform_mod {
             foreach ($mods as $mod) {
                 // Get the module name and then store it in a new array.
                 if ($module = get_coursemodule_from_instance($mod->modname, $mod->instance, $COURSE->id)) {
-                    // Exclude this lesson, if it's already been saved.
+                    // Exclude this opendsa_activity, if it's already been saved.
                     if (!isset($this->_cm->id) || $this->_cm->id != $mod->id) {
                         $modinstances[$mod->id] = $mod->modname.' - '.$module->name;
                     }
@@ -170,69 +170,69 @@ class mod_lesson_mod_form extends moodleform_mod {
             asort($modinstances); // Sort by module name.
             $modinstances=array(0=>get_string('none'))+$modinstances;
 
-            $mform->addElement('select', 'activitylink', get_string('activitylink', 'lesson'), $modinstances);
-            $mform->addHelpButton('activitylink', 'activitylink', 'lesson');
+            $mform->addElement('select', 'activitylink', get_string('activitylink', 'opendsa_activity'), $modinstances);
+            $mform->addHelpButton('activitylink', 'activitylink', 'opendsa_activity');
             $mform->setDefault('activitylink', 0);
-            $mform->setAdvanced('activitylink', $lessonconfig->activitylink_adv);
+            $mform->setAdvanced('activitylink', $opendsa_activityconfig->activitylink_adv);
         }
 
         // Availability.
         $mform->addElement('header', 'availabilityhdr', get_string('availability'));
 
-        $mform->addElement('date_time_selector', 'available', get_string('available', 'lesson'), array('optional'=>true));
+        $mform->addElement('date_time_selector', 'available', get_string('available', 'opendsa_activity'), array('optional'=>true));
         $mform->setDefault('available', 0);
 
-        $mform->addElement('date_time_selector', 'deadline', get_string('deadline', 'lesson'), array('optional'=>true));
+        $mform->addElement('date_time_selector', 'deadline', get_string('deadline', 'opendsa_activity'), array('optional'=>true));
         $mform->setDefault('deadline', 0);
 
         // Time limit.
-        $mform->addElement('duration', 'timelimit', get_string('timelimit', 'lesson'),
+        $mform->addElement('duration', 'timelimit', get_string('timelimit', 'opendsa_activity'),
                 array('optional' => true));
-        $mform->addHelpButton('timelimit', 'timelimit', 'lesson');
-        $mform->setAdvanced('timelimit', $lessonconfig->timelimit_adv);
-        $mform->setDefault('timelimit', $lessonconfig->timelimit);
+        $mform->addHelpButton('timelimit', 'timelimit', 'opendsa_activity');
+        $mform->setAdvanced('timelimit', $opendsa_activityconfig->timelimit_adv);
+        $mform->setDefault('timelimit', $opendsa_activityconfig->timelimit);
 
-        $mform->addElement('selectyesno', 'usepassword', get_string('usepassword', 'lesson'));
-        $mform->addHelpButton('usepassword', 'usepassword', 'lesson');
-        $mform->setDefault('usepassword', $lessonconfig->password);
-        $mform->setAdvanced('usepassword', $lessonconfig->password_adv);
+        $mform->addElement('selectyesno', 'usepassword', get_string('usepassword', 'opendsa_activity'));
+        $mform->addHelpButton('usepassword', 'usepassword', 'opendsa_activity');
+        $mform->setDefault('usepassword', $opendsa_activityconfig->password);
+        $mform->setAdvanced('usepassword', $opendsa_activityconfig->password_adv);
 
-        $mform->addElement('passwordunmask', 'password', get_string('password', 'lesson'));
+        $mform->addElement('passwordunmask', 'password', get_string('password', 'opendsa_activity'));
         $mform->setDefault('password', '');
-        $mform->setAdvanced('password', $lessonconfig->password_adv);
+        $mform->setAdvanced('password', $opendsa_activityconfig->password_adv);
         $mform->setType('password', PARAM_RAW);
         $mform->hideIf('password', 'usepassword', 'eq', 0);
         $mform->hideIf('passwordunmask', 'usepassword', 'eq', 0);
 
         // Dependent on.
         if ($this->current && isset($this->current->dependency) && $this->current->dependency) {
-            $mform->addElement('header', 'dependencyon', get_string('prerequisitelesson', 'lesson'));
+            $mform->addElement('header', 'dependencyon', get_string('prerequisiteopendsa_activity', 'opendsa_activity'));
             $mform->addElement('static', 'warningobsolete',
-                get_string('warning', 'lesson'),
-                get_string('prerequisiteisobsolete', 'lesson'));
+                get_string('warning', 'opendsa_activity'),
+                get_string('prerequisiteisobsolete', 'opendsa_activity'));
             $options = array(0 => get_string('none'));
-            if ($lessons = get_all_instances_in_course('lesson', $COURSE)) {
-                foreach ($lessons as $lesson) {
-                    if ($lesson->id != $this->_instance) {
-                        $options[$lesson->id] = format_string($lesson->name, true);
+            if ($opendsa_activitys = get_all_instances_in_course('opendsa_activity', $COURSE)) {
+                foreach ($opendsa_activitys as $opendsa_activity) {
+                    if ($opendsa_activity->id != $this->_instance) {
+                        $options[$opendsa_activity->id] = format_string($opendsa_activity->name, true);
                     }
 
                 }
             }
-            $mform->addElement('select', 'dependency', get_string('dependencyon', 'lesson'), $options);
-            $mform->addHelpButton('dependency', 'dependencyon', 'lesson');
+            $mform->addElement('select', 'dependency', get_string('dependencyon', 'opendsa_activity'), $options);
+            $mform->addHelpButton('dependency', 'dependencyon', 'opendsa_activity');
             $mform->setDefault('dependency', 0);
 
-            $mform->addElement('text', 'timespent', get_string('timespentminutes', 'lesson'));
+            $mform->addElement('text', 'timespent', get_string('timespentminutes', 'opendsa_activity'));
             $mform->setDefault('timespent', 0);
             $mform->setType('timespent', PARAM_INT);
             $mform->disabledIf('timespent', 'dependency', 'eq', 0);
 
-            $mform->addElement('checkbox', 'completed', get_string('completed', 'lesson'));
+            $mform->addElement('checkbox', 'completed', get_string('completed', 'opendsa_activity'));
             $mform->setDefault('completed', 0);
             $mform->disabledIf('completed', 'dependency', 'eq', 0);
 
-            $mform->addElement('text', 'gradebetterthan', get_string('gradebetterthan', 'lesson'));
+            $mform->addElement('text', 'gradebetterthan', get_string('gradebetterthan', 'opendsa_activity'));
             $mform->setDefault('gradebetterthan', 0);
             $mform->setType('gradebetterthan', PARAM_INT);
             $mform->disabledIf('gradebetterthan', 'dependency', 'eq', 0);
@@ -249,16 +249,16 @@ class mod_lesson_mod_form extends moodleform_mod {
                     'completed' => 0, 'gradebetterthan' => 0));
         }
 
-        // Allow to enable offline lessons only if the Mobile services are enabled.
+        // Allow to enable offline opendsa_activitys only if the Mobile services are enabled.
         if ($CFG->enablemobilewebservice) {
-            $mform->addElement('selectyesno', 'allowofflineattempts', get_string('allowofflineattempts', 'lesson'));
-            $mform->addHelpButton('allowofflineattempts', 'allowofflineattempts', 'lesson');
+            $mform->addElement('selectyesno', 'allowofflineattempts', get_string('allowofflineattempts', 'opendsa_activity'));
+            $mform->addHelpButton('allowofflineattempts', 'allowofflineattempts', 'opendsa_activity');
             $mform->setDefault('allowofflineattempts', 0);
             $mform->setAdvanced('allowofflineattempts');
             $mform->disabledIf('allowofflineattempts', 'timelimit[number]', 'neq', 0);
 
             $mform->addElement('static', 'allowofflineattemptswarning', '',
-                    $OUTPUT->notification(get_string('allowofflineattempts_help', 'lesson'), 'warning'));
+                    $OUTPUT->notification(get_string('allowofflineattempts_help', 'opendsa_activity'), 'warning'));
             $mform->setAdvanced('allowofflineattemptswarning');
         } else {
             $mform->addElement('hidden', 'allowofflineattempts', 0);
@@ -266,82 +266,82 @@ class mod_lesson_mod_form extends moodleform_mod {
         }
 
         // Flow control.
-        $mform->addElement('header', 'flowcontrol', get_string('flowcontrol', 'lesson'));
+        $mform->addElement('header', 'flowcontrol', get_string('flowcontrol', 'opendsa_activity'));
 
-        $mform->addElement('selectyesno', 'modattempts', get_string('modattempts', 'lesson'));
-        $mform->addHelpButton('modattempts', 'modattempts', 'lesson');
-        $mform->setDefault('modattempts', $lessonconfig->modattempts);
-        $mform->setAdvanced('modattempts', $lessonconfig->modattempts_adv);
+        $mform->addElement('selectyesno', 'modattempts', get_string('modattempts', 'opendsa_activity'));
+        $mform->addHelpButton('modattempts', 'modattempts', 'opendsa_activity');
+        $mform->setDefault('modattempts', $opendsa_activityconfig->modattempts);
+        $mform->setAdvanced('modattempts', $opendsa_activityconfig->modattempts_adv);
 
-        $mform->addElement('selectyesno', 'review', get_string('displayreview', 'lesson'));
-        $mform->addHelpButton('review', 'displayreview', 'lesson');
-        $mform->setDefault('review', $lessonconfig->displayreview);
-        $mform->setAdvanced('review', $lessonconfig->displayreview_adv);
+        $mform->addElement('selectyesno', 'review', get_string('displayreview', 'opendsa_activity'));
+        $mform->addHelpButton('review', 'displayreview', 'opendsa_activity');
+        $mform->setDefault('review', $opendsa_activityconfig->displayreview);
+        $mform->setAdvanced('review', $opendsa_activityconfig->displayreview_adv);
 
         $numbers = array();
         for ($i = 10; $i > 0; $i--) {
             $numbers[$i] = $i;
         }
-        $mform->addElement('select', 'maxattempts', get_string('maximumnumberofattempts', 'lesson'), $numbers);
-        $mform->addHelpButton('maxattempts', 'maximumnumberofattempts', 'lesson');
-        $mform->setDefault('maxattempts', $lessonconfig->maximumnumberofattempts);
-        $mform->setAdvanced('maxattempts', $lessonconfig->maximumnumberofattempts_adv);
+        $mform->addElement('select', 'maxattempts', get_string('maximumnumberofattempts', 'opendsa_activity'), $numbers);
+        $mform->addHelpButton('maxattempts', 'maximumnumberofattempts', 'opendsa_activity');
+        $mform->setDefault('maxattempts', $opendsa_activityconfig->maximumnumberofattempts);
+        $mform->setAdvanced('maxattempts', $opendsa_activityconfig->maximumnumberofattempts_adv);
 
         $defaultnextpages = array();
-        $defaultnextpages[0] = get_string('normal', 'lesson');
-        $defaultnextpages[LESSON_UNSEENPAGE] = get_string('showanunseenpage', 'lesson');
-        $defaultnextpages[LESSON_UNANSWEREDPAGE] = get_string('showanunansweredpage', 'lesson');
-        $mform->addElement('select', 'nextpagedefault', get_string('actionaftercorrectanswer', 'lesson'), $defaultnextpages);
-        $mform->addHelpButton('nextpagedefault', 'actionaftercorrectanswer', 'lesson');
-        $mform->setDefault('nextpagedefault', $lessonconfig->defaultnextpage);
-        $mform->setAdvanced('nextpagedefault', $lessonconfig->defaultnextpage_adv);
+        $defaultnextpages[0] = get_string('normal', 'opendsa_activity');
+        $defaultnextpages[OPENDSA_ACTIVITY_UNSEENPAGE] = get_string('showanunseenpage', 'opendsa_activity');
+        $defaultnextpages[OPENDSA_ACTIVITY_UNANSWEREDPAGE] = get_string('showanunansweredpage', 'opendsa_activity');
+        $mform->addElement('select', 'nextpagedefault', get_string('actionaftercorrectanswer', 'opendsa_activity'), $defaultnextpages);
+        $mform->addHelpButton('nextpagedefault', 'actionaftercorrectanswer', 'opendsa_activity');
+        $mform->setDefault('nextpagedefault', $opendsa_activityconfig->defaultnextpage);
+        $mform->setAdvanced('nextpagedefault', $opendsa_activityconfig->defaultnextpage_adv);
 
         $numbers = array();
         for ($i = 100; $i >= 0; $i--) {
             $numbers[$i] = $i;
         }
-        $mform->addElement('select', 'maxpages', get_string('numberofpagestoshow', 'lesson'), $numbers);
-        $mform->addHelpButton('maxpages', 'numberofpagestoshow', 'lesson');
-        $mform->setDefault('maxpages', $lessonconfig->numberofpagestoshow);
-        $mform->setAdvanced('maxpages', $lessonconfig->numberofpagestoshow_adv);
+        $mform->addElement('select', 'maxpages', get_string('numberofpagestoshow', 'opendsa_activity'), $numbers);
+        $mform->addHelpButton('maxpages', 'numberofpagestoshow', 'opendsa_activity');
+        $mform->setDefault('maxpages', $opendsa_activityconfig->numberofpagestoshow);
+        $mform->setAdvanced('maxpages', $opendsa_activityconfig->numberofpagestoshow_adv);
 
         // Grade.
         $this->standard_grading_coursemodule_elements();
 
         // No header here, so that the following settings are displayed in the grade section.
 
-        $mform->addElement('selectyesno', 'practice', get_string('practice', 'lesson'));
-        $mform->addHelpButton('practice', 'practice', 'lesson');
-        $mform->setDefault('practice', $lessonconfig->practice);
-        $mform->setAdvanced('practice', $lessonconfig->practice_adv);
+        $mform->addElement('selectyesno', 'practice', get_string('practice', 'opendsa_activity'));
+        $mform->addHelpButton('practice', 'practice', 'opendsa_activity');
+        $mform->setDefault('practice', $opendsa_activityconfig->practice);
+        $mform->setAdvanced('practice', $opendsa_activityconfig->practice_adv);
 
-        $mform->addElement('selectyesno', 'custom', get_string('customscoring', 'lesson'));
-        $mform->addHelpButton('custom', 'customscoring', 'lesson');
-        $mform->setDefault('custom', $lessonconfig->customscoring);
-        $mform->setAdvanced('custom', $lessonconfig->customscoring_adv);
+        $mform->addElement('selectyesno', 'custom', get_string('customscoring', 'opendsa_activity'));
+        $mform->addHelpButton('custom', 'customscoring', 'opendsa_activity');
+        $mform->setDefault('custom', $opendsa_activityconfig->customscoring);
+        $mform->setAdvanced('custom', $opendsa_activityconfig->customscoring_adv);
 
-        $mform->addElement('selectyesno', 'retake', get_string('retakesallowed', 'lesson'));
-        $mform->addHelpButton('retake', 'retakesallowed', 'lesson');
-        $mform->setDefault('retake', $lessonconfig->retakesallowed);
-        $mform->setAdvanced('retake', $lessonconfig->retakesallowed_adv);
+        $mform->addElement('selectyesno', 'retake', get_string('retakesallowed', 'opendsa_activity'));
+        $mform->addHelpButton('retake', 'retakesallowed', 'opendsa_activity');
+        $mform->setDefault('retake', $opendsa_activityconfig->retakesallowed);
+        $mform->setAdvanced('retake', $opendsa_activityconfig->retakesallowed_adv);
 
         $options = array();
-        $options[0] = get_string('usemean', 'lesson');
-        $options[1] = get_string('usemaximum', 'lesson');
-        $mform->addElement('select', 'usemaxgrade', get_string('handlingofretakes', 'lesson'), $options);
-        $mform->addHelpButton('usemaxgrade', 'handlingofretakes', 'lesson');
-        $mform->setDefault('usemaxgrade', $lessonconfig->handlingofretakes);
-        $mform->setAdvanced('usemaxgrade', $lessonconfig->handlingofretakes_adv);
+        $options[0] = get_string('usemean', 'opendsa_activity');
+        $options[1] = get_string('usemaximum', 'opendsa_activity');
+        $mform->addElement('select', 'usemaxgrade', get_string('handlingofretakes', 'opendsa_activity'), $options);
+        $mform->addHelpButton('usemaxgrade', 'handlingofretakes', 'opendsa_activity');
+        $mform->setDefault('usemaxgrade', $opendsa_activityconfig->handlingofretakes);
+        $mform->setAdvanced('usemaxgrade', $opendsa_activityconfig->handlingofretakes_adv);
         $mform->hideIf('usemaxgrade', 'retake', 'eq', '0');
 
         $numbers = array();
         for ($i = 100; $i >= 0; $i--) {
             $numbers[$i] = $i;
         }
-        $mform->addElement('select', 'minquestions', get_string('minimumnumberofquestions', 'lesson'), $numbers);
-        $mform->addHelpButton('minquestions', 'minimumnumberofquestions', 'lesson');
-        $mform->setDefault('minquestions', $lessonconfig->minimumnumberofquestions);
-        $mform->setAdvanced('minquestions', $lessonconfig->minimumnumberofquestions_adv);
+        $mform->addElement('select', 'minquestions', get_string('minimumnumberofquestions', 'opendsa_activity'), $numbers);
+        $mform->addHelpButton('minquestions', 'minimumnumberofquestions', 'opendsa_activity');
+        $mform->setDefault('minquestions', $opendsa_activityconfig->minimumnumberofquestions);
+        $mform->setAdvanced('minquestions', $opendsa_activityconfig->minimumnumberofquestions_adv);
 
 //-------------------------------------------------------------------------------
         $this->standard_coursemodule_elements();
@@ -371,7 +371,7 @@ class mod_lesson_mod_form extends moodleform_mod {
         if ($this->current->instance) {
             // Editing existing instance - copy existing files into draft area.
             $draftitemid = file_get_submitted_draft_itemid('mediafile');
-            file_prepare_draft_area($draftitemid, $this->context->id, 'mod_lesson', 'mediafile', 0, array('subdirs'=>0, 'maxbytes' => $this->course->maxbytes, 'maxfiles' => 1));
+            file_prepare_draft_area($draftitemid, $this->context->id, 'mod_opendsa_activity', 'mediafile', 0, array('subdirs'=>0, 'maxbytes' => $this->course->maxbytes, 'maxfiles' => 1));
             $defaultvalues['mediafile'] = $draftitemid;
         }
     }
@@ -388,11 +388,11 @@ class mod_lesson_mod_form extends moodleform_mod {
         // Check open and close times are consistent.
         if ($data['available'] != 0 && $data['deadline'] != 0 &&
                 $data['deadline'] < $data['available']) {
-            $errors['deadline'] = get_string('closebeforeopen', 'lesson');
+            $errors['deadline'] = get_string('closebeforeopen', 'opendsa_activity');
         }
 
         if (!empty($data['usepassword']) && empty($data['password'])) {
-            $errors['password'] = get_string('emptypassword', 'lesson');
+            $errors['password'] = get_string('emptypassword', 'opendsa_activity');
         }
 
         return $errors;
@@ -406,16 +406,16 @@ class mod_lesson_mod_form extends moodleform_mod {
     public function add_completion_rules() {
         $mform = $this->_form;
 
-        $mform->addElement('checkbox', 'completionendreached', get_string('completionendreached', 'lesson'),
-                get_string('completionendreached_desc', 'lesson'));
+        $mform->addElement('checkbox', 'completionendreached', get_string('completionendreached', 'opendsa_activity'),
+                get_string('completionendreached_desc', 'opendsa_activity'));
         // Enable this completion rule by default.
         $mform->setDefault('completionendreached', 1);
 
         $group = array();
         $group[] =& $mform->createElement('checkbox', 'completiontimespentenabled', '',
-                get_string('completiontimespent', 'lesson'));
+                get_string('completiontimespent', 'opendsa_activity'));
         $group[] =& $mform->createElement('duration', 'completiontimespent', '', array('optional' => false));
-        $mform->addGroup($group, 'completiontimespentgroup', get_string('completiontimespentgroup', 'lesson'), array(' '), false);
+        $mform->addGroup($group, 'completiontimespentgroup', get_string('completiontimespentgroup', 'opendsa_activity'), array(' '), false);
         $mform->disabledIf('completiontimespent[number]', 'completiontimespentenabled', 'notchecked');
         $mform->disabledIf('completiontimespent[timeunit]', 'completiontimespentenabled', 'notchecked');
 

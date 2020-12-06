@@ -1,6 +1,6 @@
-@mod @mod_lesson
-Feature: In a lesson activity, students can not re-attempt a question more than the allowed amount
-  In order to check a lesson question can not be attempted more than the allowed amount
+@mod @mod_opendsa_activity
+Feature: In a opendsa_activity activity, students can not re-attempt a question more than the allowed amount
+  In order to check a opendsa_activity question can not be attempted more than the allowed amount
   As a student I need to check I cannot reattempt a question more than I should be allowed
 
   Background:
@@ -19,12 +19,12 @@ Feature: In a lesson activity, students can not re-attempt a question more than 
     And I am on "Course 1" course homepage with editing mode on
     And I add a "Lesson" to section "1"
     And I set the following fields to these values:
-      | Name | Test lesson name |
-      | Description | Test lesson description |
+      | Name | Test opendsa_activity name |
+      | Description | Test opendsa_activity description |
       | Re-takes allowed | Yes |
       | Minimum number of questions | 3 |
     And I press "Save and return to course"
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
     And I follow "Add a content page"
     And I set the following fields to these values:
       | Page title | First page name |
@@ -94,7 +94,7 @@ Feature: In a lesson activity, students can not re-attempt a question more than 
   Scenario: Check that we can leave a quiz and when we re-enter we can not re-attempt the question again
     Given I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
     And I should see "First page contents"
     And I press "Next page"
     And I should see "The earth is round"
@@ -103,7 +103,7 @@ Feature: In a lesson activity, students can not re-attempt a question more than 
     And I press "Submit"
     And I should see "Wrong"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
     And I should see "Do you want to start at the last page you saw?"
     And I click on "No" "link" in the "#page-content" "css_element"
     And I should see "First page contents"
@@ -118,7 +118,7 @@ Feature: In a lesson activity, students can not re-attempt a question more than 
   Scenario: Check that we can not click back on the browser at the last quiz result page and re-attempt the last question to get full marks
     Given I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
     And I should see "First page contents"
     And I press "Next page"
     And I should see "The earth is round"
@@ -143,7 +143,7 @@ Feature: In a lesson activity, students can not re-attempt a question more than 
     And I press "Continue"
     And I should see "Third page contents"
     And I press "Next page"
-    And I should see "Congratulations - end of lesson reached"
+    And I should see "Congratulations - end of opendsa_activity reached"
     And I should see "Your score is 2 (out of 3)"
     And I press the "back" button in the browser
     And I press the "back" button in the browser
@@ -162,7 +162,7 @@ Feature: In a lesson activity, students can not re-attempt a question more than 
   Scenario: Check that we can not click back on the browser and re-attempt a question
     Given I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
     And I should see "First page contents"
     And I press "Next page"
     And I should see "The earth is round"
@@ -202,5 +202,5 @@ Feature: In a lesson activity, students can not re-attempt a question more than 
     And I press "Continue"
     And I should see "Third page contents"
     And I press "Next page"
-    And I should see "Congratulations - end of lesson reached"
+    And I should see "Congratulations - end of opendsa_activity reached"
     And I should see "Your score is 1 (out of 3)"

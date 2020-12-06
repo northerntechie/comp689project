@@ -15,9 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Unit tests for mod/lesson/lib.php.
+ * Unit tests for mod/opendsa_activity/lib.php.
  *
- * @package    mod_lesson
+ * @package    mod_opendsa_activity
  * @category   test
  * @copyright  2017 Jun Pataleta
  * @license    http://www.gnu.org/copyleft/gpl.html GNU Public License
@@ -26,50 +26,50 @@
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot . '/mod/lesson/lib.php');
+require_once($CFG->dirroot . '/mod/opendsa_activity/lib.php');
 
 /**
- * Unit tests for mod/lesson/lib.php.
+ * Unit tests for mod/opendsa_activity/lib.php.
  *
  * @copyright  2017 Jun Pataleta
  * @license    http://www.gnu.org/copyleft/gpl.html GNU Public License
  */
-class mod_lesson_lib_testcase extends advanced_testcase {
+class mod_opendsa_activity_lib_testcase extends advanced_testcase {
     /**
-     * Test for lesson_get_group_override_priorities().
+     * Test for _get_group_override_priorities().
      */
-    public function test_lesson_get_group_override_priorities() {
+    public function test_opendsa_activity_get_group_override_priorities() {
         global $DB;
         $this->resetAfterTest();
         $this->setAdminUser();
 
         $dg = $this->getDataGenerator();
         $course = $dg->create_course();
-        $lessonmodule = $this->getDataGenerator()->create_module('lesson', array('course' => $course->id));
+        $opendsa_activitymodule = $this->getDataGenerator()->create_module('opendsa_activity', array('course' => $course->id));
 
-        $this->assertNull(lesson_get_group_override_priorities($lessonmodule->id));
+        $this->assertNull(opendsa_activity_get_group_override_priorities($opendsa_activitymodule->id));
 
         $group1 = $this->getDataGenerator()->create_group(array('courseid' => $course->id));
         $group2 = $this->getDataGenerator()->create_group(array('courseid' => $course->id));
 
         $now = 100;
         $override1 = (object)[
-            'opendsa_activity_id' => $lessonmodule->id,
+            'opendsa_activity_id' => $opendsa_activitymodule->id,
             'groupid' => $group1->id,
             'available' => $now,
             'deadline' => $now + 20
         ];
-        $DB->insert_record('lesson_overrides', $override1);
+        $DB->insert_record('opendsa_activity_overrides', $override1);
 
         $override2 = (object)[
-            'opendsa_activity_id' => $lessonmodule->id,
+            'opendsa_activity_id' => $opendsa_activitymodule->id,
             'groupid' => $group2->id,
             'available' => $now - 10,
             'deadline' => $now + 10
         ];
-        $DB->insert_record('lesson_overrides', $override2);
+        $DB->insert_record('opendsa_activity_overrides', $override2);
 
-        $priorities = lesson_get_group_override_priorities($lessonmodule->id);
+        $priorities = opendsa_activity_get_group_override_priorities($opendsa_activitymodule->id);
         $this->assertNotEmpty($priorities);
 
         $openpriorities = $priorities['open'];
@@ -119,15 +119,15 @@ class mod_lesson_lib_testcase extends advanced_testcase {
             'custom' => 0,
             'feedback' => 1,
         );
-        $lessonmodule = $this->getDataGenerator()->create_module('lesson', $record);
-        // Convert to a lesson object.
-        $lesson = new lesson($lessonmodule);
-        $cm = $lesson->cm;
+        $opendsa_activitymodule = $this->getDataGenerator()->create_module('opendsa_activity', $record);
+        // Convert to a opendsa_activity object.
+        $opendsa_activity = new opendsa_activity($opendsa_activitymodule);
+        $cm = $opendsa_activity->cm;
         $cm = cm_info::create($cm);
 
         // Check that upon creation, the updates are only about the new configuration created.
         $onehourago = time() - HOURSECS;
-        $updates = lesson_check_updates_since($cm, $onehourago);
+        $updates = opendsa_activity_check_updates_since($cm, $onehourago);
         foreach ($updates as $el => $val) {
             if ($el == 'configuration') {
                 $this->assertTrue($val->updated);
@@ -138,50 +138,50 @@ class mod_lesson_lib_testcase extends advanced_testcase {
         }
 
         // Set up a generator to create content.
-        $generator = $this->getDataGenerator()->get_plugin_generator('mod_lesson');
-        $tfrecord = $generator->create_question_truefalse($lesson);
+        $generator = $this->getDataGenerator()->get_plugin_generator('mod_opendsa_activity');
+        $tfrecord = $generator->create_question_truefalse($opendsa_activity);
 
         // Check now for pages and answers.
-        $updates = lesson_check_updates_since($cm, $onehourago);
+        $updates = opendsa_activity_check_updates_since($cm, $onehourago);
         $this->assertTrue($updates->pages->updated);
         $this->assertCount(1, $updates->pages->itemids);
 
         $this->assertTrue($updates->answers->updated);
         $this->assertCount(2, $updates->answers->itemids);
 
-        // Now, do something in the lesson with the two users.
+        // Now, do something in the opendsa_activity with the two users.
         $this->setUser($studentg1);
-        mod_lesson_external::launch_attempt($lesson->id);
+        mod_opendsa_activity_external::launch_attempt($opendsa_activity->id);
         $data = array(
             array(
                 'name' => 'answerid',
-                'value' => $DB->get_field('lesson_answers', 'id', array('pageid' => $tfrecord->id, 'jumpto' => -1)),
+                'value' => $DB->get_field('opendsa_activity_answers', 'id', array('pageid' => $tfrecord->id, 'jumpto' => -1)),
             ),
             array(
-                'name' => '_qf__lesson_display_answer_form_truefalse',
+                'name' => '_qf__opendsa_activity_display_answer_form_truefalse',
                 'value' => 1,
             )
         );
-        mod_lesson_external::process_page($lesson->id, $tfrecord->id, $data);
-        mod_lesson_external::finish_attempt($lesson->id);
+        mod_opendsa_activity_external::process_page($opendsa_activity->id, $tfrecord->id, $data);
+        mod_opendsa_activity_external::finish_attempt($opendsa_activity->id);
 
         $this->setUser($studentg2);
-        mod_lesson_external::launch_attempt($lesson->id);
+        mod_opendsa_activity_external::launch_attempt($opendsa_activity->id);
         $data = array(
             array(
                 'name' => 'answerid',
-                'value' => $DB->get_field('lesson_answers', 'id', array('pageid' => $tfrecord->id, 'jumpto' => -1)),
+                'value' => $DB->get_field('opendsa_activity_answers', 'id', array('pageid' => $tfrecord->id, 'jumpto' => -1)),
             ),
             array(
-                'name' => '_qf__lesson_display_answer_form_truefalse',
+                'name' => '_qf__opendsa_activity_display_answer_form_truefalse',
                 'value' => 1,
             )
         );
-        mod_lesson_external::process_page($lesson->id, $tfrecord->id, $data);
-        mod_lesson_external::finish_attempt($lesson->id);
+        mod_opendsa_activity_external::process_page($opendsa_activity->id, $tfrecord->id, $data);
+        mod_opendsa_activity_external::finish_attempt($opendsa_activity->id);
 
         $this->setUser($studentg1);
-        $updates = lesson_check_updates_since($cm, $onehourago);
+        $updates = opendsa_activity_check_updates_since($cm, $onehourago);
 
         // Check question attempts, timers and new grades.
         $this->assertTrue($updates->questionattempts->updated);
@@ -195,7 +195,7 @@ class mod_lesson_lib_testcase extends advanced_testcase {
 
         // Now, as teacher, check that I can see the two users (even in separate groups).
         $this->setUser($teacherg1);
-        $updates = lesson_check_updates_since($cm, $onehourago);
+        $updates = opendsa_activity_check_updates_since($cm, $onehourago);
         $this->assertTrue($updates->userquestionattempts->updated);
         $this->assertCount(2, $updates->userquestionattempts->itemids);
 
@@ -209,7 +209,7 @@ class mod_lesson_lib_testcase extends advanced_testcase {
         groups_add_member($group1, $teacherg1);
         assign_capability('moodle/site:accessallgroups', CAP_PROHIBIT, $teacherrole->id, context_module::instance($cm->id));
         accesslib_clear_all_caches_for_unit_testing();
-        $updates = lesson_check_updates_since($cm, $onehourago);
+        $updates = opendsa_activity_check_updates_since($cm, $onehourago);
         // I will see only the studentg1 updates.
         $this->assertTrue($updates->userquestionattempts->updated);
         $this->assertCount(1, $updates->userquestionattempts->itemids);
@@ -221,34 +221,34 @@ class mod_lesson_lib_testcase extends advanced_testcase {
         $this->assertCount(1, $updates->usertimers->itemids);
     }
 
-    public function test_lesson_core_calendar_provide_event_action_open() {
+    public function test_opendsa_activity_core_calendar_provide_event_action_open() {
         $this->resetAfterTest();
         $this->setAdminUser();
         // Create a course.
         $course = $this->getDataGenerator()->create_course();
         // Create a teacher and enrol into the course.
         $teacher = $this->getDataGenerator()->create_and_enrol($course, 'teacher');
-        // Create a lesson activity.
-        $lesson = $this->getDataGenerator()->create_module('lesson', array('course' => $course->id,
+        // Create a opendsa_activity activity.
+        $opendsa_activity = $this->getDataGenerator()->create_module('opendsa_activity', array('course' => $course->id,
             'available' => time() - DAYSECS, 'deadline' => time() + DAYSECS));
         // Create a calendar event.
-        $event = $this->create_action_event($course->id, $lesson->id, LESSON_EVENT_TYPE_OPEN);
+        $event = $this->create_action_event($course->id, $opendsa_activity->id, OPENDSA_ACTIVITY_EVENT_TYPE_OPEN);
 
         // Log in as the teacher.
         $this->setUser($teacher);
         // Create an action factory.
         $factory = new \core_calendar\action_factory();
         // Decorate action event.
-        $actionevent = mod_lesson_core_calendar_provide_event_action($event, $factory);
+        $actionevent = mod_opendsa_activity_core_calendar_provide_event_action($event, $factory);
         // Confirm the event was decorated.
         $this->assertInstanceOf('\core_calendar\local\event\value_objects\action', $actionevent);
-        $this->assertEquals(get_string('startlesson', 'lesson'), $actionevent->get_name());
+        $this->assertEquals(get_string('startopendsa_activity', 'opendsa_activity'), $actionevent->get_name());
         $this->assertInstanceOf('moodle_url', $actionevent->get_url());
         $this->assertEquals(1, $actionevent->get_item_count());
         $this->assertTrue($actionevent->is_actionable());
     }
 
-    public function test_lesson_core_calendar_provide_event_action_open_as_non_user() {
+    public function test_opendsa_activity_core_calendar_provide_event_action_open_as_non_user() {
         global $CFG;
 
         $this->resetAfterTest();
@@ -257,12 +257,12 @@ class mod_lesson_lib_testcase extends advanced_testcase {
         // Create a course.
         $course = $this->getDataGenerator()->create_course();
 
-        // Create a lesson activity.
-        $lesson = $this->getDataGenerator()->create_module('lesson', array('course' => $course->id,
+        // Create a opendsa_activity activity.
+        $opendsa_activity = $this->getDataGenerator()->create_module('opendsa_activity', array('course' => $course->id,
                 'available' => time() - DAYSECS, 'deadline' => time() + DAYSECS));
 
         // Create a calendar event.
-        $event = $this->create_action_event($course->id, $lesson->id, LESSON_EVENT_TYPE_OPEN);
+        $event = $this->create_action_event($course->id, $opendsa_activity->id, OPENDSA_ACTIVITY_EVENT_TYPE_OPEN);
 
         // Now, log out.
         $CFG->forcelogin = true; // We don't want to be logged in as guest, as guest users might still have some capabilities.
@@ -272,13 +272,13 @@ class mod_lesson_lib_testcase extends advanced_testcase {
         $factory = new \core_calendar\action_factory();
 
         // Decorate action event.
-        $actionevent = mod_lesson_core_calendar_provide_event_action($event, $factory);
+        $actionevent = mod_opendsa_activity_core_calendar_provide_event_action($event, $factory);
 
         // Confirm the event is not shown at all.
         $this->assertNull($actionevent);
     }
 
-    public function test_lesson_core_calendar_provide_event_action_open_for_user() {
+    public function test_opendsa_activity_core_calendar_provide_event_action_open_for_user() {
         global $CFG;
 
         $this->resetAfterTest();
@@ -290,12 +290,12 @@ class mod_lesson_lib_testcase extends advanced_testcase {
         // Create a student.
         $student = $this->getDataGenerator()->create_and_enrol($course, 'student');
 
-        // Create a lesson activity.
-        $lesson = $this->getDataGenerator()->create_module('lesson', array('course' => $course->id,
+        // Create a opendsa_activity activity.
+        $opendsa_activity = $this->getDataGenerator()->create_module('opendsa_activity', array('course' => $course->id,
                 'available' => time() - DAYSECS, 'deadline' => time() + DAYSECS));
 
         // Create a calendar event.
-        $event = $this->create_action_event($course->id, $lesson->id, LESSON_EVENT_TYPE_OPEN);
+        $event = $this->create_action_event($course->id, $opendsa_activity->id, OPENDSA_ACTIVITY_EVENT_TYPE_OPEN);
 
         // Now, log out.
         $CFG->forcelogin = true; // We don't want to be logged in as guest, as guest users might still have some capabilities.
@@ -305,17 +305,17 @@ class mod_lesson_lib_testcase extends advanced_testcase {
         $factory = new \core_calendar\action_factory();
 
         // Decorate action event for the student.
-        $actionevent = mod_lesson_core_calendar_provide_event_action($event, $factory, $student->id);
+        $actionevent = mod_opendsa_activity_core_calendar_provide_event_action($event, $factory, $student->id);
 
         // Confirm the event was decorated.
         $this->assertInstanceOf('\core_calendar\local\event\value_objects\action', $actionevent);
-        $this->assertEquals(get_string('startlesson', 'lesson'), $actionevent->get_name());
+        $this->assertEquals(get_string('startopendsa_activity', 'opendsa_activity'), $actionevent->get_name());
         $this->assertInstanceOf('moodle_url', $actionevent->get_url());
         $this->assertEquals(1, $actionevent->get_item_count());
         $this->assertTrue($actionevent->is_actionable());
     }
 
-    public function test_lesson_core_calendar_provide_event_action_open_in_hidden_section() {
+    public function test_opendsa_activity_core_calendar_provide_event_action_open_in_hidden_section() {
         $this->resetAfterTest();
         $this->setAdminUser();
 
@@ -325,12 +325,12 @@ class mod_lesson_lib_testcase extends advanced_testcase {
         // Create a student.
         $student = $this->getDataGenerator()->create_and_enrol($course, 'student');
 
-        // Create a lesson activity.
-        $lesson = $this->getDataGenerator()->create_module('lesson', array('course' => $course->id,
+        // Create a opendsa_activity activity.
+        $opendsa_activity = $this->getDataGenerator()->create_module('opendsa_activity', array('course' => $course->id,
                 'available' => time() - DAYSECS, 'deadline' => time() + DAYSECS));
 
         // Create a calendar event.
-        $event = $this->create_action_event($course->id, $lesson->id, LESSON_EVENT_TYPE_OPEN);
+        $event = $this->create_action_event($course->id, $opendsa_activity->id, OPENDSA_ACTIVITY_EVENT_TYPE_OPEN);
 
         // Set sections 0 as hidden.
         set_section_visible($course->id, 0, 0);
@@ -339,13 +339,13 @@ class mod_lesson_lib_testcase extends advanced_testcase {
         $factory = new \core_calendar\action_factory();
 
         // Decorate action event for the student.
-        $actionevent = mod_lesson_core_calendar_provide_event_action($event, $factory, $student->id);
+        $actionevent = mod_opendsa_activity_core_calendar_provide_event_action($event, $factory, $student->id);
 
         // Confirm the event is not shown at all.
         $this->assertNull($actionevent);
     }
 
-    public function test_lesson_core_calendar_provide_event_action_closed() {
+    public function test_opendsa_activity_core_calendar_provide_event_action_closed() {
         $this->resetAfterTest();
         $this->setAdminUser();
 
@@ -354,12 +354,12 @@ class mod_lesson_lib_testcase extends advanced_testcase {
         // Create a teacher and enrol.
         $teacher = $this->getDataGenerator()->create_and_enrol($course, 'teacher');
 
-        // Create a lesson activity.
-        $lesson = $this->getDataGenerator()->create_module('lesson', array('course' => $course->id,
+        // Create a opendsa_activity activity.
+        $opendsa_activity = $this->getDataGenerator()->create_module('opendsa_activity', array('course' => $course->id,
             'deadline' => time() - DAYSECS));
 
         // Create a calendar event.
-        $event = $this->create_action_event($course->id, $lesson->id, LESSON_EVENT_TYPE_OPEN);
+        $event = $this->create_action_event($course->id, $opendsa_activity->id, OPENDSA_ACTIVITY_EVENT_TYPE_OPEN);
 
         // Now, log in as teacher.
         $this->setUser($teacher);
@@ -367,17 +367,17 @@ class mod_lesson_lib_testcase extends advanced_testcase {
         $factory = new \core_calendar\action_factory();
 
         // Decorate action event.
-        $actionevent = mod_lesson_core_calendar_provide_event_action($event, $factory);
+        $actionevent = mod_opendsa_activity_core_calendar_provide_event_action($event, $factory);
 
         // Confirm the event was decorated.
         $this->assertInstanceOf('\core_calendar\local\event\value_objects\action', $actionevent);
-        $this->assertEquals(get_string('startlesson', 'lesson'), $actionevent->get_name());
+        $this->assertEquals(get_string('startopendsa_activity', 'opendsa_activity'), $actionevent->get_name());
         $this->assertInstanceOf('moodle_url', $actionevent->get_url());
         $this->assertEquals(1, $actionevent->get_item_count());
         $this->assertFalse($actionevent->is_actionable());
     }
 
-    public function test_lesson_core_calendar_provide_event_action_closed_for_user() {
+    public function test_opendsa_activity_core_calendar_provide_event_action_closed_for_user() {
         global $CFG;
 
         $this->resetAfterTest();
@@ -389,12 +389,12 @@ class mod_lesson_lib_testcase extends advanced_testcase {
         // Create a student.
         $student = $this->getDataGenerator()->create_and_enrol($course, 'student');
 
-        // Create a lesson activity.
-        $lesson = $this->getDataGenerator()->create_module('lesson', array('course' => $course->id,
+        // Create a opendsa_activity activity.
+        $opendsa_activity = $this->getDataGenerator()->create_module('opendsa_activity', array('course' => $course->id,
                 'deadline' => time() - DAYSECS));
 
         // Create a calendar event.
-        $event = $this->create_action_event($course->id, $lesson->id, LESSON_EVENT_TYPE_OPEN);
+        $event = $this->create_action_event($course->id, $opendsa_activity->id, OPENDSA_ACTIVITY_EVENT_TYPE_OPEN);
 
         // Now, log out.
         $CFG->forcelogin = true; // We don't want to be logged in as guest, as guest users might still have some capabilities.
@@ -404,17 +404,17 @@ class mod_lesson_lib_testcase extends advanced_testcase {
         $factory = new \core_calendar\action_factory();
 
         // Decorate action event.
-        $actionevent = mod_lesson_core_calendar_provide_event_action($event, $factory, $student->id);
+        $actionevent = mod_opendsa_activity_core_calendar_provide_event_action($event, $factory, $student->id);
 
         // Confirm the event was decorated.
         $this->assertInstanceOf('\core_calendar\local\event\value_objects\action', $actionevent);
-        $this->assertEquals(get_string('startlesson', 'lesson'), $actionevent->get_name());
+        $this->assertEquals(get_string('startopendsa_activity', 'opendsa_activity'), $actionevent->get_name());
         $this->assertInstanceOf('moodle_url', $actionevent->get_url());
         $this->assertEquals(1, $actionevent->get_item_count());
         $this->assertFalse($actionevent->is_actionable());
     }
 
-    public function test_lesson_core_calendar_provide_event_action_open_in_future() {
+    public function test_opendsa_activity_core_calendar_provide_event_action_open_in_future() {
         $this->resetAfterTest();
         $this->setAdminUser();
 
@@ -422,12 +422,12 @@ class mod_lesson_lib_testcase extends advanced_testcase {
         $course = $this->getDataGenerator()->create_course();
         // Create a teacher and enrol into the course.
         $teacher = $this->getDataGenerator()->create_and_enrol($course, 'teacher');
-        // Create a lesson activity.
-        $lesson = $this->getDataGenerator()->create_module('lesson', array('course' => $course->id,
+        // Create a opendsa_activity activity.
+        $opendsa_activity = $this->getDataGenerator()->create_module('opendsa_activity', array('course' => $course->id,
             'available' => time() + DAYSECS));
 
         // Create a calendar event.
-        $event = $this->create_action_event($course->id, $lesson->id, LESSON_EVENT_TYPE_OPEN);
+        $event = $this->create_action_event($course->id, $opendsa_activity->id, OPENDSA_ACTIVITY_EVENT_TYPE_OPEN);
 
         // Now, log in as teacher.
         $this->setUser($teacher);
@@ -435,17 +435,17 @@ class mod_lesson_lib_testcase extends advanced_testcase {
         $factory = new \core_calendar\action_factory();
 
         // Decorate action event.
-        $actionevent = mod_lesson_core_calendar_provide_event_action($event, $factory);
+        $actionevent = mod_opendsa_activity_core_calendar_provide_event_action($event, $factory);
 
         // Confirm the event was decorated.
         $this->assertInstanceOf('\core_calendar\local\event\value_objects\action', $actionevent);
-        $this->assertEquals(get_string('startlesson', 'lesson'), $actionevent->get_name());
+        $this->assertEquals(get_string('startopendsa_activity', 'opendsa_activity'), $actionevent->get_name());
         $this->assertInstanceOf('moodle_url', $actionevent->get_url());
         $this->assertEquals(1, $actionevent->get_item_count());
         $this->assertFalse($actionevent->is_actionable());
     }
 
-    public function test_lesson_core_calendar_provide_event_action_open_in_future_for_user() {
+    public function test_opendsa_activity_core_calendar_provide_event_action_open_in_future_for_user() {
         global $CFG;
 
         $this->resetAfterTest();
@@ -457,12 +457,12 @@ class mod_lesson_lib_testcase extends advanced_testcase {
         // Create a student.
         $student = $this->getDataGenerator()->create_and_enrol($course, 'student');
 
-        // Create a lesson activity.
-        $lesson = $this->getDataGenerator()->create_module('lesson', array('course' => $course->id,
+        // Create a opendsa_activity activity.
+        $opendsa_activity = $this->getDataGenerator()->create_module('opendsa_activity', array('course' => $course->id,
                 'available' => time() + DAYSECS));
 
         // Create a calendar event.
-        $event = $this->create_action_event($course->id, $lesson->id, LESSON_EVENT_TYPE_OPEN);
+        $event = $this->create_action_event($course->id, $opendsa_activity->id, OPENDSA_ACTIVITY_EVENT_TYPE_OPEN);
 
         // Now, log out.
         $CFG->forcelogin = true; // We don't want to be logged in as guest, as guest users might still have some capabilities.
@@ -472,17 +472,17 @@ class mod_lesson_lib_testcase extends advanced_testcase {
         $factory = new \core_calendar\action_factory();
 
         // Decorate action event.
-        $actionevent = mod_lesson_core_calendar_provide_event_action($event, $factory, $student->id);
+        $actionevent = mod_opendsa_activity_core_calendar_provide_event_action($event, $factory, $student->id);
 
         // Confirm the event was decorated.
         $this->assertInstanceOf('\core_calendar\local\event\value_objects\action', $actionevent);
-        $this->assertEquals(get_string('startlesson', 'lesson'), $actionevent->get_name());
+        $this->assertEquals(get_string('startopendsa_activity', 'opendsa_activity'), $actionevent->get_name());
         $this->assertInstanceOf('moodle_url', $actionevent->get_url());
         $this->assertEquals(1, $actionevent->get_item_count());
         $this->assertFalse($actionevent->is_actionable());
     }
 
-    public function test_lesson_core_calendar_provide_event_action_no_time_specified() {
+    public function test_opendsa_activity_core_calendar_provide_event_action_no_time_specified() {
         $this->resetAfterTest();
         $this->setAdminUser();
 
@@ -490,28 +490,28 @@ class mod_lesson_lib_testcase extends advanced_testcase {
         $course = $this->getDataGenerator()->create_course();
         // Create a teacher and enrol into the course.
         $teacher = $this->getDataGenerator()->create_and_enrol($course, 'teacher');
-        // Create a lesson activity.
-        $lesson = $this->getDataGenerator()->create_module('lesson', array('course' => $course->id));
+        // Create a opendsa_activity activity.
+        $opendsa_activity = $this->getDataGenerator()->create_module('opendsa_activity', array('course' => $course->id));
 
         // Create a calendar event.
-        $event = $this->create_action_event($course->id, $lesson->id, LESSON_EVENT_TYPE_OPEN);
+        $event = $this->create_action_event($course->id, $opendsa_activity->id, OPENDSA_ACTIVITY_EVENT_TYPE_OPEN);
         // Now, log in as teacher.
         $this->setUser($teacher);
         // Create an action factory.
         $factory = new \core_calendar\action_factory();
 
         // Decorate action event.
-        $actionevent = mod_lesson_core_calendar_provide_event_action($event, $factory);
+        $actionevent = mod_opendsa_activity_core_calendar_provide_event_action($event, $factory);
 
         // Confirm the event was decorated.
         $this->assertInstanceOf('\core_calendar\local\event\value_objects\action', $actionevent);
-        $this->assertEquals(get_string('startlesson', 'lesson'), $actionevent->get_name());
+        $this->assertEquals(get_string('startopendsa_activity', 'opendsa_activity'), $actionevent->get_name());
         $this->assertInstanceOf('moodle_url', $actionevent->get_url());
         $this->assertEquals(1, $actionevent->get_item_count());
         $this->assertTrue($actionevent->is_actionable());
     }
 
-    public function test_lesson_core_calendar_provide_event_action_no_time_specified_for_user() {
+    public function test_opendsa_activity_core_calendar_provide_event_action_no_time_specified_for_user() {
         global $CFG;
 
         $this->resetAfterTest();
@@ -523,11 +523,11 @@ class mod_lesson_lib_testcase extends advanced_testcase {
         // Create a student.
         $student = $this->getDataGenerator()->create_and_enrol($course, 'student');
 
-        // Create a lesson activity.
-        $lesson = $this->getDataGenerator()->create_module('lesson', array('course' => $course->id));
+        // Create a opendsa_activity activity.
+        $opendsa_activity = $this->getDataGenerator()->create_module('opendsa_activity', array('course' => $course->id));
 
         // Create a calendar event.
-        $event = $this->create_action_event($course->id, $lesson->id, LESSON_EVENT_TYPE_OPEN);
+        $event = $this->create_action_event($course->id, $opendsa_activity->id, OPENDSA_ACTIVITY_EVENT_TYPE_OPEN);
 
         // Now, log out.
         $CFG->forcelogin = true; // We don't want to be logged in as guest, as guest users might still have some capabilities.
@@ -537,17 +537,17 @@ class mod_lesson_lib_testcase extends advanced_testcase {
         $factory = new \core_calendar\action_factory();
 
         // Decorate action event.
-        $actionevent = mod_lesson_core_calendar_provide_event_action($event, $factory, $student->id);
+        $actionevent = mod_opendsa_activity_core_calendar_provide_event_action($event, $factory, $student->id);
 
         // Confirm the event was decorated.
         $this->assertInstanceOf('\core_calendar\local\event\value_objects\action', $actionevent);
-        $this->assertEquals(get_string('startlesson', 'lesson'), $actionevent->get_name());
+        $this->assertEquals(get_string('startopendsa_activity', 'opendsa_activity'), $actionevent->get_name());
         $this->assertInstanceOf('moodle_url', $actionevent->get_url());
         $this->assertEquals(1, $actionevent->get_item_count());
         $this->assertTrue($actionevent->is_actionable());
     }
 
-    public function test_lesson_core_calendar_provide_event_action_after_attempt() {
+    public function test_opendsa_activity_core_calendar_provide_event_action_after_attempt() {
         global $DB;
 
         $this->resetAfterTest();
@@ -559,45 +559,45 @@ class mod_lesson_lib_testcase extends advanced_testcase {
         // Create user.
         $student = self::getDataGenerator()->create_user();
 
-        // Create a lesson activity.
-        $lesson = $this->getDataGenerator()->create_module('lesson', array('course' => $course->id));
+        // Create a opendsa_activity activity.
+        $opendsa_activity = $this->getDataGenerator()->create_module('opendsa_activity', array('course' => $course->id));
 
         // Create a calendar event.
-        $event = $this->create_action_event($course->id, $lesson->id, LESSON_EVENT_TYPE_OPEN);
+        $event = $this->create_action_event($course->id, $opendsa_activity->id, OPENDSA_ACTIVITY_EVENT_TYPE_OPEN);
 
         $studentrole = $DB->get_record('role', array('shortname' => 'student'));
         $this->getDataGenerator()->enrol_user($student->id, $course->id, $studentrole->id, 'manual');
 
-        $generator = $this->getDataGenerator()->get_plugin_generator('mod_lesson');
-        $tfrecord = $generator->create_question_truefalse($lesson);
+        $generator = $this->getDataGenerator()->get_plugin_generator('mod_opendsa_activity');
+        $tfrecord = $generator->create_question_truefalse($opendsa_activity);
 
-        // Now, do something in the lesson.
+        // Now, do something in the opendsa_activity.
         $this->setUser($student);
-        mod_lesson_external::launch_attempt($lesson->id);
+        mod_opendsa_activity_external::launch_attempt($opendsa_activity->id);
         $data = array(
             array(
                 'name' => 'answerid',
-                'value' => $DB->get_field('lesson_answers', 'id', array('pageid' => $tfrecord->id, 'jumpto' => -1)),
+                'value' => $DB->get_field('opendsa_activity_answers', 'id', array('pageid' => $tfrecord->id, 'jumpto' => -1)),
             ),
             array(
-                'name' => '_qf__lesson_display_answer_form_truefalse',
+                'name' => '_qf__opendsa_activity_display_answer_form_truefalse',
                 'value' => 1,
             )
         );
-        mod_lesson_external::process_page($lesson->id, $tfrecord->id, $data);
-        mod_lesson_external::finish_attempt($lesson->id);
+        mod_opendsa_activity_external::process_page($opendsa_activity->id, $tfrecord->id, $data);
+        mod_opendsa_activity_external::finish_attempt($opendsa_activity->id);
 
         // Create an action factory.
         $factory = new \core_calendar\action_factory();
 
         // Decorate action event.
-        $action = mod_lesson_core_calendar_provide_event_action($event, $factory);
+        $action = mod_opendsa_activity_core_calendar_provide_event_action($event, $factory);
 
         // Confirm there was no action for the user.
         $this->assertNull($action);
     }
 
-    public function test_lesson_core_calendar_provide_event_action_after_attempt_for_user() {
+    public function test_opendsa_activity_core_calendar_provide_event_action_after_attempt_for_user() {
         global $DB;
 
         $this->resetAfterTest();
@@ -610,30 +610,30 @@ class mod_lesson_lib_testcase extends advanced_testcase {
         $student1 = $this->getDataGenerator()->create_and_enrol($course, 'student');
         $student2 = $this->getDataGenerator()->create_and_enrol($course, 'student');
 
-        // Create a lesson activity.
-        $lesson = $this->getDataGenerator()->create_module('lesson', array('course' => $course->id));
+        // Create a opendsa_activity activity.
+        $opendsa_activity = $this->getDataGenerator()->create_module('opendsa_activity', array('course' => $course->id));
 
         // Create a calendar event.
-        $event = $this->create_action_event($course->id, $lesson->id, LESSON_EVENT_TYPE_OPEN);
+        $event = $this->create_action_event($course->id, $opendsa_activity->id, OPENDSA_ACTIVITY_EVENT_TYPE_OPEN);
 
-        $generator = $this->getDataGenerator()->get_plugin_generator('mod_lesson');
-        $tfrecord = $generator->create_question_truefalse($lesson);
+        $generator = $this->getDataGenerator()->get_plugin_generator('mod_opendsa_activity');
+        $tfrecord = $generator->create_question_truefalse($opendsa_activity);
 
-        // Now, do something in the lesson as student1.
+        // Now, do something in the opendsa_activity as student1.
         $this->setUser($student1);
-        mod_lesson_external::launch_attempt($lesson->id);
+        mod_opendsa_activity_external::launch_attempt($opendsa_activity->id);
         $data = array(
             array(
                 'name' => 'answerid',
-                'value' => $DB->get_field('lesson_answers', 'id', array('pageid' => $tfrecord->id, 'jumpto' => -1)),
+                'value' => $DB->get_field('opendsa_activity_answers', 'id', array('pageid' => $tfrecord->id, 'jumpto' => -1)),
             ),
             array(
-                'name' => '_qf__lesson_display_answer_form_truefalse',
+                'name' => '_qf__opendsa_activity_display_answer_form_truefalse',
                 'value' => 1,
             )
         );
-        mod_lesson_external::process_page($lesson->id, $tfrecord->id, $data);
-        mod_lesson_external::finish_attempt($lesson->id);
+        mod_opendsa_activity_external::process_page($opendsa_activity->id, $tfrecord->id, $data);
+        mod_opendsa_activity_external::finish_attempt($opendsa_activity->id);
 
         // Now, log in as the other student.
         $this->setUser($student2);
@@ -642,27 +642,27 @@ class mod_lesson_lib_testcase extends advanced_testcase {
         $factory = new \core_calendar\action_factory();
 
         // Decorate action event.
-        $action = mod_lesson_core_calendar_provide_event_action($event, $factory, $student1->id);
+        $action = mod_opendsa_activity_core_calendar_provide_event_action($event, $factory, $student1->id);
 
         // Confirm there was no action for the user.
         $this->assertNull($action);
     }
 
-    public function test_lesson_core_calendar_provide_event_action_already_completed() {
+    public function test_opendsa_activity_core_calendar_provide_event_action_already_completed() {
         $this->resetAfterTest();
         set_config('enablecompletion', 1);
         $this->setAdminUser();
 
         // Create the activity.
         $course = $this->getDataGenerator()->create_course(array('enablecompletion' => 1));
-        $lesson = $this->getDataGenerator()->create_module('lesson', array('course' => $course->id),
+        $opendsa_activity = $this->getDataGenerator()->create_module('opendsa_activity', array('course' => $course->id),
             array('completion' => 2, 'completionview' => 1, 'completionexpected' => time() + DAYSECS));
 
         // Get some additional data.
-        $cm = get_coursemodule_from_instance('lesson', $lesson->id);
+        $cm = get_coursemodule_from_instance('opendsa_activity', $opendsa_activity->id);
 
         // Create a calendar event.
-        $event = $this->create_action_event($course->id, $lesson->id,
+        $event = $this->create_action_event($course->id, $opendsa_activity->id,
             \core_completion\api::COMPLETION_EVENT_TYPE_DATE_COMPLETION_EXPECTED);
 
         // Mark the activity as completed.
@@ -673,30 +673,30 @@ class mod_lesson_lib_testcase extends advanced_testcase {
         $factory = new \core_calendar\action_factory();
 
         // Decorate action event.
-        $actionevent = mod_lesson_core_calendar_provide_event_action($event, $factory);
+        $actionevent = mod_opendsa_activity_core_calendar_provide_event_action($event, $factory);
 
         // Ensure result was null.
         $this->assertNull($actionevent);
     }
 
-    public function test_lesson_core_calendar_provide_event_action_already_completed_for_user() {
+    public function test_opendsa_activity_core_calendar_provide_event_action_already_completed_for_user() {
         $this->resetAfterTest();
         set_config('enablecompletion', 1);
         $this->setAdminUser();
 
         // Create the activity.
         $course = $this->getDataGenerator()->create_course(array('enablecompletion' => 1));
-        $lesson = $this->getDataGenerator()->create_module('lesson', array('course' => $course->id),
+        $opendsa_activity = $this->getDataGenerator()->create_module('opendsa_activity', array('course' => $course->id),
             array('completion' => 2, 'completionview' => 1, 'completionexpected' => time() + DAYSECS));
 
         // Enrol a student in the course.
         $student = $this->getDataGenerator()->create_and_enrol($course, 'student');
 
         // Get some additional data.
-        $cm = get_coursemodule_from_instance('lesson', $lesson->id);
+        $cm = get_coursemodule_from_instance('opendsa_activity', $opendsa_activity->id);
 
         // Create a calendar event.
-        $event = $this->create_action_event($course->id, $lesson->id,
+        $event = $this->create_action_event($course->id, $opendsa_activity->id,
             \core_completion\api::COMPLETION_EVENT_TYPE_DATE_COMPLETION_EXPECTED);
 
         // Mark the activity as completed for the student.
@@ -707,7 +707,7 @@ class mod_lesson_lib_testcase extends advanced_testcase {
         $factory = new \core_calendar\action_factory();
 
         // Decorate action event for the student.
-        $actionevent = mod_lesson_core_calendar_provide_event_action($event, $factory, $student->id);
+        $actionevent = mod_opendsa_activity_core_calendar_provide_event_action($event, $factory, $student->id);
 
         // Ensure result was null.
         $this->assertNull($actionevent);
@@ -717,14 +717,14 @@ class mod_lesson_lib_testcase extends advanced_testcase {
      * Creates an action event.
      *
      * @param int $courseid
-     * @param int $instanceid The lesson id.
-     * @param string $eventtype The event type. eg. LESSON_EVENT_TYPE_OPEN.
+     * @param int $instanceid The opendsa_activity id.
+     * @param string $eventtype The event type. eg. OPENDSA_ACTIVITY_EVENT_TYPE_OPEN.
      * @return bool|calendar_event
      */
     private function create_action_event($courseid, $instanceid, $eventtype) {
         $event = new stdClass();
         $event->name = 'Calendar event';
-        $event->modulename  = 'lesson';
+        $event->modulename  = 'opendsa_activity';
         $event->courseid = $courseid;
         $event->instance = $instanceid;
         $event->type = CALENDAR_EVENT_TYPE_ACTION;
@@ -738,26 +738,26 @@ class mod_lesson_lib_testcase extends advanced_testcase {
      * This function should work given either an instance of the module (cm_info), such as when checking the active rules,
      * or if passed a stdClass of similar structure, such as when checking the the default completion settings for a mod type.
      */
-    public function test_mod_lesson_completion_get_active_rule_descriptions() {
+    public function test_mod_opendsa_activity_completion_get_active_rule_descriptions() {
         $this->resetAfterTest();
         $this->setAdminUser();
 
         // Two activities, both with automatic completion. One has the 'completionsubmit' rule, one doesn't.
         $course = $this->getDataGenerator()->create_course(['enablecompletion' => 2]);
-        $lesson1 = $this->getDataGenerator()->create_module('lesson', [
+        $opendsa_activity1 = $this->getDataGenerator()->create_module('opendsa_activity', [
             'course' => $course->id,
             'completion' => 2,
             'completionendreached' => 1,
             'completiontimespent' => 3600
         ]);
-        $lesson2 = $this->getDataGenerator()->create_module('lesson', [
+        $opendsa_activity2 = $this->getDataGenerator()->create_module('opendsa_activity', [
             'course' => $course->id,
             'completion' => 2,
             'completionendreached' => 0,
             'completiontimespent' => 0
         ]);
-        $cm1 = cm_info::create(get_coursemodule_from_instance('lesson', $lesson1->id));
-        $cm2 = cm_info::create(get_coursemodule_from_instance('lesson', $lesson2->id));
+        $cm1 = cm_info::create(get_coursemodule_from_instance('opendsa_activity', $opendsa_activity1->id));
+        $cm2 = cm_info::create(get_coursemodule_from_instance('opendsa_activity', $opendsa_activity2->id));
 
         // Data for the stdClass input type.
         // This type of input would occur when checking the default completion rules for an activity type, where we don't have
@@ -770,19 +770,19 @@ class mod_lesson_lib_testcase extends advanced_testcase {
         $moddefaults->completion = 2;
 
         $activeruledescriptions = [
-            get_string('completionendreached_desc', 'lesson'),
-            get_string('completiontimespentdesc', 'lesson', format_time(3600)),
+            get_string('completionendreached_desc', 'opendsa_activity'),
+            get_string('completiontimespentdesc', 'opendsa_activity', format_time(3600)),
         ];
-        $this->assertEquals(mod_lesson_get_completion_active_rule_descriptions($cm1), $activeruledescriptions);
-        $this->assertEquals(mod_lesson_get_completion_active_rule_descriptions($cm2), []);
-        $this->assertEquals(mod_lesson_get_completion_active_rule_descriptions($moddefaults), $activeruledescriptions);
-        $this->assertEquals(mod_lesson_get_completion_active_rule_descriptions(new stdClass()), []);
+        $this->assertEquals(mod_opendsa_activity_get_completion_active_rule_descriptions($cm1), $activeruledescriptions);
+        $this->assertEquals(mod_opendsa_activity_get_completion_active_rule_descriptions($cm2), []);
+        $this->assertEquals(mod_opendsa_activity_get_completion_active_rule_descriptions($moddefaults), $activeruledescriptions);
+        $this->assertEquals(mod_opendsa_activity_get_completion_active_rule_descriptions(new stdClass()), []);
     }
 
     /**
-     * An unknown event type should not change the lesson instance.
+     * An unknown event type should not change the opendsa_activity instance.
      */
-    public function test_mod_lesson_core_calendar_event_timestart_updated_unknown_event() {
+    public function test_mod_opendsa_activity_core_calendar_event_timestart_updated_unknown_event() {
         global $CFG, $DB;
         require_once($CFG->dirroot . "/calendar/lib.php");
 
@@ -790,13 +790,13 @@ class mod_lesson_lib_testcase extends advanced_testcase {
         $this->setAdminUser();
         $generator = $this->getDataGenerator();
         $course = $generator->create_course();
-        $lessongenerator = $generator->get_plugin_generator('mod_lesson');
+        $opendsa_activitygenerator = $generator->get_plugin_generator('mod_opendsa_activity');
         $timeopen = time();
         $timeclose = $timeopen + DAYSECS;
-        $lesson = $lessongenerator->create_instance(['course' => $course->id]);
-        $lesson->available = $timeopen;
-        $lesson->deadline = $timeclose;
-        $DB->update_record('lesson', $lesson);
+        $opendsa_activity = $opendsa_activitygenerator->create_instance(['course' => $course->id]);
+        $opendsa_activity->available = $timeopen;
+        $opendsa_activity->deadline = $timeclose;
+        $DB->update_record('opendsa_activity', $opendsa_activity);
 
         // Create a valid event.
         $event = new \calendar_event([
@@ -806,24 +806,24 @@ class mod_lesson_lib_testcase extends advanced_testcase {
             'courseid' => $course->id,
             'groupid' => 0,
             'userid' => 2,
-            'modulename' => 'lesson',
-            'instance' => $lesson->id,
-            'eventtype' => LESSON_EVENT_TYPE_OPEN . "SOMETHING ELSE",
+            'modulename' => 'opendsa_activity',
+            'instance' => $opendsa_activity->id,
+            'eventtype' => OPENDSA_ACTIVITY_EVENT_TYPE_OPEN . "SOMETHING ELSE",
             'timestart' => 1,
             'timeduration' => 86400,
             'visible' => 1
         ]);
 
-        mod_lesson_core_calendar_event_timestart_updated($event, $lesson);
-        $lesson = $DB->get_record('lesson', ['id' => $lesson->id]);
-        $this->assertEquals($timeopen, $lesson->available);
-        $this->assertEquals($timeclose, $lesson->deadline);
+        mod_opendsa_activity_core_calendar_event_timestart_updated($event, $opendsa_activity);
+        $opendsa_activity = $DB->get_record('opendsa_activity', ['id' => $opendsa_activity->id]);
+        $this->assertEquals($timeopen, $opendsa_activity->available);
+        $this->assertEquals($timeclose, $opendsa_activity->deadline);
     }
 
     /**
-     * A LESSON_EVENT_TYPE_OPEN event should update the available property of the lesson activity.
+     * A OPENDSA_ACTIVITY_EVENT_TYPE_OPEN event should update the available property of the opendsa_activity activity.
      */
-    public function test_mod_lesson_core_calendar_event_timestart_updated_open_event() {
+    public function test_mod_opendsa_activity_core_calendar_event_timestart_updated_open_event() {
         global $CFG, $DB;
         require_once($CFG->dirroot . "/calendar/lib.php");
 
@@ -831,16 +831,16 @@ class mod_lesson_lib_testcase extends advanced_testcase {
         $this->setAdminUser();
         $generator = $this->getDataGenerator();
         $course = $generator->create_course();
-        $lessongenerator = $generator->get_plugin_generator('mod_lesson');
+        $opendsa_activitygenerator = $generator->get_plugin_generator('mod_opendsa_activity');
         $timeopen = time();
         $timeclose = $timeopen + DAYSECS;
         $timemodified = 1;
         $newtimeopen = $timeopen - DAYSECS;
-        $lesson = $lessongenerator->create_instance(['course' => $course->id]);
-        $lesson->available = $timeopen;
-        $lesson->deadline = $timeclose;
-        $lesson->timemodified = $timemodified;
-        $DB->update_record('lesson', $lesson);
+        $opendsa_activity = $opendsa_activitygenerator->create_instance(['course' => $course->id]);
+        $opendsa_activity->available = $timeopen;
+        $opendsa_activity->deadline = $timeclose;
+        $opendsa_activity->timemodified = $timemodified;
+        $DB->update_record('opendsa_activity', $opendsa_activity);
 
         // Create a valid event.
         $event = new \calendar_event([
@@ -850,9 +850,9 @@ class mod_lesson_lib_testcase extends advanced_testcase {
             'courseid' => $course->id,
             'groupid' => 0,
             'userid' => 2,
-            'modulename' => 'lesson',
-            'instance' => $lesson->id,
-            'eventtype' => LESSON_EVENT_TYPE_OPEN,
+            'modulename' => 'opendsa_activity',
+            'instance' => $opendsa_activity->id,
+            'eventtype' => OPENDSA_ACTIVITY_EVENT_TYPE_OPEN,
             'timestart' => $newtimeopen,
             'timeduration' => 86400,
             'visible' => 1
@@ -860,46 +860,46 @@ class mod_lesson_lib_testcase extends advanced_testcase {
 
         // Trigger and capture the event when adding a contact.
         $sink = $this->redirectEvents();
-        mod_lesson_core_calendar_event_timestart_updated($event, $lesson);
+        mod_opendsa_activity_core_calendar_event_timestart_updated($event, $opendsa_activity);
         $triggeredevents = $sink->get_events();
         $moduleupdatedevents = array_filter($triggeredevents, function($e) {
             return is_a($e, 'core\event\course_module_updated');
         });
-        $lesson = $DB->get_record('lesson', ['id' => $lesson->id]);
+        $opendsa_activity = $DB->get_record('opendsa_activity', ['id' => $opendsa_activity->id]);
 
         // Ensure the available property matches the event timestart.
-        $this->assertEquals($newtimeopen, $lesson->available);
+        $this->assertEquals($newtimeopen, $opendsa_activity->available);
 
         // Ensure the deadline isn't changed.
-        $this->assertEquals($timeclose, $lesson->deadline);
+        $this->assertEquals($timeclose, $opendsa_activity->deadline);
 
         // Ensure the timemodified property has been changed.
-        $this->assertNotEquals($timemodified, $lesson->timemodified);
+        $this->assertNotEquals($timemodified, $opendsa_activity->timemodified);
 
         // Confirm that a module updated event is fired when the module is changed.
         $this->assertNotEmpty($moduleupdatedevents);
     }
 
     /**
-     * A LESSON_EVENT_TYPE_CLOSE event should update the deadline property of the lesson activity.
+     * A OPENDSA_ACTIVITY_EVENT_TYPE_CLOSE event should update the deadline property of the opendsa_activity activity.
      */
-    public function test_mod_lesson_core_calendar_event_timestart_updated_close_event() {
+    public function test_mod_opendsa_activity_core_calendar_event_timestart_updated_close_event() {
         global $CFG, $DB;
         require_once($CFG->dirroot . "/calendar/lib.php");
         $this->resetAfterTest(true);
         $this->setAdminUser();
         $generator = $this->getDataGenerator();
         $course = $generator->create_course();
-        $lessongenerator = $generator->get_plugin_generator('mod_lesson');
+        $opendsa_activitygenerator = $generator->get_plugin_generator('mod_opendsa_activity');
         $timeopen = time();
         $timeclose = $timeopen + DAYSECS;
         $timemodified = 1;
         $newtimeclose = $timeclose + DAYSECS;
-        $lesson = $lessongenerator->create_instance(['course' => $course->id]);
-        $lesson->available = $timeopen;
-        $lesson->deadline = $timeclose;
-        $lesson->timemodified = $timemodified;
-        $DB->update_record('lesson', $lesson);
+        $opendsa_activity = $opendsa_activitygenerator->create_instance(['course' => $course->id]);
+        $opendsa_activity->available = $timeopen;
+        $opendsa_activity->deadline = $timeclose;
+        $opendsa_activity->timemodified = $timemodified;
+        $DB->update_record('opendsa_activity', $opendsa_activity);
         // Create a valid event.
         $event = new \calendar_event([
             'name' => 'Test event',
@@ -908,27 +908,27 @@ class mod_lesson_lib_testcase extends advanced_testcase {
             'courseid' => $course->id,
             'groupid' => 0,
             'userid' => 2,
-            'modulename' => 'lesson',
-            'instance' => $lesson->id,
-            'eventtype' => LESSON_EVENT_TYPE_CLOSE,
+            'modulename' => 'opendsa_activity',
+            'instance' => $opendsa_activity->id,
+            'eventtype' => OPENDSA_ACTIVITY_EVENT_TYPE_CLOSE,
             'timestart' => $newtimeclose,
             'timeduration' => 86400,
             'visible' => 1
         ]);
         // Trigger and capture the event when adding a contact.
         $sink = $this->redirectEvents();
-        mod_lesson_core_calendar_event_timestart_updated($event, $lesson);
+        mod_opendsa_activity_core_calendar_event_timestart_updated($event, $opendsa_activity);
         $triggeredevents = $sink->get_events();
         $moduleupdatedevents = array_filter($triggeredevents, function($e) {
             return is_a($e, 'core\event\course_module_updated');
         });
-        $lesson = $DB->get_record('lesson', ['id' => $lesson->id]);
+        $opendsa_activity = $DB->get_record('opendsa_activity', ['id' => $opendsa_activity->id]);
         // Ensure the deadline property matches the event timestart.
-        $this->assertEquals($newtimeclose, $lesson->deadline);
+        $this->assertEquals($newtimeclose, $opendsa_activity->deadline);
         // Ensure the available isn't changed.
-        $this->assertEquals($timeopen, $lesson->available);
+        $this->assertEquals($timeopen, $opendsa_activity->available);
         // Ensure the timemodified property has been changed.
-        $this->assertNotEquals($timemodified, $lesson->timemodified);
+        $this->assertNotEquals($timemodified, $opendsa_activity->timemodified);
         // Confirm that a module updated event is fired when the module is changed.
         $this->assertNotEmpty($moduleupdatedevents);
     }
@@ -936,7 +936,7 @@ class mod_lesson_lib_testcase extends advanced_testcase {
     /**
      * An unknown event type should not have any limits.
      */
-    public function test_mod_lesson_core_calendar_get_valid_event_timestart_range_unknown_event() {
+    public function test_mod_opendsa_activity_core_calendar_get_valid_event_timestart_range_unknown_event() {
         global $CFG;
         require_once($CFG->dirroot . "/calendar/lib.php");
 
@@ -946,9 +946,9 @@ class mod_lesson_lib_testcase extends advanced_testcase {
         $course = $generator->create_course();
         $timeopen = time();
         $timeclose = $timeopen + DAYSECS;
-        $lesson = new \stdClass();
-        $lesson->available = $timeopen;
-        $lesson->deadline = $timeclose;
+        $opendsa_activity = new \stdClass();
+        $opendsa_activity->available = $timeopen;
+        $opendsa_activity->deadline = $timeclose;
 
         // Create a valid event.
         $event = new \calendar_event([
@@ -958,23 +958,23 @@ class mod_lesson_lib_testcase extends advanced_testcase {
             'courseid' => $course->id,
             'groupid' => 0,
             'userid' => 2,
-            'modulename' => 'lesson',
+            'modulename' => 'opendsa_activity',
             'instance' => 1,
-            'eventtype' => LESSON_EVENT_TYPE_OPEN . "SOMETHING ELSE",
+            'eventtype' => OPENDSA_ACTIVITY_EVENT_TYPE_OPEN . "SOMETHING ELSE",
             'timestart' => 1,
             'timeduration' => 86400,
             'visible' => 1
         ]);
 
-        list ($min, $max) = mod_lesson_core_calendar_get_valid_event_timestart_range($event, $lesson);
+        list ($min, $max) = mod_opendsa_activity_core_calendar_get_valid_event_timestart_range($event, $opendsa_activity);
         $this->assertNull($min);
         $this->assertNull($max);
     }
 
     /**
-     * The open event should be limited by the lesson's deadline property, if it's set.
+     * The open event should be limited by the opendsa_activity's deadline property, if it's set.
      */
-    public function test_mod_lesson_core_calendar_get_valid_event_timestart_range_open_event() {
+    public function test_mod_opendsa_activity_core_calendar_get_valid_event_timestart_range_open_event() {
         global $CFG;
         require_once($CFG->dirroot . "/calendar/lib.php");
 
@@ -984,9 +984,9 @@ class mod_lesson_lib_testcase extends advanced_testcase {
         $course = $generator->create_course();
         $timeopen = time();
         $timeclose = $timeopen + DAYSECS;
-        $lesson = new \stdClass();
-        $lesson->available = $timeopen;
-        $lesson->deadline = $timeclose;
+        $opendsa_activity = new \stdClass();
+        $opendsa_activity->available = $timeopen;
+        $opendsa_activity->deadline = $timeclose;
 
         // Create a valid event.
         $event = new \calendar_event([
@@ -996,30 +996,30 @@ class mod_lesson_lib_testcase extends advanced_testcase {
             'courseid' => $course->id,
             'groupid' => 0,
             'userid' => 2,
-            'modulename' => 'lesson',
+            'modulename' => 'opendsa_activity',
             'instance' => 1,
-            'eventtype' => LESSON_EVENT_TYPE_OPEN,
+            'eventtype' => OPENDSA_ACTIVITY_EVENT_TYPE_OPEN,
             'timestart' => 1,
             'timeduration' => 86400,
             'visible' => 1
         ]);
 
         // The max limit should be bounded by the timeclose value.
-        list ($min, $max) = mod_lesson_core_calendar_get_valid_event_timestart_range($event, $lesson);
+        list ($min, $max) = mod_opendsa_activity_core_calendar_get_valid_event_timestart_range($event, $opendsa_activity);
         $this->assertNull($min);
         $this->assertEquals($timeclose, $max[0]);
 
         // No timeclose value should result in no upper limit.
-        $lesson->deadline = 0;
-        list ($min, $max) = mod_lesson_core_calendar_get_valid_event_timestart_range($event, $lesson);
+        $opendsa_activity->deadline = 0;
+        list ($min, $max) = mod_opendsa_activity_core_calendar_get_valid_event_timestart_range($event, $opendsa_activity);
         $this->assertNull($min);
         $this->assertNull($max);
     }
 
     /**
-     * The close event should be limited by the lesson's available property, if it's set.
+     * The close event should be limited by the opendsa_activity's available property, if it's set.
      */
-    public function test_mod_lesson_core_calendar_get_valid_event_timestart_range_close_event() {
+    public function test_mod_opendsa_activity_core_calendar_get_valid_event_timestart_range_close_event() {
         global $CFG;
         require_once($CFG->dirroot . "/calendar/lib.php");
 
@@ -1029,9 +1029,9 @@ class mod_lesson_lib_testcase extends advanced_testcase {
         $course = $generator->create_course();
         $timeopen = time();
         $timeclose = $timeopen + DAYSECS;
-        $lesson = new \stdClass();
-        $lesson->available = $timeopen;
-        $lesson->deadline = $timeclose;
+        $opendsa_activity = new \stdClass();
+        $opendsa_activity->available = $timeopen;
+        $opendsa_activity->deadline = $timeclose;
 
         // Create a valid event.
         $event = new \calendar_event([
@@ -1041,28 +1041,28 @@ class mod_lesson_lib_testcase extends advanced_testcase {
             'courseid' => $course->id,
             'groupid' => 0,
             'userid' => 2,
-            'modulename' => 'lesson',
+            'modulename' => 'opendsa_activity',
             'instance' => 1,
-            'eventtype' => LESSON_EVENT_TYPE_CLOSE,
+            'eventtype' => OPENDSA_ACTIVITY_EVENT_TYPE_CLOSE,
             'timestart' => 1,
             'timeduration' => 86400,
             'visible' => 1
         ]);
 
         // The max limit should be bounded by the timeclose value.
-        list ($min, $max) = mod_lesson_core_calendar_get_valid_event_timestart_range($event, $lesson);
+        list ($min, $max) = mod_opendsa_activity_core_calendar_get_valid_event_timestart_range($event, $opendsa_activity);
         $this->assertEquals($timeopen, $min[0]);
         $this->assertNull($max);
 
         // No deadline value should result in no upper limit.
-        $lesson->available = 0;
-        list ($min, $max) = mod_lesson_core_calendar_get_valid_event_timestart_range($event, $lesson);
+        $opendsa_activity->available = 0;
+        list ($min, $max) = mod_opendsa_activity_core_calendar_get_valid_event_timestart_range($event, $opendsa_activity);
         $this->assertNull($min);
         $this->assertNull($max);
     }
 
     /**
-     * A user who does not have capabilities to add events to the calendar should be able to create an lesson.
+     * A user who does not have capabilities to add events to the calendar should be able to create an opendsa_activity.
      */
     public function test_creation_with_no_calendar_capabilities() {
         $this->resetAfterTest();
@@ -1072,7 +1072,7 @@ class mod_lesson_lib_testcase extends advanced_testcase {
         $roleid = self::getDataGenerator()->create_role();
         self::getDataGenerator()->role_assign($roleid, $user->id, $context->id);
         assign_capability('moodle/calendar:manageentries', CAP_PROHIBIT, $roleid, $context, true);
-        $generator = self::getDataGenerator()->get_plugin_generator('mod_lesson');
+        $generator = self::getDataGenerator()->get_plugin_generator('mod_opendsa_activity');
         // Create an instance as a user without the calendar capabilities.
         $this->setUser($user);
         $time = time();

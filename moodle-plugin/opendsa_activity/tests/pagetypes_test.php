@@ -17,7 +17,7 @@
 /**
  * Unit tests for page types classes
  *
- * @package   mod_lesson
+ * @package   mod_opendsa_activity
  * @category  test
  * @copyright 2015 Jean-Michel Vedrine
  * @license   http://www.gnu.org/copyleft/gpl.html GNU Public License
@@ -27,18 +27,18 @@
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot . '/mod/lesson/locallib.php');
-require_once($CFG->dirroot . '/mod/lesson/pagetypes/essay.php');
+require_once($CFG->dirroot . '/mod/opendsa_activity/locallib.php');
+require_once($CFG->dirroot . '/mod/opendsa_activity/pagetypes/essay.php');
 
 
 /**
- * This class contains the test cases for some of the functions in the lesson essay page type class.
+ * This class contains the test cases for some of the functions in the opendsa_activity essay page type class.
  *
  * @copyright 2015 Jean-Michel Vedrine
  * @license   http://www.gnu.org/copyleft/gpl.html GNU Public License
  */
-class mod_lesson_essay_page_type_test extends advanced_testcase {
-    public function test_lesson_essay_extract_useranswer() {
+class mod_opendsa_activity_essay_page_type_test extends advanced_testcase {
+    public function test_opendsa_activity_essay_extract_useranswer() {
         // Test that reponseformat is added when not present.
         $answer = 'O:8:"stdClass":6:{s:4:"sent";i:1;s:6:"graded";i:1;s:5:"score";s:1:"1";'
                 . 's:6:"answer";s:64:"<p>This is my answer <b>with bold</b> and <i>italics</i><br></p>";'
@@ -51,7 +51,7 @@ class mod_lesson_essay_page_type_test extends advanced_testcase {
         $userresponse->answerformat = FORMAT_HTML;
         $userresponse->response = "Well done!";
         $userresponse->responseformat = FORMAT_HTML;
-        $this->assertEquals($userresponse, lesson_page_type_essay::extract_useranswer($answer));
+        $this->assertEquals($userresponse, opendsa_activity_page_type_essay::extract_useranswer($answer));
 
         // Test that reponseformat is not modified when present.
         $answer = 'O:8:"stdClass":7:{s:4:"sent";i:0;s:6:"graded";i:1;s:5:"score";s:1:"0";'
@@ -65,6 +65,6 @@ class mod_lesson_essay_page_type_test extends advanced_testcase {
         $userresponse->answerformat = FORMAT_HTML;
         $userresponse->response = "Well done!";
         $userresponse->responseformat = FORMAT_PLAIN;
-        $this->assertEquals($userresponse, lesson_page_type_essay::extract_useranswer($answer));
+        $this->assertEquals($userresponse, opendsa_activity_page_type_essay::extract_useranswer($answer));
     }
 }

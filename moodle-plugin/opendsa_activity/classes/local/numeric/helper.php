@@ -19,17 +19,17 @@
  *
  * Contains any helper functions for the numeric pagetyep
  *
- * @package    mod_lesson
+ * @package    mod_opendsa_activity
  * @copyright  2020 Peter Dias <peter@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-namespace mod_lesson\local\numeric;
+namespace mod_opendsa_activity\local\numeric;
 
 /**
  * Lesson numeric page helper
  *
  * @copyright  2020 Peter Dias<peter@moodle.com>
- * @package core_lesson
+ * @package core_opendsa_activity
  */
 class helper {
 
@@ -43,7 +43,7 @@ class helper {
      *              Float - if it's a properly formatted float
      *              Null - If empty and could not be converted
      */
-    public static function lesson_unformat_numeric_value(string $value) {
+    public static function opendsa_activity_unformat_numeric_value(string $value) {
         if (strpos($value, ':')) {
             list($min, $max) = explode(':', $value);
             $formattedvalue = unformat_float($min) . ':' . unformat_float($max);
@@ -60,7 +60,7 @@ class helper {
      * @param string|number $value The value to be formatted
      * @return string $formattedvalue Formatted value OR $value if not numeric
      */
-    public static function lesson_format_numeric_value($value) : string {
+    public static function opendsa_activity_format_numeric_value($value) : string {
         $formattedvalue = $value;
         if (strpos($value, ':')) {
             list($min, $max) = explode(':', $value);

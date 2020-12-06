@@ -16,50 +16,50 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Imports lesson pages
+ * Imports opendsa_activity pages
  *
- * @package mod_lesson
+ * @package mod_opendsa_activity
  * @copyright 1999 onwards Martin Dougiamas  {@link http://moodle.com}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  **/
 
 require_once("../../config.php");
 require_once($CFG->libdir.'/questionlib.php');
-require_once($CFG->dirroot.'/mod/lesson/locallib.php');
-require_once($CFG->dirroot.'/mod/lesson/import_form.php');
-require_once($CFG->dirroot.'/mod/lesson/format.php');  // Parent class
+require_once($CFG->dirroot.'/mod/opendsa_activity/locallib.php');
+require_once($CFG->dirroot.'/mod/opendsa_activity/import_form.php');
+require_once($CFG->dirroot.'/mod/opendsa_activity/format.php');  // Parent class
 
 $id     = required_param('id', PARAM_INT);         // Course Module ID
 $pageid = optional_param('pageid', '', PARAM_INT); // Page ID
 
-$PAGE->set_url('/mod/lesson/import.php', array('id'=>$id, 'pageid'=>$pageid));
+$PAGE->set_url('/mod/opendsa_activity/import.php', array('id'=>$id, 'pageid'=>$pageid));
 
-$cm = get_coursemodule_from_id('lesson', $id, 0, false, MUST_EXIST);
+$cm = get_coursemodule_from_id('opendsa_activity', $id, 0, false, MUST_EXIST);
 $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
-$lesson = new lesson($DB->get_record('lesson', array('id' => $cm->instance), '*', MUST_EXIST));
+$opendsa_activity = new opendsa_activity($DB->get_record('opendsa_activity', array('id' => $cm->instance), '*', MUST_EXIST));
 
 require_login($course, false, $cm);
 $context = context_module::instance($cm->id);
-require_capability('mod/lesson:edit', $context);
+require_capability('mod/opendsa_activity:edit', $context);
 
-$strimportquestions = get_string("importquestions", "lesson");
-$strlessons = get_string("modulenameplural", "lesson");
+$strimportquestions = get_string("importquestions", "opendsa_activity");
+$stropendsa_activitys = get_string("modulenameplural", "opendsa_activity");
 
-$manager = lesson_page_type_manager::get($lesson);
+$manager = opendsa_activity_page_type_manager::get($opendsa_activity);
 
 $data = new stdClass;
 $data->id = $PAGE->cm->id;
 $data->pageid = $pageid;
 
-$mform = new lesson_import_form(null, array('formats'=>lesson_get_import_export_formats('import')));
+$mform = new opendsa_activity_import_form(null, array('formats'=>opendsa_activity_get_import_export_formats('import')));
 $mform->set_data($data);
 
     $PAGE->navbar->add($strimportquestions);
     $PAGE->set_title($strimportquestions);
     $PAGE->set_heading($course->fullname);
     echo $OUTPUT->header();
-    echo $OUTPUT->heading(format_string($lesson->name), 2);
-    echo $OUTPUT->heading_with_help($strimportquestions, 'importquestions', 'lesson', '', '', 3);
+    echo $OUTPUT->heading(format_string($opendsa_activity->name), 2);
+    echo $OUTPUT->heading_with_help($strimportquestions, 'importquestions', 'opendsa_activity', '', '', 3);
 
 if ($data = $mform->get_data()) {
 
@@ -83,17 +83,17 @@ if ($data = $mform->get_data()) {
 
     // Do anything before that we need to
     if (! $format->importpreprocess()) {
-                print_error('preprocesserror', 'lesson');
+                print_error('preprocesserror', 'opendsa_activity');
             }
 
     // Process the uploaded file
-    if (! $format->importprocess($importfile, $lesson, $pageid)) {
-                print_error('processerror', 'lesson');
+    if (! $format->importprocess($importfile, $opendsa_activity, $pageid)) {
+                print_error('processerror', 'opendsa_activity');
             }
 
     // In case anything needs to be done after
     if (! $format->importpostprocess()) {
-                print_error('postprocesserror', 'lesson');
+                print_error('postprocesserror', 'opendsa_activity');
             }
 
             echo "<hr>";

@@ -1,9 +1,9 @@
-@mod @mod_lesson
-Feature: In a lesson activity, teacher can delete question answers and
+@mod @mod_opendsa_activity
+Feature: In a opendsa_activity activity, teacher can delete question answers and
 branch table contents
-  In order to modify an existing lesson
+  In order to modify an existing opendsa_activity
   As a teacher
-  I need to question answers and branch table contents in the lesson
+  I need to question answers and branch table contents in the opendsa_activity
 
   Background:
     Given the following "users" exist:
@@ -20,9 +20,9 @@ branch table contents
     And I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
     And I add a "Lesson" to section "1" and I fill the form with:
-      | Name | Test lesson name |
-      | Description | Test lesson description |
-    And I follow "Test lesson name"
+      | Name | Test opendsa_activity name |
+      | Description | Test opendsa_activity description |
+    And I follow "Test opendsa_activity name"
     And I follow "Add a content page"
     And I set the following fields to these values:
       | Page title | First page name |
@@ -40,7 +40,7 @@ branch table contents
       | Page contents | 1 + 1? |
       | id_answer_editor_0 | 2 |
       | id_response_editor_0 | Correct answer |
-      | id_jumpto_0 | End of lesson |
+      | id_jumpto_0 | End of opendsa_activity |
       | id_score_0 | 1 |
       | id_answer_editor_1 | 1 |
       | id_response_editor_1 | Incorrect answer |
@@ -49,7 +49,7 @@ branch table contents
     And I press "Save page"
     And I follow "Expanded"
 
-  Scenario: Edit lesson content page
+  Scenario: Edit opendsa_activity content page
     Given I click on "//th[normalize-space(.)='First page name']/descendant::a[3]" "xpath_element"
     When I set the following fields to these values:
       | id_answer_editor_1 | |
@@ -58,7 +58,7 @@ branch table contents
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
     And I should see "First page contents"
     And I should not see "Previous page"
     And I press "Next page"
@@ -69,10 +69,10 @@ branch table contents
     And I should see "Correct answer"
     And I should not see "Incorrect answer"
     And I press "Continue"
-    And I should see "Congratulations - end of lesson reached"
+    And I should see "Congratulations - end of opendsa_activity reached"
     And I should see "Your score is 1 (out of 1)."
 
-  Scenario: Edit lesson question page
+  Scenario: Edit opendsa_activity question page
     Given I click on "//th[normalize-space(.)='Hardest question ever']/descendant::a[3]" "xpath_element"
     When I set the following fields to these values:
       | id_answer_editor_1 | |
@@ -81,7 +81,7 @@ branch table contents
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
     And I should see "First page contents"
     And I press "Next page"
     And I should see "1 + 1?"
@@ -89,5 +89,5 @@ branch table contents
       | Your answer | 1 |
     And I press "Submit"
     And I should not see "Incorrect answer"
-    And I should see "Congratulations - end of lesson reached"
+    And I should see "Congratulations - end of opendsa_activity reached"
     And I should see "Your score is 0 (out of 1)."

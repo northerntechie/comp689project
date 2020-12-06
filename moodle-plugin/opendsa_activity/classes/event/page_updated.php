@@ -15,19 +15,19 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The mod_lesson page_added event class.
+ * The mod_opendsa_activity page_added event class.
  *
- * @package    mod_lesson
+ * @package    mod_opendsa_activity
  * @copyright  2015 Stephen Bourget
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 
-namespace mod_lesson\event;
+namespace mod_opendsa_activity\event;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * The mod_lesson page_updated event class.
+ * The mod_opendsa_activity page_updated event class.
  *
  * @property-read array $other {
  *     Extra information about event.
@@ -35,7 +35,7 @@ defined('MOODLE_INTERNAL') || die();
  *     - string pagetype: the name of the pagetype as defined in the individual page class
  * }
  *
- * @package    mod_lesson
+ * @package    mod_opendsa_activity
  * @since      Moodle 2.9
  * @copyright  2015 Stephen Bourget
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
@@ -45,16 +45,16 @@ class page_updated extends \core\event\base {
     /**
      * Create instance of event.
      *
-     * @param \lesson_page $lessonpage
+     * @param \opendsa_activity_page $opendsa_activitypage
      * @param \context_module $context
      * @return page_updated
      */
-    public static function create_from_lesson_page(\lesson_page $lessonpage, \context_module $context) {
+    public static function create_from_opendsa_activity_page(\opendsa_activity_page $opendsa_activitypage, \context_module $context) {
         $data = array(
             'context' => $context,
-            'objectid' => $lessonpage->properties()->id,
+            'objectid' => $opendsa_activitypage->properties()->id,
             'other' => array(
-                'pagetype' => $lessonpage->get_typestring()
+                'pagetype' => $opendsa_activitypage->get_typestring()
             )
         );
         return self::create($data);
@@ -65,7 +65,7 @@ class page_updated extends \core\event\base {
      * Set basic properties for the event.
      */
     protected function init() {
-        $this->data['objecttable'] = 'lesson_pages';
+        $this->data['objecttable'] = 'opendsa_activity_pages';
         $this->data['crud'] = 'u';
         $this->data['edulevel'] = self::LEVEL_TEACHING;
     }
@@ -76,7 +76,7 @@ class page_updated extends \core\event\base {
      * @return string
      */
     public static function get_name() {
-        return get_string('eventpageupdated', 'mod_lesson');
+        return get_string('eventpageupdated', 'mod_opendsa_activity');
     }
 
     /**
@@ -85,7 +85,7 @@ class page_updated extends \core\event\base {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url('/mod/lesson/view.php', array('id' => $this->contextinstanceid, 'pageid' => $this->objectid));
+        return new \moodle_url('/mod/opendsa_activity/view.php', array('id' => $this->contextinstanceid, 'pageid' => $this->objectid));
     }
 
     /**
@@ -95,7 +95,7 @@ class page_updated extends \core\event\base {
      */
     public function get_description() {
         return "The user with id '$this->userid' has updated the ".$this->other['pagetype']." page with the ".
-                "id '$this->objectid' in the lesson activity with course module id '$this->contextinstanceid'.";
+                "id '$this->objectid' in the opendsa_activity activity with course module id '$this->contextinstanceid'.";
     }
 
     /**
@@ -116,7 +116,7 @@ class page_updated extends \core\event\base {
     }
 
     public static function get_objectid_mapping() {
-        return array('db' => 'lesson_pages', 'restore' => 'lesson_page');
+        return array('db' => 'opendsa_activity_pages', 'restore' => 'opendsa_activity_page');
     }
 
     public static function get_other_mapping() {

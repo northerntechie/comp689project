@@ -17,7 +17,7 @@
 /**
  * Lesson module external functions tests
  *
- * @package    mod_lesson
+ * @package    mod_opendsa_activity
  * @category   external
  * @copyright  2017 Juan Leyva <juan@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -29,42 +29,42 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 
 require_once($CFG->dirroot . '/webservice/tests/helpers.php');
-require_once($CFG->dirroot . '/mod/lesson/locallib.php');
+require_once($CFG->dirroot . '/mod/opendsa_activity/locallib.php');
 
 /**
- * Silly class to access mod_lesson_external internal methods.
+ * Silly class to access mod_opendsa_activity_external internal methods.
  *
- * @package mod_lesson
+ * @package mod_opendsa_activity
  * @copyright 2017 Juan Leyva <juan@moodle.com>
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @since  Moodle 3.3
  */
-class testable_mod_lesson_external extends mod_lesson_external {
+class testable_mod_opendsa_activity_external extends mod_opendsa_activity_external {
 
     /**
      * Validates a new attempt.
      *
-     * @param  lesson  $lesson lesson instance
+     * @param  opendsa_activity  $opendsa_activity opendsa_activity instance
      * @param  array   $params request parameters
      * @param  boolean $return whether to return the errors or throw exceptions
      * @return [array          the errors (if return set to true)
      * @since  Moodle 3.3
      */
-    public static function validate_attempt(lesson $lesson, $params, $return = false) {
-        return parent::validate_attempt($lesson, $params, $return);
+    public static function validate_attempt(opendsa_activity $opendsa_activity, $params, $return = false) {
+        return parent::validate_attempt($opendsa_activity, $params, $return);
     }
 }
 
 /**
  * Lesson module external functions tests
  *
- * @package    mod_lesson
+ * @package    mod_opendsa_activity
  * @category   external
  * @copyright  2017 Juan Leyva <juan@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @since      Moodle 3.3
  */
-class mod_lesson_external_testcase extends externallib_advanced_testcase {
+class mod_opendsa_activity_external_testcase extends externallib_advanced_testcase {
 
     /**
      * Set up for every test
@@ -76,12 +76,12 @@ class mod_lesson_external_testcase extends externallib_advanced_testcase {
 
         // Setup test data.
         $this->course = $this->getDataGenerator()->create_course();
-        $this->lesson = $this->getDataGenerator()->create_module('lesson', array('course' => $this->course->id));
-        $lessongenerator = $this->getDataGenerator()->get_plugin_generator('mod_lesson');
-        $this->page1 = $lessongenerator->create_content($this->lesson);
-        $this->page2 = $lessongenerator->create_question_truefalse($this->lesson);
-        $this->context = context_module::instance($this->lesson->cmid);
-        $this->cm = get_coursemodule_from_instance('lesson', $this->lesson->id);
+        $this->opendsa_activity = $this->getDataGenerator()->create_module('opendsa_activity', array('course' => $this->course->id));
+        $opendsa_activitygenerator = $this->getDataGenerator()->get_plugin_generator('mod_opendsa_activity');
+        $this->page1 = $opendsa_activitygenerator->create_content($this->opendsa_activity);
+        $this->page2 = $opendsa_activitygenerator->create_question_truefalse($this->opendsa_activity);
+        $this->context = context_module::instance($this->opendsa_activity->cmid);
+        $this->cm = get_coursemodule_from_instance('opendsa_activity', $this->opendsa_activity->id);
 
         // Create users.
         $this->student = self::getDataGenerator()->create_user();
@@ -96,20 +96,20 @@ class mod_lesson_external_testcase extends externallib_advanced_testcase {
 
 
     /**
-     * Test test_mod_lesson_get_lessons_by_courses
+     * Test test_mod_opendsa_activity_get_opendsa_activitys_by_courses
      */
-    public function test_mod_lesson_get_lessons_by_courses() {
+    public function test_mod_opendsa_activity_get_opendsa_activitys_by_courses() {
         global $DB, $CFG;
         require_once($CFG->libdir . '/externallib.php');
 
         // Create additional course.
         $course2 = self::getDataGenerator()->create_course();
 
-        // Second lesson.
+        // Second opendsa_activity.
         $record = new stdClass();
         $record->course = $course2->id;
         $record->name = '<span lang="en" class="multilang">English</span><span lang="es" class="multilang">Español</span>';
-        $lesson2 = self::getDataGenerator()->create_module('lesson', $record);
+        $opendsa_activity2 = self::getDataGenerator()->create_module('opendsa_activity', $record);
 
         // Execute real Moodle enrolment as we'll call unenrol() method on the instance later.
         $enrol = enrol_get_plugin('manual');
@@ -132,7 +132,7 @@ class mod_lesson_external_testcase extends externallib_advanced_testcase {
         $wssettings = external_settings::get_instance();
         $wssettings->set_filter(true);
 
-        $returndescription = mod_lesson_external::get_lessons_by_courses_returns();
+        $returndescription = mod_opendsa_activity_external::get_opendsa_activitys_by_courses_returns();
 
         // Create what we expect to be returned when querying the two courses.
         // First for the student user.
@@ -144,56 +144,56 @@ class mod_lesson_external_testcase extends externallib_advanced_testcase {
                                 'progressbar', 'allowofflineattempts');
 
         // Add expected coursemodule and data.
-        $lesson1 = $this->lesson;
-        $lesson1->coursemodule = $lesson1->cmid;
-        $lesson1->introformat = 1;
-        $lesson1->introfiles = [];
-        $lesson1->mediafiles = [];
+        $opendsa_activity1 = $this->opendsa_activity;
+        $opendsa_activity1->coursemodule = $opendsa_activity1->cmid;
+        $opendsa_activity1->introformat = 1;
+        $opendsa_activity1->introfiles = [];
+        $opendsa_activity1->mediafiles = [];
 
-        $lesson2->coursemodule = $lesson2->cmid;
-        $lesson2->introformat = 1;
-        $lesson2->introfiles = [];
-        $lesson2->mediafiles = [];
+        $opendsa_activity2->coursemodule = $opendsa_activity2->cmid;
+        $opendsa_activity2->introformat = 1;
+        $opendsa_activity2->introfiles = [];
+        $opendsa_activity2->mediafiles = [];
 
         $booltypes = array('practice', 'modattempts', 'usepassword', 'custom', 'ongoing', 'review', 'feedback', 'retake',
             'slideshow', 'displayleft', 'progressbar', 'allowofflineattempts');
 
         foreach ($expectedfields as $field) {
             if (in_array($field, $booltypes)) {
-                $lesson1->{$field} = (bool) $lesson1->{$field};
-                $lesson2->{$field} = (bool) $lesson2->{$field};
+                $opendsa_activity1->{$field} = (bool) $opendsa_activity1->{$field};
+                $opendsa_activity2->{$field} = (bool) $opendsa_activity2->{$field};
             }
-            $expected1[$field] = $lesson1->{$field};
-            $expected2[$field] = $lesson2->{$field};
+            $expected1[$field] = $opendsa_activity1->{$field};
+            $expected2[$field] = $opendsa_activity2->{$field};
         }
 
         $expected2['name'] = 'English';  // Lang filtered expected.
-        $expectedlessons = array($expected2, $expected1);
+        $expectedopendsa_activitys = array($expected2, $expected1);
 
         // Call the external function passing course ids.
-        $result = mod_lesson_external::get_lessons_by_courses(array($course2->id, $this->course->id));
+        $result = mod_opendsa_activity_external::get_opendsa_activitys_by_courses(array($course2->id, $this->course->id));
         $result = external_api::clean_returnvalue($returndescription, $result);
 
-        $this->assertEquals($expectedlessons, $result['lessons']);
+        $this->assertEquals($expectedopendsa_activitys, $result['opendsa_activitys']);
         $this->assertCount(0, $result['warnings']);
 
         // Call the external function without passing course id.
-        $result = mod_lesson_external::get_lessons_by_courses();
+        $result = mod_opendsa_activity_external::get_opendsa_activitys_by_courses();
         $result = external_api::clean_returnvalue($returndescription, $result);
-        $this->assertEquals($expectedlessons, $result['lessons']);
+        $this->assertEquals($expectedopendsa_activitys, $result['opendsa_activitys']);
         $this->assertCount(0, $result['warnings']);
 
-        // Unenrol user from second course and alter expected lessons.
+        // Unenrol user from second course and alter expected opendsa_activitys.
         $enrol->unenrol_user($instance2, $this->student->id);
-        array_shift($expectedlessons);
+        array_shift($expectedopendsa_activitys);
 
         // Call the external function without passing course id.
-        $result = mod_lesson_external::get_lessons_by_courses();
+        $result = mod_opendsa_activity_external::get_opendsa_activitys_by_courses();
         $result = external_api::clean_returnvalue($returndescription, $result);
-        $this->assertEquals($expectedlessons, $result['lessons']);
+        $this->assertEquals($expectedopendsa_activitys, $result['opendsa_activitys']);
 
         // Call for the second course we unenrolled the user from, expected warning.
-        $result = mod_lesson_external::get_lessons_by_courses(array($course2->id));
+        $result = mod_opendsa_activity_external::get_opendsa_activitys_by_courses(array($course2->id));
         $this->assertCount(1, $result['warnings']);
         $this->assertEquals('1', $result['warnings'][0]['warningcode']);
         $this->assertEquals($course2->id, $result['warnings'][0]['itemid']);
@@ -205,28 +205,28 @@ class mod_lesson_external_testcase extends externallib_advanced_testcase {
                                     'timemodified', 'completionendreached', 'completiontimespent');
 
         foreach ($additionalfields as $field) {
-            $expectedlessons[0][$field] = $lesson1->{$field};
+            $expectedopendsa_activitys[0][$field] = $opendsa_activity1->{$field};
         }
 
-        $result = mod_lesson_external::get_lessons_by_courses();
+        $result = mod_opendsa_activity_external::get_opendsa_activitys_by_courses();
         $result = external_api::clean_returnvalue($returndescription, $result);
-        $this->assertEquals($expectedlessons, $result['lessons']);
+        $this->assertEquals($expectedopendsa_activitys, $result['opendsa_activitys']);
 
         // Admin also should get all the information.
         self::setAdminUser();
 
-        $result = mod_lesson_external::get_lessons_by_courses(array($this->course->id));
+        $result = mod_opendsa_activity_external::get_opendsa_activitys_by_courses(array($this->course->id));
         $result = external_api::clean_returnvalue($returndescription, $result);
-        $this->assertEquals($expectedlessons, $result['lessons']);
+        $this->assertEquals($expectedopendsa_activitys, $result['opendsa_activitys']);
 
         // Now, add a restriction.
         $this->setUser($this->student);
-        $DB->set_field('lesson', 'usepassword', 1, array('id' => $lesson1->id));
-        $DB->set_field('lesson', 'password', 'abc', array('id' => $lesson1->id));
+        $DB->set_field('opendsa_activity', 'usepassword', 1, array('id' => $opendsa_activity1->id));
+        $DB->set_field('opendsa_activity', 'password', 'abc', array('id' => $opendsa_activity1->id));
 
-        $lessons = mod_lesson_external::get_lessons_by_courses(array($this->course->id));
-        $lessons = external_api::clean_returnvalue(mod_lesson_external::get_lessons_by_courses_returns(), $lessons);
-        $this->assertFalse(isset($lessons['lessons'][0]['intro']));
+        $opendsa_activitys = mod_opendsa_activity_external::get_opendsa_activitys_by_courses(array($this->course->id));
+        $opendsa_activitys = external_api::clean_returnvalue(mod_opendsa_activity_external::get_opendsa_activitys_by_courses_returns(), $opendsa_activitys);
+        $this->assertFalse(isset($opendsa_activitys['opendsa_activitys'][0]['intro']));
     }
 
     /**
@@ -238,71 +238,71 @@ class mod_lesson_external_testcase extends externallib_advanced_testcase {
         $this->setUser($this->student);
         // Test deadline.
         $oldtime = time() - DAYSECS;
-        $DB->set_field('lesson', 'deadline', $oldtime, array('id' => $this->lesson->id));
+        $DB->set_field('opendsa_activity', 'deadline', $oldtime, array('id' => $this->opendsa_activity->id));
 
-        $lesson = new lesson($DB->get_record('lesson', array('id' => $this->lesson->id)));
-        $validation = testable_mod_lesson_external::validate_attempt($lesson, ['password' => ''], true);
-        $this->assertEquals('lessonclosed', key($validation));
+        $opendsa_activity = new opendsa_activity($DB->get_record('opendsa_activity', array('id' => $this->opendsa_activity->id)));
+        $validation = testable_mod_opendsa_activity_external::validate_attempt($opendsa_activity, ['password' => ''], true);
+        $this->assertEquals('opendsa_activityclosed', key($validation));
         $this->assertCount(1, $validation);
 
         // Test not available yet.
         $futuretime = time() + DAYSECS;
-        $DB->set_field('lesson', 'deadline', 0, array('id' => $this->lesson->id));
-        $DB->set_field('lesson', 'available', $futuretime, array('id' => $this->lesson->id));
+        $DB->set_field('opendsa_activity', 'deadline', 0, array('id' => $this->opendsa_activity->id));
+        $DB->set_field('opendsa_activity', 'available', $futuretime, array('id' => $this->opendsa_activity->id));
 
-        $lesson = new lesson($DB->get_record('lesson', array('id' => $this->lesson->id)));
-        $validation = testable_mod_lesson_external::validate_attempt($lesson, ['password' => ''], true);
-        $this->assertEquals('lessonopen', key($validation));
+        $opendsa_activity = new opendsa_activity($DB->get_record('opendsa_activity', array('id' => $this->opendsa_activity->id)));
+        $validation = testable_mod_opendsa_activity_external::validate_attempt($opendsa_activity, ['password' => ''], true);
+        $this->assertEquals('opendsa_activityopen', key($validation));
         $this->assertCount(1, $validation);
 
         // Test password.
-        $DB->set_field('lesson', 'deadline', 0, array('id' => $this->lesson->id));
-        $DB->set_field('lesson', 'available', 0, array('id' => $this->lesson->id));
-        $DB->set_field('lesson', 'usepassword', 1, array('id' => $this->lesson->id));
-        $DB->set_field('lesson', 'password', 'abc', array('id' => $this->lesson->id));
+        $DB->set_field('opendsa_activity', 'deadline', 0, array('id' => $this->opendsa_activity->id));
+        $DB->set_field('opendsa_activity', 'available', 0, array('id' => $this->opendsa_activity->id));
+        $DB->set_field('opendsa_activity', 'usepassword', 1, array('id' => $this->opendsa_activity->id));
+        $DB->set_field('opendsa_activity', 'password', 'abc', array('id' => $this->opendsa_activity->id));
 
-        $lesson = new lesson($DB->get_record('lesson', array('id' => $this->lesson->id)));
-        $validation = testable_mod_lesson_external::validate_attempt($lesson, ['password' => ''], true);
-        $this->assertEquals('passwordprotectedlesson', key($validation));
+        $opendsa_activity = new opendsa_activity($DB->get_record('opendsa_activity', array('id' => $this->opendsa_activity->id)));
+        $validation = testable_mod_opendsa_activity_external::validate_attempt($opendsa_activity, ['password' => ''], true);
+        $this->assertEquals('passwordprotectedopendsa_activity', key($validation));
         $this->assertCount(1, $validation);
 
-        $lesson = new lesson($DB->get_record('lesson', array('id' => $this->lesson->id)));
-        $validation = testable_mod_lesson_external::validate_attempt($lesson, ['password' => 'abc'], true);
+        $opendsa_activity = new opendsa_activity($DB->get_record('opendsa_activity', array('id' => $this->opendsa_activity->id)));
+        $validation = testable_mod_opendsa_activity_external::validate_attempt($opendsa_activity, ['password' => 'abc'], true);
         $this->assertCount(0, $validation);
 
         // Dependencies.
         $record = new stdClass();
         $record->course = $this->course->id;
-        $lesson2 = self::getDataGenerator()->create_module('lesson', $record);
-        $DB->set_field('lesson', 'usepassword', 0, array('id' => $this->lesson->id));
-        $DB->set_field('lesson', 'password', '', array('id' => $this->lesson->id));
-        $DB->set_field('lesson', 'dependency', $lesson->id, array('id' => $this->lesson->id));
+        $opendsa_activity2 = self::getDataGenerator()->create_module('opendsa_activity', $record);
+        $DB->set_field('opendsa_activity', 'usepassword', 0, array('id' => $this->opendsa_activity->id));
+        $DB->set_field('opendsa_activity', 'password', '', array('id' => $this->opendsa_activity->id));
+        $DB->set_field('opendsa_activity', 'dependency', $opendsa_activity->id, array('id' => $this->opendsa_activity->id));
 
-        $lesson = new lesson($DB->get_record('lesson', array('id' => $this->lesson->id)));
-        $lesson->conditions = serialize((object) ['completed' => true, 'timespent' => 0, 'gradebetterthan' => 0]);
-        $validation = testable_mod_lesson_external::validate_attempt($lesson, ['password' => ''], true);
+        $opendsa_activity = new opendsa_activity($DB->get_record('opendsa_activity', array('id' => $this->opendsa_activity->id)));
+        $opendsa_activity->conditions = serialize((object) ['completed' => true, 'timespent' => 0, 'gradebetterthan' => 0]);
+        $validation = testable_mod_opendsa_activity_external::validate_attempt($opendsa_activity, ['password' => ''], true);
         $this->assertEquals('completethefollowingconditions', key($validation));
         $this->assertCount(1, $validation);
 
         // Lesson withou pages.
-        $lesson = new lesson($lesson2);
-        $validation = testable_mod_lesson_external::validate_attempt($lesson, ['password' => ''], true);
-        $this->assertEquals('lessonnotready2', key($validation));
+        $opendsa_activity = new opendsa_activity($opendsa_activity2);
+        $validation = testable_mod_opendsa_activity_external::validate_attempt($opendsa_activity, ['password' => ''], true);
+        $this->assertEquals('opendsa_activitynotready2', key($validation));
         $this->assertCount(1, $validation);
 
         // Test retakes.
-        $DB->set_field('lesson', 'dependency', 0, array('id' => $this->lesson->id));
-        $DB->set_field('lesson', 'retake', 0, array('id' => $this->lesson->id));
+        $DB->set_field('opendsa_activity', 'dependency', 0, array('id' => $this->opendsa_activity->id));
+        $DB->set_field('opendsa_activity', 'retake', 0, array('id' => $this->opendsa_activity->id));
         $record = [
-            'opendsa_activity_id' => $this->lesson->id,
+            'opendsa_activity_id' => $this->opendsa_activity->id,
             'userid' => $this->student->id,
             'grade' => 100,
             'late' => 0,
             'completed' => 1,
         ];
-        $DB->insert_record('lesson_grades', (object) $record);
-        $lesson = new lesson($DB->get_record('lesson', array('id' => $this->lesson->id)));
-        $validation = testable_mod_lesson_external::validate_attempt($lesson, ['password' => ''], true);
+        $DB->insert_record('opendsa_activity_grades', (object) $record);
+        $opendsa_activity = new opendsa_activity($DB->get_record('opendsa_activity', array('id' => $this->opendsa_activity->id)));
+        $validation = testable_mod_opendsa_activity_external::validate_attempt($opendsa_activity, ['password' => ''], true);
         $this->assertEquals('noretake', key($validation));
         $this->assertCount(1, $validation);
 
@@ -310,40 +310,40 @@ class mod_lesson_external_testcase extends externallib_advanced_testcase {
         $timenow = time();
         // Create a timer for the current user.
         $timer1 = new stdClass;
-        $timer1->opendsa_activity_id = $this->lesson->id;
+        $timer1->opendsa_activity_id = $this->opendsa_activity->id;
         $timer1->userid = $this->student->id;
         $timer1->completed = 0;
         $timer1->starttime = $timenow - DAYSECS;
-        $timer1->lessontime = $timenow;
-        $timer1->id = $DB->insert_record("lesson_timer", $timer1);
+        $timer1->opendsa_activitytime = $timenow;
+        $timer1->id = $DB->insert_record("opendsa_activity_timer", $timer1);
 
         // Out of time.
-        $DB->set_field('lesson', 'timelimit', HOURSECS, array('id' => $this->lesson->id));
-        $lesson = new lesson($DB->get_record('lesson', array('id' => $this->lesson->id)));
-        $validation = testable_mod_lesson_external::validate_attempt($lesson, ['password' => '', 'pageid' => 1], true);
+        $DB->set_field('opendsa_activity', 'timelimit', HOURSECS, array('id' => $this->opendsa_activity->id));
+        $opendsa_activity = new opendsa_activity($DB->get_record('opendsa_activity', array('id' => $this->opendsa_activity->id)));
+        $validation = testable_mod_opendsa_activity_external::validate_attempt($opendsa_activity, ['password' => '', 'pageid' => 1], true);
         $this->assertEquals('eolstudentoutoftime', key($validation));
         $this->assertCount(1, $validation);
     }
 
     /**
-     * Test the get_lesson_access_information function.
+     * Test the get_opendsa_activity_access_information function.
      */
-    public function test_get_lesson_access_information() {
+    public function test_get_opendsa_activity_access_information() {
         global $DB;
 
         $this->setUser($this->student);
         // Add previous attempt.
         $record = [
-            'opendsa_activity_id' => $this->lesson->id,
+            'opendsa_activity_id' => $this->opendsa_activity->id,
             'userid' => $this->student->id,
             'grade' => 100,
             'late' => 0,
             'completed' => 1,
         ];
-        $DB->insert_record('lesson_grades', (object) $record);
+        $DB->insert_record('opendsa_activity_grades', (object) $record);
 
-        $result = mod_lesson_external::get_lesson_access_information($this->lesson->id);
-        $result = external_api::clean_returnvalue(mod_lesson_external::get_lesson_access_information_returns(), $result);
+        $result = mod_opendsa_activity_external::get_opendsa_activity_access_information($this->opendsa_activity->id);
+        $result = external_api::clean_returnvalue(mod_opendsa_activity_external::get_opendsa_activity_access_information_returns(), $result);
         $this->assertFalse($result['canmanage']);
         $this->assertFalse($result['cangrade']);
         $this->assertFalse($result['canviewreports']);
@@ -356,48 +356,48 @@ class mod_lesson_external_testcase extends externallib_advanced_testcase {
         $this->assertCount(1, $result['preventaccessreasons']);
         $this->assertEquals('noretake', $result['preventaccessreasons'][0]['reason']);
         $this->assertEquals(null, $result['preventaccessreasons'][0]['data']);
-        $this->assertEquals(get_string('noretake', 'lesson'), $result['preventaccessreasons'][0]['message']);
+        $this->assertEquals(get_string('noretake', 'opendsa_activity'), $result['preventaccessreasons'][0]['message']);
 
         // Now check permissions as admin.
         $this->setAdminUser();
-        $result = mod_lesson_external::get_lesson_access_information($this->lesson->id);
-        $result = external_api::clean_returnvalue(mod_lesson_external::get_lesson_access_information_returns(), $result);
+        $result = mod_opendsa_activity_external::get_opendsa_activity_access_information($this->opendsa_activity->id);
+        $result = external_api::clean_returnvalue(mod_opendsa_activity_external::get_opendsa_activity_access_information_returns(), $result);
         $this->assertTrue($result['canmanage']);
         $this->assertTrue($result['cangrade']);
         $this->assertTrue($result['canviewreports']);
     }
 
     /**
-     * Test test_view_lesson invalid id.
+     * Test test_view_opendsa_activity invalid id.
      */
-    public function test_view_lesson_invalid_id() {
+    public function test_view_opendsa_activity_invalid_id() {
         $this->expectException('moodle_exception');
-        mod_lesson_external::view_lesson(0);
+        mod_opendsa_activity_external::view_opendsa_activity(0);
     }
 
     /**
-     * Test test_view_lesson user not enrolled.
+     * Test test_view_opendsa_activity user not enrolled.
      */
-    public function test_view_lesson_user_not_enrolled() {
+    public function test_view_opendsa_activity_user_not_enrolled() {
         // Test not-enrolled user.
         $usernotenrolled = self::getDataGenerator()->create_user();
         $this->setUser($usernotenrolled);
         $this->expectException('moodle_exception');
-        mod_lesson_external::view_lesson($this->lesson->id);
+        mod_opendsa_activity_external::view_opendsa_activity($this->opendsa_activity->id);
     }
 
     /**
-     * Test test_view_lesson user student.
+     * Test test_view_opendsa_activity user student.
      */
-    public function test_view_lesson_user_student() {
+    public function test_view_opendsa_activity_user_student() {
         // Test user with full capabilities.
         $this->setUser($this->student);
 
         // Trigger and capture the event.
         $sink = $this->redirectEvents();
 
-        $result = mod_lesson_external::view_lesson($this->lesson->id);
-        $result = external_api::clean_returnvalue(mod_lesson_external::view_lesson_returns(), $result);
+        $result = mod_opendsa_activity_external::view_opendsa_activity($this->opendsa_activity->id);
+        $result = external_api::clean_returnvalue(mod_opendsa_activity_external::view_opendsa_activity_returns(), $result);
         $this->assertTrue($result['status']);
 
         $events = $sink->get_events();
@@ -405,28 +405,28 @@ class mod_lesson_external_testcase extends externallib_advanced_testcase {
         $event = array_shift($events);
 
         // Checking that the event contains the expected values.
-        $this->assertInstanceOf('\mod_lesson\event\course_module_viewed', $event);
+        $this->assertInstanceOf('\mod_opendsa_activity\event\course_module_viewed', $event);
         $this->assertEquals($this->context, $event->get_context());
-        $moodlelesson = new \moodle_url('/mod/lesson/view.php', array('id' => $this->cm->id));
-        $this->assertEquals($moodlelesson, $event->get_url());
+        $moodleopendsa_activity = new \moodle_url('/mod/opendsa_activity/view.php', array('id' => $this->cm->id));
+        $this->assertEquals($moodleopendsa_activity, $event->get_url());
         $this->assertEventContextNotUsed($event);
         $this->assertNotEmpty($event->get_name());
     }
 
     /**
-     * Test test_view_lesson user missing capabilities.
+     * Test test_view_opendsa_activity user missing capabilities.
      */
-    public function test_view_lesson_user_missing_capabilities() {
+    public function test_view_opendsa_activity_user_missing_capabilities() {
         // Test user with no capabilities.
         // We need a explicit prohibit since this capability is only defined in authenticated user and guest roles.
-        assign_capability('mod/lesson:view', CAP_PROHIBIT, $this->studentrole->id, $this->context->id);
+        assign_capability('mod/opendsa_activity:view', CAP_PROHIBIT, $this->studentrole->id, $this->context->id);
         // Empty all the caches that may be affected  by this change.
         accesslib_clear_all_caches_for_unit_testing();
         course_modinfo::clear_instance_cache();
 
         $this->setUser($this->student);
         $this->expectException('moodle_exception');
-        mod_lesson_external::view_lesson($this->lesson->id);
+        mod_opendsa_activity_external::view_opendsa_activity($this->opendsa_activity->id);
     }
 
     /**
@@ -438,18 +438,18 @@ class mod_lesson_external_testcase extends externallib_advanced_testcase {
         $this->setUser($this->student);
         $attemptnumber = 1;
 
-        // Test lesson without page attempts.
-        $result = mod_lesson_external::get_questions_attempts($this->lesson->id, $attemptnumber);
-        $result = external_api::clean_returnvalue(mod_lesson_external::get_questions_attempts_returns(), $result);
+        // Test opendsa_activity without page attempts.
+        $result = mod_opendsa_activity_external::get_questions_attempts($this->opendsa_activity->id, $attemptnumber);
+        $result = external_api::clean_returnvalue(mod_opendsa_activity_external::get_questions_attempts_returns(), $result);
         $this->assertCount(0, $result['warnings']);
         $this->assertCount(0, $result['attempts']);
 
         // Create a fake attempt for the first possible answer.
-        $p2answers = $DB->get_records('lesson_answers', array('opendsa_activity_id' => $this->lesson->id, 'pageid' => $this->page2->id), 'id');
+        $p2answers = $DB->get_records('opendsa_activity_answers', array('opendsa_activity_id' => $this->opendsa_activity->id, 'pageid' => $this->page2->id), 'id');
         $answerid = reset($p2answers)->id;
 
         $newpageattempt = [
-            'opendsa_activity_id' => $this->lesson->id,
+            'opendsa_activity_id' => $this->opendsa_activity->id,
             'pageid' => $this->page2->id,
             'userid' => $this->student->id,
             'answerid' => $answerid,
@@ -458,10 +458,10 @@ class mod_lesson_external_testcase extends externallib_advanced_testcase {
             'useranswer' => '1',
             'timeseen' => time(),
         ];
-        $DB->insert_record('lesson_attempts', (object) $newpageattempt);
+        $DB->insert_record('opendsa_activity_attempts', (object) $newpageattempt);
 
-        $result = mod_lesson_external::get_questions_attempts($this->lesson->id, $attemptnumber);
-        $result = external_api::clean_returnvalue(mod_lesson_external::get_questions_attempts_returns(), $result);
+        $result = mod_opendsa_activity_external::get_questions_attempts($this->opendsa_activity->id, $attemptnumber);
+        $result = external_api::clean_returnvalue(mod_opendsa_activity_external::get_questions_attempts_returns(), $result);
         $this->assertCount(0, $result['warnings']);
         $this->assertCount(1, $result['attempts']);
 
@@ -469,28 +469,28 @@ class mod_lesson_external_testcase extends externallib_advanced_testcase {
         $this->assertEquals($newpageattempt, $result['attempts'][0]);
 
         // Test filtering. Only correct.
-        $result = mod_lesson_external::get_questions_attempts($this->lesson->id, $attemptnumber, true);
-        $result = external_api::clean_returnvalue(mod_lesson_external::get_questions_attempts_returns(), $result);
+        $result = mod_opendsa_activity_external::get_questions_attempts($this->opendsa_activity->id, $attemptnumber, true);
+        $result = external_api::clean_returnvalue(mod_opendsa_activity_external::get_questions_attempts_returns(), $result);
         $this->assertCount(0, $result['warnings']);
         $this->assertCount(1, $result['attempts']);
 
         // Test filtering. Only correct only for page 2.
-        $result = mod_lesson_external::get_questions_attempts($this->lesson->id, $attemptnumber, true, $this->page2->id);
-        $result = external_api::clean_returnvalue(mod_lesson_external::get_questions_attempts_returns(), $result);
+        $result = mod_opendsa_activity_external::get_questions_attempts($this->opendsa_activity->id, $attemptnumber, true, $this->page2->id);
+        $result = external_api::clean_returnvalue(mod_opendsa_activity_external::get_questions_attempts_returns(), $result);
         $this->assertCount(0, $result['warnings']);
         $this->assertCount(1, $result['attempts']);
 
         // Teacher retrieve student page attempts.
         $this->setUser($this->teacher);
-        $result = mod_lesson_external::get_questions_attempts($this->lesson->id, $attemptnumber, false, null, $this->student->id);
-        $result = external_api::clean_returnvalue(mod_lesson_external::get_questions_attempts_returns(), $result);
+        $result = mod_opendsa_activity_external::get_questions_attempts($this->opendsa_activity->id, $attemptnumber, false, null, $this->student->id);
+        $result = external_api::clean_returnvalue(mod_opendsa_activity_external::get_questions_attempts_returns(), $result);
         $this->assertCount(0, $result['warnings']);
         $this->assertCount(1, $result['attempts']);
 
         // Test exception.
         $this->setUser($this->student);
         $this->expectException('moodle_exception');
-        $result = mod_lesson_external::get_questions_attempts($this->lesson->id, $attemptnumber, false, null, $this->teacher->id);
+        $result = mod_opendsa_activity_external::get_questions_attempts($this->opendsa_activity->id, $attemptnumber, false, null, $this->teacher->id);
     }
 
     /**
@@ -501,52 +501,52 @@ class mod_lesson_external_testcase extends externallib_advanced_testcase {
 
         // Add grades for the user.
         $newgrade = [
-            'opendsa_activity_id' => $this->lesson->id,
+            'opendsa_activity_id' => $this->opendsa_activity->id,
             'userid' => $this->student->id,
             'grade' => 50,
             'late' => 0,
             'completed' => time(),
         ];
-        $DB->insert_record('lesson_grades', (object) $newgrade);
+        $DB->insert_record('opendsa_activity_grades', (object) $newgrade);
 
         $newgrade = [
-            'opendsa_activity_id' => $this->lesson->id,
+            'opendsa_activity_id' => $this->opendsa_activity->id,
             'userid' => $this->student->id,
             'grade' => 100,
             'late' => 0,
             'completed' => time(),
         ];
-        $DB->insert_record('lesson_grades', (object) $newgrade);
+        $DB->insert_record('opendsa_activity_grades', (object) $newgrade);
 
         $this->setUser($this->student);
 
-        // Test lesson without multiple attemps. The first result must be returned.
-        $result = mod_lesson_external::get_user_grade($this->lesson->id);
-        $result = external_api::clean_returnvalue(mod_lesson_external::get_user_grade_returns(), $result);
+        // Test opendsa_activity without multiple attemps. The first result must be returned.
+        $result = mod_opendsa_activity_external::get_user_grade($this->opendsa_activity->id);
+        $result = external_api::clean_returnvalue(mod_opendsa_activity_external::get_user_grade_returns(), $result);
         $this->assertCount(0, $result['warnings']);
         $this->assertEquals(50, $result['grade']);
         $this->assertEquals('50.00', $result['formattedgrade']);
 
         // With retakes. By default average.
-        $DB->set_field('lesson', 'retake', 1, array('id' => $this->lesson->id));
-        $result = mod_lesson_external::get_user_grade($this->lesson->id, $this->student->id);
-        $result = external_api::clean_returnvalue(mod_lesson_external::get_user_grade_returns(), $result);
+        $DB->set_field('opendsa_activity', 'retake', 1, array('id' => $this->opendsa_activity->id));
+        $result = mod_opendsa_activity_external::get_user_grade($this->opendsa_activity->id, $this->student->id);
+        $result = external_api::clean_returnvalue(mod_opendsa_activity_external::get_user_grade_returns(), $result);
         $this->assertCount(0, $result['warnings']);
         $this->assertEquals(75, $result['grade']);
         $this->assertEquals('75.00', $result['formattedgrade']);
 
         // With retakes. With max grade setting.
-        $DB->set_field('lesson', 'usemaxgrade', 1, array('id' => $this->lesson->id));
-        $result = mod_lesson_external::get_user_grade($this->lesson->id, $this->student->id);
-        $result = external_api::clean_returnvalue(mod_lesson_external::get_user_grade_returns(), $result);
+        $DB->set_field('opendsa_activity', 'usemaxgrade', 1, array('id' => $this->opendsa_activity->id));
+        $result = mod_opendsa_activity_external::get_user_grade($this->opendsa_activity->id, $this->student->id);
+        $result = external_api::clean_returnvalue(mod_opendsa_activity_external::get_user_grade_returns(), $result);
         $this->assertCount(0, $result['warnings']);
         $this->assertEquals(100, $result['grade']);
         $this->assertEquals('100.00', $result['formattedgrade']);
 
         // Test as teacher we get the same result.
         $this->setUser($this->teacher);
-        $result = mod_lesson_external::get_user_grade($this->lesson->id, $this->student->id);
-        $result = external_api::clean_returnvalue(mod_lesson_external::get_user_grade_returns(), $result);
+        $result = mod_opendsa_activity_external::get_user_grade($this->opendsa_activity->id, $this->student->id);
+        $result = external_api::clean_returnvalue(mod_opendsa_activity_external::get_user_grade_returns(), $result);
         $this->assertCount(0, $result['warnings']);
         $this->assertEquals(100, $result['grade']);
         $this->assertEquals('100.00', $result['formattedgrade']);
@@ -554,7 +554,7 @@ class mod_lesson_external_testcase extends externallib_advanced_testcase {
         // Test exception. As student try to retrieve grades from teacher.
         $this->setUser($this->student);
         $this->expectException('moodle_exception');
-        $result = mod_lesson_external::get_user_grade($this->lesson->id, $this->teacher->id);
+        $result = mod_opendsa_activity_external::get_user_grade($this->opendsa_activity->id, $this->teacher->id);
     }
 
     /**
@@ -565,11 +565,11 @@ class mod_lesson_external_testcase extends externallib_advanced_testcase {
 
         // Create a fake attempt for the first possible answer.
         $attemptnumber = 1;
-        $p2answers = $DB->get_records('lesson_answers', array('opendsa_activity_id' => $this->lesson->id, 'pageid' => $this->page2->id), 'id');
+        $p2answers = $DB->get_records('opendsa_activity_answers', array('opendsa_activity_id' => $this->opendsa_activity->id, 'pageid' => $this->page2->id), 'id');
         $answerid = reset($p2answers)->id;
 
         $newpageattempt = [
-            'opendsa_activity_id' => $this->lesson->id,
+            'opendsa_activity_id' => $this->opendsa_activity->id,
             'pageid' => $this->page2->id,
             'userid' => $this->student->id,
             'answerid' => $answerid,
@@ -578,13 +578,13 @@ class mod_lesson_external_testcase extends externallib_advanced_testcase {
             'useranswer' => '1',
             'timeseen' => time(),
         ];
-        $DB->insert_record('lesson_attempts', (object) $newpageattempt);
+        $DB->insert_record('opendsa_activity_attempts', (object) $newpageattempt);
 
         // Test first without custom scoring. All questions receive the same value if correctly responsed.
-        $DB->set_field('lesson', 'custom', 0, array('id' => $this->lesson->id));
+        $DB->set_field('opendsa_activity', 'custom', 0, array('id' => $this->opendsa_activity->id));
         $this->setUser($this->student);
-        $result = mod_lesson_external::get_user_attempt_grade($this->lesson->id, $attemptnumber, $this->student->id);
-        $result = external_api::clean_returnvalue(mod_lesson_external::get_user_attempt_grade_returns(), $result);
+        $result = mod_opendsa_activity_external::get_user_attempt_grade($this->opendsa_activity->id, $attemptnumber, $this->student->id);
+        $result = external_api::clean_returnvalue(mod_opendsa_activity_external::get_user_attempt_grade_returns(), $result);
         $this->assertCount(0, $result['warnings']);
         $this->assertEquals(1, $result['grade']['nquestions']);
         $this->assertEquals(1, $result['grade']['attempts']);
@@ -595,9 +595,9 @@ class mod_lesson_external_testcase extends externallib_advanced_testcase {
         $this->assertEquals(0, $result['grade']['manualpoints']);
 
         // With custom scoring, in this case, we don't retrieve any values since we are using questions without particular score.
-        $DB->set_field('lesson', 'custom', 1, array('id' => $this->lesson->id));
-        $result = mod_lesson_external::get_user_attempt_grade($this->lesson->id, $attemptnumber, $this->student->id);
-        $result = external_api::clean_returnvalue(mod_lesson_external::get_user_attempt_grade_returns(), $result);
+        $DB->set_field('opendsa_activity', 'custom', 1, array('id' => $this->opendsa_activity->id));
+        $result = mod_opendsa_activity_external::get_user_attempt_grade($this->opendsa_activity->id, $attemptnumber, $this->student->id);
+        $result = external_api::clean_returnvalue(mod_opendsa_activity_external::get_user_attempt_grade_returns(), $result);
         $this->assertCount(0, $result['warnings']);
         $this->assertEquals(1, $result['grade']['nquestions']);
         $this->assertEquals(1, $result['grade']['attempts']);
@@ -615,32 +615,32 @@ class mod_lesson_external_testcase extends externallib_advanced_testcase {
         global $DB;
 
         // Create another content pages.
-        $lessongenerator = $this->getDataGenerator()->get_plugin_generator('mod_lesson');
-        $page3 = $lessongenerator->create_content($this->lesson);
+        $opendsa_activitygenerator = $this->getDataGenerator()->get_plugin_generator('mod_opendsa_activity');
+        $page3 = $opendsa_activitygenerator->create_content($this->opendsa_activity);
 
         $branch1 = new stdClass;
-        $branch1->opendsa_activity_id = $this->lesson->id;
+        $branch1->opendsa_activity_id = $this->opendsa_activity->id;
         $branch1->userid = $this->student->id;
         $branch1->pageid = $this->page1->id;
         $branch1->retry = 1;
         $branch1->flag = 0;
         $branch1->timeseen = time();
         $branch1->nextpageid = $page3->id;
-        $branch1->id = $DB->insert_record("lesson_branch", $branch1);
+        $branch1->id = $DB->insert_record("opendsa_activity_branch", $branch1);
 
         $branch2 = new stdClass;
-        $branch2->opendsa_activity_id = $this->lesson->id;
+        $branch2->opendsa_activity_id = $this->opendsa_activity->id;
         $branch2->userid = $this->student->id;
         $branch2->pageid = $page3->id;
         $branch2->retry = 1;
         $branch2->flag = 0;
         $branch2->timeseen = time() + 1;
         $branch2->nextpageid = 0;
-        $branch2->id = $DB->insert_record("lesson_branch", $branch2);
+        $branch2->id = $DB->insert_record("opendsa_activity_branch", $branch2);
 
         // Test first attempt.
-        $result = mod_lesson_external::get_content_pages_viewed($this->lesson->id, 1, $this->student->id);
-        $result = external_api::clean_returnvalue(mod_lesson_external::get_content_pages_viewed_returns(), $result);
+        $result = mod_opendsa_activity_external::get_content_pages_viewed($this->opendsa_activity->id, 1, $this->student->id);
+        $result = external_api::clean_returnvalue(mod_opendsa_activity_external::get_content_pages_viewed_returns(), $result);
         $this->assertCount(0, $result['warnings']);
         $this->assertCount(2, $result['pages']);
         foreach ($result['pages'] as $page) {
@@ -652,8 +652,8 @@ class mod_lesson_external_testcase extends externallib_advanced_testcase {
         }
 
         // Attempt without pages viewed.
-        $result = mod_lesson_external::get_content_pages_viewed($this->lesson->id, 3, $this->student->id);
-        $result = external_api::clean_returnvalue(mod_lesson_external::get_content_pages_viewed_returns(), $result);
+        $result = mod_opendsa_activity_external::get_content_pages_viewed($this->opendsa_activity->id, 3, $this->student->id);
+        $result = external_api::clean_returnvalue(mod_opendsa_activity_external::get_content_pages_viewed_returns(), $result);
         $this->assertCount(0, $result['warnings']);
         $this->assertCount(0, $result['pages']);
     }
@@ -666,26 +666,26 @@ class mod_lesson_external_testcase extends externallib_advanced_testcase {
 
         // Create a couple of timers for the current user.
         $timer1 = new stdClass;
-        $timer1->opendsa_activity_id = $this->lesson->id;
+        $timer1->opendsa_activity_id = $this->opendsa_activity->id;
         $timer1->userid = $this->student->id;
         $timer1->completed = 1;
         $timer1->starttime = time() - WEEKSECS;
-        $timer1->lessontime = time();
+        $timer1->opendsa_activitytime = time();
         $timer1->timemodifiedoffline = time();
-        $timer1->id = $DB->insert_record("lesson_timer", $timer1);
+        $timer1->id = $DB->insert_record("opendsa_activity_timer", $timer1);
 
         $timer2 = new stdClass;
-        $timer2->opendsa_activity_id = $this->lesson->id;
+        $timer2->opendsa_activity_id = $this->opendsa_activity->id;
         $timer2->userid = $this->student->id;
         $timer2->completed = 0;
         $timer2->starttime = time() - DAYSECS;
-        $timer2->lessontime = time() + 1;
+        $timer2->opendsa_activitytime = time() + 1;
         $timer2->timemodifiedoffline = time() + 1;
-        $timer2->id = $DB->insert_record("lesson_timer", $timer2);
+        $timer2->id = $DB->insert_record("opendsa_activity_timer", $timer2);
 
         // Test retrieve timers.
-        $result = mod_lesson_external::get_user_timers($this->lesson->id, $this->student->id);
-        $result = external_api::clean_returnvalue(mod_lesson_external::get_user_timers_returns(), $result);
+        $result = mod_opendsa_activity_external::get_user_timers($this->opendsa_activity->id, $this->student->id);
+        $result = external_api::clean_returnvalue(mod_opendsa_activity_external::get_user_timers_returns(), $result);
         $this->assertCount(0, $result['warnings']);
         $this->assertCount(2, $result['timers']);
         foreach ($result['timers'] as $timer) {
@@ -705,17 +705,17 @@ class mod_lesson_external_testcase extends externallib_advanced_testcase {
 
         $this->setAdminUser();
         // Create another content page.
-        $lessongenerator = $this->getDataGenerator()->get_plugin_generator('mod_lesson');
-        $page3 = $lessongenerator->create_content($this->lesson);
+        $opendsa_activitygenerator = $this->getDataGenerator()->get_plugin_generator('mod_opendsa_activity');
+        $page3 = $opendsa_activitygenerator->create_content($this->opendsa_activity);
 
-        $p2answers = $DB->get_records('lesson_answers', array('opendsa_activity_id' => $this->lesson->id, 'pageid' => $this->page2->id), 'id');
+        $p2answers = $DB->get_records('opendsa_activity_answers', array('opendsa_activity_id' => $this->opendsa_activity->id, 'pageid' => $this->page2->id), 'id');
 
         // Add files everywhere.
         $fs = get_file_storage();
 
         $filerecord = array(
             'contextid' => $this->context->id,
-            'component' => 'mod_lesson',
+            'component' => 'mod_opendsa_activity',
             'filearea'  => 'page_contents',
             'itemid'    => $this->page1->id,
             'filepath'  => '/',
@@ -736,8 +736,8 @@ class mod_lesson_external_testcase extends externallib_advanced_testcase {
             $fs->create_file_from_string($filerecord, 'Test resource file');
         }
 
-        $result = mod_lesson_external::get_pages($this->lesson->id);
-        $result = external_api::clean_returnvalue(mod_lesson_external::get_pages_returns(), $result);
+        $result = mod_opendsa_activity_external::get_pages($this->opendsa_activity->id);
+        $result = external_api::clean_returnvalue(mod_opendsa_activity_external::get_pages_returns(), $result);
         $this->assertCount(0, $result['warnings']);
         $this->assertCount(3, $result['pages']);
 
@@ -755,9 +755,9 @@ class mod_lesson_external_testcase extends externallib_advanced_testcase {
 
         // Now, as student without pages menu.
         $this->setUser($this->student);
-        $DB->set_field('lesson', 'displayleft', 0, array('id' => $this->lesson->id));
-        $result = mod_lesson_external::get_pages($this->lesson->id);
-        $result = external_api::clean_returnvalue(mod_lesson_external::get_pages_returns(), $result);
+        $DB->set_field('opendsa_activity', 'displayleft', 0, array('id' => $this->opendsa_activity->id));
+        $result = mod_opendsa_activity_external::get_pages($this->opendsa_activity->id);
+        $result = external_api::clean_returnvalue(mod_opendsa_activity_external::get_pages_returns(), $result);
         $this->assertCount(0, $result['warnings']);
         $this->assertCount(3, $result['pages']);
 
@@ -776,18 +776,18 @@ class mod_lesson_external_testcase extends externallib_advanced_testcase {
         $timenow = time();
         // Create a timer for the current user.
         $timer1 = new stdClass;
-        $timer1->opendsa_activity_id = $this->lesson->id;
+        $timer1->opendsa_activity_id = $this->opendsa_activity->id;
         $timer1->userid = $this->student->id;
         $timer1->completed = 0;
         $timer1->starttime = $timenow;
-        $timer1->lessontime = $timenow;
-        $timer1->id = $DB->insert_record("lesson_timer", $timer1);
+        $timer1->opendsa_activitytime = $timenow;
+        $timer1->id = $DB->insert_record("opendsa_activity_timer", $timer1);
 
-        $DB->set_field('lesson', 'timelimit', 30, array('id' => $this->lesson->id));
+        $DB->set_field('opendsa_activity', 'timelimit', 30, array('id' => $this->opendsa_activity->id));
 
-        unset($SESSION->lesson_messages);
-        $result = mod_lesson_external::launch_attempt($this->lesson->id, '', 1);
-        $result = external_api::clean_returnvalue(mod_lesson_external::launch_attempt_returns(), $result);
+        unset($SESSION->opendsa_activity_messages);
+        $result = mod_opendsa_activity_external::launch_attempt($this->opendsa_activity->id, '', 1);
+        $result = external_api::clean_returnvalue(mod_opendsa_activity_external::launch_attempt_returns(), $result);
 
         $this->assertCount(0, $result['warnings']);
         $this->assertCount(2, $result['messages']);
@@ -808,17 +808,17 @@ class mod_lesson_external_testcase extends externallib_advanced_testcase {
         // Create a timer for the current user.
         $timenow = time();
         $timer1 = new stdClass;
-        $timer1->opendsa_activity_id = $this->lesson->id;
+        $timer1->opendsa_activity_id = $this->opendsa_activity->id;
         $timer1->userid = $this->student->id;
         $timer1->completed = 0;
         $timer1->starttime = $timenow;
-        $timer1->lessontime = $timenow;
-        $timer1->id = $DB->insert_record("lesson_timer", $timer1);
+        $timer1->opendsa_activitytime = $timenow;
+        $timer1->id = $DB->insert_record("opendsa_activity_timer", $timer1);
 
-        unset($SESSION->lesson_messages);
+        unset($SESSION->opendsa_activity_messages);
         $this->setUser($this->teacher);
-        $result = mod_lesson_external::launch_attempt($this->lesson->id, '', 1, true);
-        $result = external_api::clean_returnvalue(mod_lesson_external::launch_attempt_returns(), $result);
+        $result = mod_opendsa_activity_external::launch_attempt($this->opendsa_activity->id, '', 1, true);
+        $result = external_api::clean_returnvalue(mod_opendsa_activity_external::launch_attempt_returns(), $result);
         // Everything ok as teacher.
         $this->assertCount(0, $result['warnings']);
         $this->assertCount(0, $result['messages']);
@@ -826,7 +826,7 @@ class mod_lesson_external_testcase extends externallib_advanced_testcase {
         $this->setUser($this->student);
         // Now, try to review this attempt. We should not be able because is a non-finished attempt.
         $this->expectException('moodle_exception');
-        mod_lesson_external::launch_attempt($this->lesson->id, '', 1, true);
+        mod_opendsa_activity_external::launch_attempt($this->opendsa_activity->id, '', 1, true);
     }
 
     /**
@@ -838,16 +838,16 @@ class mod_lesson_external_testcase extends externallib_advanced_testcase {
         // Create a timer for the current user.
         $timenow = time();
         $timer1 = new stdClass;
-        $timer1->opendsa_activity_id = $this->lesson->id;
+        $timer1->opendsa_activity_id = $this->opendsa_activity->id;
         $timer1->userid = $this->student->id;
         $timer1->completed = 1;
         $timer1->starttime = $timenow;
-        $timer1->lessontime = $timenow;
-        $timer1->id = $DB->insert_record("lesson_timer", $timer1);
+        $timer1->opendsa_activitytime = $timenow;
+        $timer1->id = $DB->insert_record("opendsa_activity_timer", $timer1);
 
         // Create attempt.
         $newpageattempt = [
-            'opendsa_activity_id' => $this->lesson->id,
+            'opendsa_activity_id' => $this->opendsa_activity->id,
             'pageid' => $this->page2->id,
             'userid' => $this->student->id,
             'answerid' => 0,
@@ -856,22 +856,22 @@ class mod_lesson_external_testcase extends externallib_advanced_testcase {
             'useranswer' => '1',
             'timeseen' => time(),
         ];
-        $DB->insert_record('lesson_attempts', (object) $newpageattempt);
+        $DB->insert_record('opendsa_activity_attempts', (object) $newpageattempt);
         // Create grade.
         $record = [
-            'opendsa_activity_id' => $this->lesson->id,
+            'opendsa_activity_id' => $this->opendsa_activity->id,
             'userid' => $this->student->id,
             'grade' => 100,
             'late' => 0,
             'completed' => 1,
         ];
-        $DB->insert_record('lesson_grades', (object) $record);
+        $DB->insert_record('opendsa_activity_grades', (object) $record);
 
-        unset($SESSION->lesson_messages);
+        unset($SESSION->opendsa_activity_messages);
 
         $this->setUser($this->student);
-        $result = mod_lesson_external::launch_attempt($this->lesson->id, '', $this->page2->id, true);
-        $result = external_api::clean_returnvalue(mod_lesson_external::launch_attempt_returns(), $result);
+        $result = mod_opendsa_activity_external::launch_attempt($this->opendsa_activity->id, '', $this->page2->id, true);
+        $result = external_api::clean_returnvalue(mod_opendsa_activity_external::launch_attempt_returns(), $result);
         // Everything ok as student.
         $this->assertCount(0, $result['warnings']);
         $this->assertCount(0, $result['messages']);
@@ -886,26 +886,26 @@ class mod_lesson_external_testcase extends externallib_advanced_testcase {
         // Create a timer for the current user.
         $timenow = time();
         $timer1 = new stdClass;
-        $timer1->opendsa_activity_id = $this->lesson->id;
+        $timer1->opendsa_activity_id = $this->opendsa_activity->id;
         $timer1->userid = $this->student->id;
         $timer1->completed = 1;
         $timer1->starttime = $timenow - DAYSECS;
-        $timer1->lessontime = $timenow - $CFG->sessiontimeout - HOURSECS;
-        $timer1->id = $DB->insert_record("lesson_timer", $timer1);
+        $timer1->opendsa_activitytime = $timenow - $CFG->sessiontimeout - HOURSECS;
+        $timer1->id = $DB->insert_record("opendsa_activity_timer", $timer1);
 
-        unset($SESSION->lesson_messages);
+        unset($SESSION->opendsa_activity_messages);
 
         // Everything ok as teacher.
         $this->setUser($this->teacher);
-        $result = mod_lesson_external::launch_attempt($this->lesson->id, '', 1, true);
-        $result = external_api::clean_returnvalue(mod_lesson_external::launch_attempt_returns(), $result);
+        $result = mod_opendsa_activity_external::launch_attempt($this->opendsa_activity->id, '', 1, true);
+        $result = external_api::clean_returnvalue(mod_opendsa_activity_external::launch_attempt_returns(), $result);
         $this->assertCount(0, $result['warnings']);
         $this->assertCount(0, $result['messages']);
 
         // Fail as student.
         $this->setUser($this->student);
         $this->expectException('moodle_exception');
-        mod_lesson_external::launch_attempt($this->lesson->id, '', 1, true);
+        mod_opendsa_activity_external::launch_attempt($this->opendsa_activity->id, '', 1, true);
     }
 
     /*
@@ -915,8 +915,8 @@ class mod_lesson_external_testcase extends externallib_advanced_testcase {
         global $DB;
 
         // Test a content page first (page1).
-        $result = mod_lesson_external::get_page_data($this->lesson->id, $this->page1->id, '', false, true);
-        $result = external_api::clean_returnvalue(mod_lesson_external::get_page_data_returns(), $result);
+        $result = mod_opendsa_activity_external::get_page_data($this->opendsa_activity->id, $this->page1->id, '', false, true);
+        $result = external_api::clean_returnvalue(mod_opendsa_activity_external::get_page_data_returns(), $result);
 
         $this->assertCount(0, $result['warnings']);
         $this->assertCount(0, $result['answers']);  // No answers, auto-generated content page.
@@ -934,9 +934,9 @@ class mod_lesson_external_testcase extends externallib_advanced_testcase {
         $this->assertFalse($result['displaymenu']);
 
         // Check now a page with answers (true / false) and with menu available.
-        $DB->set_field('lesson', 'displayleft', 1, array('id' => $this->lesson->id));
-        $result = mod_lesson_external::get_page_data($this->lesson->id, $this->page2->id, '', false, true);
-        $result = external_api::clean_returnvalue(mod_lesson_external::get_page_data_returns(), $result);
+        $DB->set_field('opendsa_activity', 'displayleft', 1, array('id' => $this->opendsa_activity->id));
+        $result = mod_opendsa_activity_external::get_page_data($this->opendsa_activity->id, $this->page2->id, '', false, true);
+        $result = external_api::clean_returnvalue(mod_opendsa_activity_external::get_page_data_returns(), $result);
         $this->assertCount(0, $result['warnings']);
         $this->assertCount(2, $result['answers']);  // One for true, one for false.
         // Check menu availability.
@@ -955,10 +955,10 @@ class mod_lesson_external_testcase extends externallib_advanced_testcase {
     public function test_get_page_data_student() {
         // Now check using a normal student account.
         $this->setUser($this->student);
-        // First we need to launch the lesson so the timer is on.
-        mod_lesson_external::launch_attempt($this->lesson->id);
-        $result = mod_lesson_external::get_page_data($this->lesson->id, $this->page2->id, '', false, true);
-        $result = external_api::clean_returnvalue(mod_lesson_external::get_page_data_returns(), $result);
+        // First we need to launch the opendsa_activity so the timer is on.
+        mod_opendsa_activity_external::launch_attempt($this->opendsa_activity->id);
+        $result = mod_opendsa_activity_external::get_page_data($this->opendsa_activity->id, $this->page2->id, '', false, true);
+        $result = external_api::clean_returnvalue(mod_opendsa_activity_external::get_page_data_returns(), $result);
         $this->assertCount(0, $result['warnings']);
         $this->assertCount(2, $result['answers']);  // One for true, one for false.
         // Check contents.
@@ -978,7 +978,7 @@ class mod_lesson_external_testcase extends externallib_advanced_testcase {
         $this->setUser($this->student);
 
         $this->expectException('moodle_exception');
-        $result = mod_lesson_external::get_page_data($this->lesson->id, $this->page2->id, '', false, true);
+        $result = mod_opendsa_activity_external::get_page_data($this->opendsa_activity->id, $this->page2->id, '', false, true);
     }
 
     /**
@@ -994,17 +994,17 @@ class mod_lesson_external_testcase extends externallib_advanced_testcase {
 
         $this->setUser($user);
 
-        // First we need to launch the lesson so the timer is on.
-        mod_lesson_external::launch_attempt($this->lesson->id);
+        // First we need to launch the opendsa_activity so the timer is on.
+        mod_opendsa_activity_external::launch_attempt($this->opendsa_activity->id);
 
-        $DB->set_field('lesson', 'feedback', 1, array('id' => $this->lesson->id));
-        $DB->set_field('lesson', 'progressbar', 1, array('id' => $this->lesson->id));
-        $DB->set_field('lesson', 'custom', 0, array('id' => $this->lesson->id));
-        $DB->set_field('lesson', 'maxattempts', 3, array('id' => $this->lesson->id));
+        $DB->set_field('opendsa_activity', 'feedback', 1, array('id' => $this->opendsa_activity->id));
+        $DB->set_field('opendsa_activity', 'progressbar', 1, array('id' => $this->opendsa_activity->id));
+        $DB->set_field('opendsa_activity', 'custom', 0, array('id' => $this->opendsa_activity->id));
+        $DB->set_field('opendsa_activity', 'maxattempts', 3, array('id' => $this->opendsa_activity->id));
 
         $answercorrect = 0;
         $answerincorrect = 0;
-        $p2answers = $DB->get_records('lesson_answers', array('opendsa_activity_id' => $this->lesson->id, 'pageid' => $this->page2->id), 'id');
+        $p2answers = $DB->get_records('opendsa_activity_answers', array('opendsa_activity_id' => $this->opendsa_activity->id, 'pageid' => $this->page2->id), 'id');
         foreach ($p2answers as $answer) {
             if ($answer->jumpto == 0) {
                 $answerincorrect = $answer->id;
@@ -1019,16 +1019,16 @@ class mod_lesson_external_testcase extends externallib_advanced_testcase {
                 'value' => $correct ? $answercorrect : $answerincorrect,
             ),
             array(
-                'name' => '_qf__lesson_display_answer_form_truefalse',
+                'name' => '_qf__opendsa_activity_display_answer_form_truefalse',
                 'value' => 1,
             )
         );
-        $result = mod_lesson_external::process_page($this->lesson->id, $this->page2->id, $data);
-        $result = external_api::clean_returnvalue(mod_lesson_external::process_page_returns(), $result);
+        $result = mod_opendsa_activity_external::process_page($this->opendsa_activity->id, $this->page2->id, $data);
+        $result = external_api::clean_returnvalue(mod_opendsa_activity_external::process_page_returns(), $result);
 
         if ($finished) {
-            $result = mod_lesson_external::finish_attempt($this->lesson->id);
-            $result = external_api::clean_returnvalue(mod_lesson_external::finish_attempt_returns(), $result);
+            $result = mod_opendsa_activity_external::finish_attempt($this->opendsa_activity->id);
+            $result = external_api::clean_returnvalue(mod_opendsa_activity_external::finish_attempt_returns(), $result);
         }
         return $result;
     }
@@ -1061,18 +1061,18 @@ class mod_lesson_external_testcase extends externallib_advanced_testcase {
     public function test_finish_attempt_not_doing_anything() {
 
         $this->setUser($this->student);
-        // First we need to launch the lesson so the timer is on.
-        mod_lesson_external::launch_attempt($this->lesson->id);
+        // First we need to launch the opendsa_activity so the timer is on.
+        mod_opendsa_activity_external::launch_attempt($this->opendsa_activity->id);
 
-        $result = mod_lesson_external::finish_attempt($this->lesson->id);
-        $result = external_api::clean_returnvalue(mod_lesson_external::finish_attempt_returns(), $result);
+        $result = mod_opendsa_activity_external::finish_attempt($this->opendsa_activity->id);
+        $result = external_api::clean_returnvalue(mod_opendsa_activity_external::finish_attempt_returns(), $result);
 
         $this->assertCount(0, $result['warnings']);
         $returneddata = [];
         foreach ($result['data'] as $data) {
             $returneddata[$data['name']] = $data['value'];
         }
-        $this->assertEquals(1, $returneddata['gradelesson']);   // Graded lesson.
+        $this->assertEquals(1, $returneddata['gradeopendsa_activity']);   // Graded opendsa_activity.
         $this->assertEquals(1, $returneddata['welldone']);      // Finished correctly (even without grades).
         $gradeinfo = json_decode($returneddata['gradeinfo']);
         $expectedgradeinfo = (object) [
@@ -1098,7 +1098,7 @@ class mod_lesson_external_testcase extends externallib_advanced_testcase {
         foreach ($result['data'] as $data) {
             $returneddata[$data['name']] = $data['value'];
         }
-        $this->assertEquals(1, $returneddata['gradelesson']);   // Graded lesson.
+        $this->assertEquals(1, $returneddata['gradeopendsa_activity']);   // Graded opendsa_activity.
         $this->assertEquals(1, $returneddata['numberofpagesviewed']);
         $this->assertEquals(1, $returneddata['numberofcorrectanswers']);
         $gradeinfo = json_decode($returneddata['gradeinfo']);
@@ -1124,8 +1124,8 @@ class mod_lesson_external_testcase extends externallib_advanced_testcase {
         $this->create_attempt($this->student, false, true);
 
         $this->setAdminUser();
-        $result = mod_lesson_external::get_attempts_overview($this->lesson->id);
-        $result = external_api::clean_returnvalue(mod_lesson_external::get_attempts_overview_returns(), $result);
+        $result = mod_opendsa_activity_external::get_attempts_overview($this->opendsa_activity->id);
+        $result = external_api::clean_returnvalue(mod_opendsa_activity_external::get_attempts_overview_returns(), $result);
 
         // One attempt, 0 for grade (incorrect response) in overal statistics.
         $this->assertEquals(1, $result['data']['numofattempts']);
@@ -1145,14 +1145,14 @@ class mod_lesson_external_testcase extends externallib_advanced_testcase {
         // Add a new attempt (same user).
         sleep(1);
         // Allow first retake.
-        $DB->set_field('lesson', 'retake', 1, array('id' => $this->lesson->id));
+        $DB->set_field('opendsa_activity', 'retake', 1, array('id' => $this->opendsa_activity->id));
         // Create a finished attempt with correct answer.
         $this->setCurrentTimeStart();
         $this->create_attempt($this->student, true, true);
 
         $this->setAdminUser();
-        $result = mod_lesson_external::get_attempts_overview($this->lesson->id);
-        $result = external_api::clean_returnvalue(mod_lesson_external::get_attempts_overview_returns(), $result);
+        $result = mod_opendsa_activity_external::get_attempts_overview($this->opendsa_activity->id);
+        $result = external_api::clean_returnvalue(mod_opendsa_activity_external::get_attempts_overview_returns(), $result);
 
         // Two attempts with maximum grade.
         $this->assertEquals(2, $result['data']['numofattempts']);
@@ -1180,8 +1180,8 @@ class mod_lesson_external_testcase extends externallib_advanced_testcase {
 
         // Now check we have two students and the statistics changed.
         $this->setAdminUser();
-        $result = mod_lesson_external::get_attempts_overview($this->lesson->id);
-        $result = external_api::clean_returnvalue(mod_lesson_external::get_attempts_overview_returns(), $result);
+        $result = mod_opendsa_activity_external::get_attempts_overview($this->opendsa_activity->id);
+        $result = external_api::clean_returnvalue(mod_opendsa_activity_external::get_attempts_overview_returns(), $result);
 
         // Total of 3 attempts with maximum grade.
         $this->assertEquals(3, $result['data']['numofattempts']);
@@ -1197,8 +1197,8 @@ class mod_lesson_external_testcase extends externallib_advanced_testcase {
      */
     public function test_get_attempts_overview_no_attempts() {
         $this->setAdminUser();
-        $result = mod_lesson_external::get_attempts_overview($this->lesson->id);
-        $result = external_api::clean_returnvalue(mod_lesson_external::get_attempts_overview_returns(), $result);
+        $result = mod_opendsa_activity_external::get_attempts_overview($this->opendsa_activity->id);
+        $result = external_api::clean_returnvalue(mod_opendsa_activity_external::get_attempts_overview_returns(), $result);
         $this->assertCount(0, $result['warnings']);
         $this->assertArrayNotHasKey('data', $result);
     }
@@ -1213,22 +1213,22 @@ class mod_lesson_external_testcase extends externallib_advanced_testcase {
         $this->setCurrentTimeStart();
         $this->create_attempt($this->student, true, true);
 
-        $DB->set_field('lesson', 'retake', 1, array('id' => $this->lesson->id));
+        $DB->set_field('opendsa_activity', 'retake', 1, array('id' => $this->opendsa_activity->id));
         sleep(1);
         $this->create_attempt($this->student, false, false);
 
         $this->setAdminUser();
         // Test first attempt finished.
-        $result = mod_lesson_external::get_user_attempt($this->lesson->id, $this->student->id, 0);
-        $result = external_api::clean_returnvalue(mod_lesson_external::get_user_attempt_returns(), $result);
+        $result = mod_opendsa_activity_external::get_user_attempt($this->opendsa_activity->id, $this->student->id, 0);
+        $result = external_api::clean_returnvalue(mod_opendsa_activity_external::get_user_attempt_returns(), $result);
 
-        $this->assertCount(2, $result['answerpages']);  // 2 pages in the lesson.
+        $this->assertCount(2, $result['answerpages']);  // 2 pages in the opendsa_activity.
         $this->assertCount(2, $result['answerpages'][0]['answerdata']['answers']);  // 2 possible answers in true/false.
         $this->assertEquals(100, $result['userstats']['grade']);    // Correct answer.
         $this->assertEquals(1, $result['userstats']['gradeinfo']['total']);     // Total correct answers.
         $this->assertEquals(100, $result['userstats']['gradeinfo']['grade']);   // Correct answer.
 
-        // Check page object contains the lesson pages answered.
+        // Check page object contains the opendsa_activity pages answered.
         $pagesanswered = array();
         foreach ($result['answerpages'] as $answerp) {
             $pagesanswered[] = $answerp['page']['id'];
@@ -1237,27 +1237,27 @@ class mod_lesson_external_testcase extends externallib_advanced_testcase {
         $this->assertEquals(array($this->page1->id, $this->page2->id), $pagesanswered);
 
         // Test second attempt unfinished.
-        $result = mod_lesson_external::get_user_attempt($this->lesson->id, $this->student->id, 1);
-        $result = external_api::clean_returnvalue(mod_lesson_external::get_user_attempt_returns(), $result);
+        $result = mod_opendsa_activity_external::get_user_attempt($this->opendsa_activity->id, $this->student->id, 1);
+        $result = external_api::clean_returnvalue(mod_opendsa_activity_external::get_user_attempt_returns(), $result);
 
-        $this->assertCount(2, $result['answerpages']);  // 2 pages in the lesson.
+        $this->assertCount(2, $result['answerpages']);  // 2 pages in the opendsa_activity.
         $this->assertCount(2, $result['answerpages'][0]['answerdata']['answers']);  // 2 possible answers in true/false.
         $this->assertArrayNotHasKey('gradeinfo', $result['userstats']);    // No grade info since it not finished.
 
         // Check as student I can get this information for only me.
         $this->setUser($this->student);
         // Test first attempt finished.
-        $result = mod_lesson_external::get_user_attempt($this->lesson->id, $this->student->id, 0);
-        $result = external_api::clean_returnvalue(mod_lesson_external::get_user_attempt_returns(), $result);
+        $result = mod_opendsa_activity_external::get_user_attempt($this->opendsa_activity->id, $this->student->id, 0);
+        $result = external_api::clean_returnvalue(mod_opendsa_activity_external::get_user_attempt_returns(), $result);
 
-        $this->assertCount(2, $result['answerpages']);  // 2 pages in the lesson.
+        $this->assertCount(2, $result['answerpages']);  // 2 pages in the opendsa_activity.
         $this->assertCount(2, $result['answerpages'][0]['answerdata']['answers']);  // 2 possible answers in true/false.
         $this->assertEquals(100, $result['userstats']['grade']);    // Correct answer.
         $this->assertEquals(1, $result['userstats']['gradeinfo']['total']);     // Total correct answers.
         $this->assertEquals(100, $result['userstats']['gradeinfo']['grade']);   // Correct answer.
 
         $this->expectException('moodle_exception');
-        $result = mod_lesson_external::get_user_attempt($this->lesson->id, $this->teacher->id, 0);
+        $result = mod_opendsa_activity_external::get_user_attempt($this->opendsa_activity->id, $this->teacher->id, 0);
     }
 
     /**
@@ -1265,8 +1265,8 @@ class mod_lesson_external_testcase extends externallib_advanced_testcase {
      */
     public function test_get_pages_possible_jumps() {
         $this->setAdminUser();
-        $result = mod_lesson_external::get_pages_possible_jumps($this->lesson->id);
-        $result = external_api::clean_returnvalue(mod_lesson_external::get_pages_possible_jumps_returns(), $result);
+        $result = mod_opendsa_activity_external::get_pages_possible_jumps($this->opendsa_activity->id);
+        $result = external_api::clean_returnvalue(mod_opendsa_activity_external::get_pages_possible_jumps_returns(), $result);
 
         $this->assertCount(0, $result['warnings']);
         $this->assertCount(3, $result['jumps']);    // 3 jumps, 2 from the question page and 1 from the content.
@@ -1288,8 +1288,8 @@ class mod_lesson_external_testcase extends externallib_advanced_testcase {
      */
     public function test_get_pages_possible_jumps_with_offlineattemps_disabled() {
         $this->setUser($this->student->id);
-        $result = mod_lesson_external::get_pages_possible_jumps($this->lesson->id);
-        $result = external_api::clean_returnvalue(mod_lesson_external::get_pages_possible_jumps_returns(), $result);
+        $result = mod_opendsa_activity_external::get_pages_possible_jumps($this->opendsa_activity->id);
+        $result = external_api::clean_returnvalue(mod_opendsa_activity_external::get_pages_possible_jumps_returns(), $result);
         $this->assertCount(0, $result['jumps']);
     }
 
@@ -1299,78 +1299,78 @@ class mod_lesson_external_testcase extends externallib_advanced_testcase {
     public function test_get_pages_possible_jumps_with_offlineattemps_enabled() {
         global $DB;
 
-        $DB->set_field('lesson', 'allowofflineattempts', 1, array('id' => $this->lesson->id));
+        $DB->set_field('opendsa_activity', 'allowofflineattempts', 1, array('id' => $this->opendsa_activity->id));
         $this->setUser($this->student->id);
-        $result = mod_lesson_external::get_pages_possible_jumps($this->lesson->id);
-        $result = external_api::clean_returnvalue(mod_lesson_external::get_pages_possible_jumps_returns(), $result);
+        $result = mod_opendsa_activity_external::get_pages_possible_jumps($this->opendsa_activity->id);
+        $result = external_api::clean_returnvalue(mod_opendsa_activity_external::get_pages_possible_jumps_returns(), $result);
         $this->assertCount(3, $result['jumps']);
     }
 
     /*
-     * Test get_lesson user student.
+     * Test get_opendsa_activity user student.
      */
-    public function test_get_lesson_user_student() {
+    public function test_get_opendsa_activity_user_student() {
         // Test user with full capabilities.
         $this->setUser($this->student);
 
         // Lesson not using password.
-        $result = mod_lesson_external::get_lesson($this->lesson->id);
-        $result = external_api::clean_returnvalue(mod_lesson_external::get_lesson_returns(), $result);
-        $this->assertCount(36, $result['lesson']);  // Expect most of the fields.
+        $result = mod_opendsa_activity_external::get_opendsa_activity($this->opendsa_activity->id);
+        $result = external_api::clean_returnvalue(mod_opendsa_activity_external::get_opendsa_activity_returns(), $result);
+        $this->assertCount(36, $result['opendsa_activity']);  // Expect most of the fields.
         $this->assertFalse(isset($result['password']));
     }
 
     /**
-     * Test get_lesson user student with missing password.
+     * Test get_opendsa_activity user student with missing password.
      */
-    public function test_get_lesson_user_student_with_missing_password() {
+    public function test_get_opendsa_activity_user_student_with_missing_password() {
         global $DB;
 
         // Test user with full capabilities.
         $this->setUser($this->student);
-        $DB->set_field('lesson', 'usepassword', 1, array('id' => $this->lesson->id));
-        $DB->set_field('lesson', 'password', 'abc', array('id' => $this->lesson->id));
+        $DB->set_field('opendsa_activity', 'usepassword', 1, array('id' => $this->opendsa_activity->id));
+        $DB->set_field('opendsa_activity', 'password', 'abc', array('id' => $this->opendsa_activity->id));
 
         // Lesson not using password.
-        $result = mod_lesson_external::get_lesson($this->lesson->id);
-        $result = external_api::clean_returnvalue(mod_lesson_external::get_lesson_returns(), $result);
-        $this->assertCount(6, $result['lesson']);   // Expect just this few fields.
+        $result = mod_opendsa_activity_external::get_opendsa_activity($this->opendsa_activity->id);
+        $result = external_api::clean_returnvalue(mod_opendsa_activity_external::get_opendsa_activity_returns(), $result);
+        $this->assertCount(6, $result['opendsa_activity']);   // Expect just this few fields.
         $this->assertFalse(isset($result['intro']));
     }
 
     /**
-     * Test get_lesson user student with correct password.
+     * Test get_opendsa_activity user student with correct password.
      */
-    public function test_get_lesson_user_student_with_correct_password() {
+    public function test_get_opendsa_activity_user_student_with_correct_password() {
         global $DB;
         // Test user with full capabilities.
         $this->setUser($this->student);
         $password = 'abc';
-        $DB->set_field('lesson', 'usepassword', 1, array('id' => $this->lesson->id));
-        $DB->set_field('lesson', 'password', $password, array('id' => $this->lesson->id));
+        $DB->set_field('opendsa_activity', 'usepassword', 1, array('id' => $this->opendsa_activity->id));
+        $DB->set_field('opendsa_activity', 'password', $password, array('id' => $this->opendsa_activity->id));
 
         // Lesson not using password.
-        $result = mod_lesson_external::get_lesson($this->lesson->id, $password);
-        $result = external_api::clean_returnvalue(mod_lesson_external::get_lesson_returns(), $result);
-        $this->assertCount(36, $result['lesson']);
+        $result = mod_opendsa_activity_external::get_opendsa_activity($this->opendsa_activity->id, $password);
+        $result = external_api::clean_returnvalue(mod_opendsa_activity_external::get_opendsa_activity_returns(), $result);
+        $this->assertCount(36, $result['opendsa_activity']);
         $this->assertFalse(isset($result['intro']));
     }
 
     /**
-     * Test get_lesson teacher.
+     * Test get_opendsa_activity teacher.
      */
-    public function test_get_lesson_teacher() {
+    public function test_get_opendsa_activity_teacher() {
         global $DB;
         // Test user with full capabilities.
         $this->setUser($this->teacher);
         $password = 'abc';
-        $DB->set_field('lesson', 'usepassword', 1, array('id' => $this->lesson->id));
-        $DB->set_field('lesson', 'password', $password, array('id' => $this->lesson->id));
+        $DB->set_field('opendsa_activity', 'usepassword', 1, array('id' => $this->opendsa_activity->id));
+        $DB->set_field('opendsa_activity', 'password', $password, array('id' => $this->opendsa_activity->id));
 
         // Lesson not passing a valid password (but we are teachers, we should see all the info).
-        $result = mod_lesson_external::get_lesson($this->lesson->id);
-        $result = external_api::clean_returnvalue(mod_lesson_external::get_lesson_returns(), $result);
-        $this->assertCount(45, $result['lesson']);  // Expect all the fields.
-        $this->assertEquals($result['lesson']['password'], $password);
+        $result = mod_opendsa_activity_external::get_opendsa_activity($this->opendsa_activity->id);
+        $result = external_api::clean_returnvalue(mod_opendsa_activity_external::get_opendsa_activity_returns(), $result);
+        $this->assertCount(45, $result['opendsa_activity']);  // Expect all the fields.
+        $this->assertEquals($result['opendsa_activity']['password'], $password);
     }
 }

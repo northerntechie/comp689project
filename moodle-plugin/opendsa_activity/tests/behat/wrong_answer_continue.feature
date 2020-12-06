@@ -1,8 +1,8 @@
-@mod @mod_lesson
+@mod @mod_opendsa_activity
 Feature: An incorrect response to an answer with multiple attempts show appropriate continue buttons
-  In order for lesson the appropriate continue button to be displayed
+  In order for opendsa_activity the appropriate continue button to be displayed
   As a teacher
-  I need to create a lesson with multiple attempts for each question
+  I need to create a opendsa_activity with multiple attempts for each question
 
   Background:
     Given the following "users" exist:
@@ -20,8 +20,8 @@ Feature: An incorrect response to an answer with multiple attempts show appropri
     And I am on "Course 1" course homepage with editing mode on
     And I add a "Lesson" to section "1"
     And I set the following fields to these values:
-      | Name | Test lesson name |
-      | Description | Test lesson description |
+      | Name | Test opendsa_activity name |
+      | Description | Test opendsa_activity description |
       | Provide option to try a question again | Yes |
       | Maximum number of attempts | 2 |
     And I press "Save and display"
@@ -42,13 +42,13 @@ Feature: An incorrect response to an answer with multiple attempts show appropri
     And I set the following fields to these values:
       | Page title | Just move on page |
       | Page contents | You are here to move on |
-      | id_answer_editor_0 | End this lesson |
-      | id_jumpto_0 | End of lesson |
+      | id_answer_editor_0 | End this opendsa_activity |
+      | id_jumpto_0 | End of opendsa_activity |
     And I press "Save page"
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
     When I set the field "Your answer" to "2"
     And I press "Submit"
     And I should see "That's the wrong answer"
@@ -70,13 +70,13 @@ Feature: An incorrect response to an answer with multiple attempts show appropri
     And I set the following fields to these values:
       | Page title | Just move on page |
       | Page contents | You are here to move on |
-      | id_answer_editor_0 | End this lesson |
-      | id_jumpto_0 | End of lesson |
+      | id_answer_editor_0 | End this opendsa_activity |
+      | id_jumpto_0 | End of opendsa_activity |
     And I press "Save page"
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
     When I set the field "Your answer" to "2"
     And I press "Submit"
     And I should see "That's the wrong answer"

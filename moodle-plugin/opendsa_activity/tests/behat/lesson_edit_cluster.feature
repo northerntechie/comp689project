@@ -1,8 +1,8 @@
-@mod @mod_lesson
-Feature: In a lesson activity, teacher can edit a cluster page
-  In order to modify an existing lesson and change navigation
+@mod @mod_opendsa_activity
+Feature: In a opendsa_activity activity, teacher can edit a cluster page
+  In order to modify an existing opendsa_activity and change navigation
   As a teacher
-  I need to edit cluster pages in the lesson
+  I need to edit cluster pages in the opendsa_activity
 
   Background:
     Given the following "users" exist:
@@ -20,7 +20,7 @@ Feature: In a lesson activity, teacher can edit a cluster page
     And I am on "Course 1" course homepage with editing mode on
     And I add a "Lesson" to section "1" and I fill the form with:
       | Name | Lesson with cluster |
-      | Description | Test lesson description |
+      | Description | Test opendsa_activity description |
     And I follow "Lesson with cluster"
     And I follow "Add a content page"
     And I set the following fields to these values:
@@ -70,7 +70,7 @@ Feature: In a lesson activity, teacher can edit a cluster page
       | id_jumpto_0 | Next page |
     And I press "Save page"
 
-  Scenario: Edit lesson cluster page
+  Scenario: Edit opendsa_activity cluster page
     Given I click on "//th[normalize-space(.)='Cluster']/descendant::a[3]" "xpath_element"
     When I set the following fields to these values:
       | Page title | Modified name |
@@ -107,5 +107,5 @@ Feature: In a lesson activity, teacher can edit a cluster page
     And I press "Continue"
     And I should see "Content page after cluster"
     And I press "Next page"
-    And I should see "Congratulations - end of lesson reached"
+    And I should see "Congratulations - end of opendsa_activity reached"
     And I should see "Your score is 2 (out of 2)."

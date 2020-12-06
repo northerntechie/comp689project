@@ -1,8 +1,8 @@
-@mod @mod_lesson
-Feature: In a lesson activity, students can review the answers they gave to questions
-  To review questions of a lesson
+@mod @mod_opendsa_activity
+Feature: In a opendsa_activity activity, students can review the answers they gave to questions
+  To review questions of a opendsa_activity
   As a student
-  I need to complete a lesson answering all of the questions.
+  I need to complete a opendsa_activity answering all of the questions.
 
   Scenario: Student answers questions and then reviews them.
     Given the following "users" exist:
@@ -19,8 +19,8 @@ Feature: In a lesson activity, students can review the answers they gave to ques
     And I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
     And I add a "Lesson" to section "1" and I fill the form with:
-      | Name | Test lesson name |
-      | Description | Test lesson description |
+      | Name | Test opendsa_activity name |
+      | Description | Test opendsa_activity description |
       | Display ongoing score | Yes |
       | Slideshow | Yes |
       | Maximum number of answers | 10 |
@@ -28,7 +28,7 @@ Feature: In a lesson activity, students can review the answers they gave to ques
       | Maximum number of attempts | 3 |
       | Custom scoring | No |
       | Re-takes allowed | Yes |
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
     And I follow "Add a question page"
     And I set the field "Select a question type" to "Numerical"
     And I press "Add a question page"
@@ -58,7 +58,7 @@ Feature: In a lesson activity, students can review the answers they gave to ques
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
     And I should see "You have answered 0 correctly out of 0 attempts."
     And I set the following fields to these values:
       | Your answer | 1 |
@@ -75,7 +75,7 @@ Feature: In a lesson activity, students can review the answers they gave to ques
     And I press "Submit"
     And I should see "You have answered 2 correctly out of 3 attempts."
     And I press "Continue"
-    When I follow "Review lesson"
+    When I follow "Review opendsa_activity"
     Then I should see "You have answered 2 correctly out of 3 attempts."
     And I press "Next page"
     And I should see "You have answered 2 correctly out of 3 attempts."

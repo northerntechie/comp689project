@@ -15,29 +15,29 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The mod_lesson page_moved event class.
+ * The mod_opendsa_activity page_moved event class.
  *
- * @package    mod_lesson
+ * @package    mod_opendsa_activity
  * @copyright  2015 Stephen Bourget
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 
-namespace mod_lesson\event;
+namespace mod_opendsa_activity\event;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * The mod_lesson page_moved event class.
+ * The mod_opendsa_activity page_moved event class.
  *
  * @property-read array $other {
  *     Extra information about event.
  *
  *     - string pagetype: the name of the pagetype as defined in the individual page class
- *     - int prevpageid: the id of the previous lesson page
- *     - int nextpageid: the id of the next lesson page
+ *     - int prevpageid: the id of the previous opendsa_activity page
+ *     - int nextpageid: the id of the next opendsa_activity page
  * }
  *
- * @package    mod_lesson
+ * @package    mod_opendsa_activity
  * @since      Moodle 2.9
  * @copyright  2015 Stephen Bourget
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
@@ -48,7 +48,7 @@ class page_moved extends \core\event\base {
      * Set basic properties for the event.
      */
     protected function init() {
-        $this->data['objecttable'] = 'lesson_pages';
+        $this->data['objecttable'] = 'opendsa_activity_pages';
         $this->data['crud'] = 'u';
         $this->data['edulevel'] = self::LEVEL_TEACHING;
     }
@@ -59,7 +59,7 @@ class page_moved extends \core\event\base {
      * @return string
      */
     public static function get_name() {
-        return get_string('eventpagemoved', 'mod_lesson');
+        return get_string('eventpagemoved', 'mod_opendsa_activity');
     }
 
     /**
@@ -68,7 +68,7 @@ class page_moved extends \core\event\base {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url('/mod/lesson/view.php', array('id' => $this->contextinstanceid, 'pageid' => $this->objectid));
+        return new \moodle_url('/mod/opendsa_activity/view.php', array('id' => $this->contextinstanceid, 'pageid' => $this->objectid));
     }
 
     /**
@@ -80,7 +80,7 @@ class page_moved extends \core\event\base {
         return "The user with id '$this->userid' has moved a ".$this->other['pagetype']." page with the ".
                 "id '$this->objectid' to the slot after the page with the id '".$this->other['prevpageid'].
                 "' and before the page with the id '".$this->other['nextpageid'].
-                "' in the lesson activity with course module id '$this->contextinstanceid'.";
+                "' in the opendsa_activity activity with course module id '$this->contextinstanceid'.";
     }
 
     /**
@@ -107,13 +107,13 @@ class page_moved extends \core\event\base {
     }
 
     public static function get_objectid_mapping() {
-        return array('db' => 'lesson_pages', 'restore' => 'lesson_page');
+        return array('db' => 'opendsa_activity_pages', 'restore' => 'opendsa_activity_page');
     }
 
     public static function get_other_mapping() {
         $othermapped = array();
-        $othermapped['prevpageid'] = array('db' => 'lesson_pages', 'restore' => 'lesson_page');
-        $othermapped['nextpageid'] = array('db' => 'lesson_pages', 'restore' => 'lesson_page');
+        $othermapped['prevpageid'] = array('db' => 'opendsa_activity_pages', 'restore' => 'opendsa_activity_page');
+        $othermapped['nextpageid'] = array('db' => 'opendsa_activity_pages', 'restore' => 'opendsa_activity_page');
 
         return $othermapped;
     }

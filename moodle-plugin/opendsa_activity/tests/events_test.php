@@ -17,7 +17,7 @@
 /**
  * Events tests.
  *
- * @package    mod_lesson
+ * @package    mod_opendsa_activity
  * @category   test
  * @copyright  2013 Mark Nelson <markn@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -27,15 +27,15 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 
-require_once($CFG->dirroot.'/mod/lesson/locallib.php');
+require_once($CFG->dirroot.'/mod/opendsa_activity/locallib.php');
 
-class mod_lesson_events_testcase extends advanced_testcase {
+class mod_opendsa_activity_events_testcase extends advanced_testcase {
 
     /** @var stdClass the course used for testing */
     private $course;
 
-    /** @var lesson the lesson used for testing */
-    private $lesson;
+    /** @var opendsa_activity the opendsa_activity used for testing */
+    private $opendsa_activity;
 
     /**
      * Test set up.
@@ -47,10 +47,10 @@ class mod_lesson_events_testcase extends advanced_testcase {
 
         $this->setAdminUser();
         $this->course = $this->getDataGenerator()->create_course();
-        $lesson = $this->getDataGenerator()->create_module('lesson', array('course' => $this->course->id));
+        $opendsa_activity = $this->getDataGenerator()->create_module('opendsa_activity', array('course' => $this->course->id));
 
-        // Convert to a lesson object.
-        $this->lesson = new lesson($lesson);
+        // Convert to a opendsa_activity object.
+        $this->opendsa_activity = new opendsa_activity($opendsa_activity);
     }
 
     /**
@@ -60,18 +60,18 @@ class mod_lesson_events_testcase extends advanced_testcase {
     public function test_page_created() {
 
         // Set up a generator to create content.
-        $generator = $this->getDataGenerator()->get_plugin_generator('mod_lesson');
+        $generator = $this->getDataGenerator()->get_plugin_generator('mod_opendsa_activity');
         // Trigger and capture the event.
         $sink = $this->redirectEvents();
-        $pagerecord = $generator->create_content($this->lesson);
-        $page = $this->lesson->load_page($pagerecord->id);
+        $pagerecord = $generator->create_content($this->opendsa_activity);
+        $page = $this->opendsa_activity->load_page($pagerecord->id);
 
         // Get our event event.
         $events = $sink->get_events();
         $event = reset($events);
 
         // Check that the event data is valid.
-        $this->assertInstanceOf('\mod_lesson\event\page_created', $event);
+        $this->assertInstanceOf('\mod_opendsa_activity\event\page_created', $event);
         $this->assertEquals($page->id, $event->objectid);
         $this->assertEventContextNotUsed($event);
         $this->assertDebuggingNotCalled();
@@ -85,23 +85,23 @@ class mod_lesson_events_testcase extends advanced_testcase {
 
         // Set up a generator to create content.
         // paga3 is the first one and page1 the last one.
-        $generator = $this->getDataGenerator()->get_plugin_generator('mod_lesson');
-        $pagerecord1 = $generator->create_content($this->lesson);
-        $page1 = $this->lesson->load_page($pagerecord1->id);
-        $pagerecord2 = $generator->create_content($this->lesson);
-        $page2 = $this->lesson->load_page($pagerecord2->id);
-        $pagerecord3 = $generator->create_content($this->lesson);
-        $page3 = $this->lesson->load_page($pagerecord3->id);
+        $generator = $this->getDataGenerator()->get_plugin_generator('mod_opendsa_activity');
+        $pagerecord1 = $generator->create_content($this->opendsa_activity);
+        $page1 = $this->opendsa_activity->load_page($pagerecord1->id);
+        $pagerecord2 = $generator->create_content($this->opendsa_activity);
+        $page2 = $this->opendsa_activity->load_page($pagerecord2->id);
+        $pagerecord3 = $generator->create_content($this->opendsa_activity);
+        $page3 = $this->opendsa_activity->load_page($pagerecord3->id);
         // Trigger and capture the event.
         $sink = $this->redirectEvents();
-        $this->lesson->resort_pages($page3->id, $pagerecord2->id);
+        $this->opendsa_activity->resort_pages($page3->id, $pagerecord2->id);
         // Get our event event.
         $events = $sink->get_events();
         $event = reset($events);
 
         $this->assertCount(1, $events);
         // Check that the event data is valid.
-        $this->assertInstanceOf('\mod_lesson\event\page_moved', $event);
+        $this->assertInstanceOf('\mod_opendsa_activity\event\page_moved', $event);
         $this->assertEquals($page3->id, $event->objectid);
         $this->assertEquals($pagerecord1->id, $event->other['nextpageid']);
         $this->assertEquals($pagerecord2->id, $event->other['prevpageid']);
@@ -116,11 +116,11 @@ class mod_lesson_events_testcase extends advanced_testcase {
     public function test_page_deleted() {
 
         // Set up a generator to create content.
-        $generator = $this->getDataGenerator()->get_plugin_generator('mod_lesson');
+        $generator = $this->getDataGenerator()->get_plugin_generator('mod_opendsa_activity');
         // Create a content page.
-        $pagerecord = $generator->create_content($this->lesson);
-        // Get the lesson page information.
-        $page = $this->lesson->load_page($pagerecord->id);
+        $pagerecord = $generator->create_content($this->opendsa_activity);
+        // Get the opendsa_activity page information.
+        $page = $this->opendsa_activity->load_page($pagerecord->id);
         // Trigger and capture the event.
         $sink = $this->redirectEvents();
         $page->delete();
@@ -130,7 +130,7 @@ class mod_lesson_events_testcase extends advanced_testcase {
         $event = reset($events);
 
         // Check that the event data is valid.
-        $this->assertInstanceOf('\mod_lesson\event\page_deleted', $event);
+        $this->assertInstanceOf('\mod_opendsa_activity\event\page_deleted', $event);
         $this->assertEquals($page->id, $event->objectid);
         $this->assertEventContextNotUsed($event);
         $this->assertDebuggingNotCalled();
@@ -146,14 +146,14 @@ class mod_lesson_events_testcase extends advanced_testcase {
 
         // Trigger an event: page updated.
         $eventparams = array(
-            'context' => context_module::instance($this->lesson->properties()->cmid),
+            'context' => context_module::instance($this->opendsa_activity->properties()->cmid),
             'objectid' => 25,
             'other' => array(
                 'pagetype' => 'True/false'
                 )
         );
 
-        $event = \mod_lesson\event\page_updated::create($eventparams);
+        $event = \mod_opendsa_activity\event\page_updated::create($eventparams);
 
         // Trigger and capture the event.
         $sink = $this->redirectEvents();
@@ -162,7 +162,7 @@ class mod_lesson_events_testcase extends advanced_testcase {
         $event = reset($events);
 
         // Check that the event data is valid.
-        $this->assertInstanceOf('\mod_lesson\event\page_updated', $event);
+        $this->assertInstanceOf('\mod_opendsa_activity\event\page_updated', $event);
         $this->assertEquals(25, $event->objectid);
         $this->assertEquals('True/false', $event->other['pagetype']);
         $this->assertEventContextNotUsed($event);
@@ -177,10 +177,10 @@ class mod_lesson_events_testcase extends advanced_testcase {
      */
     public function test_essay_attempt_viewed() {
         // Create a essays list viewed event
-        $event = \mod_lesson\event\essay_attempt_viewed::create(array(
-            'objectid' => $this->lesson->id,
+        $event = \mod_opendsa_activity\event\essay_attempt_viewed::create(array(
+            'objectid' => $this->opendsa_activity->id,
             'relateduserid' => 3,
-            'context' => context_module::instance($this->lesson->properties()->cmid),
+            'context' => context_module::instance($this->opendsa_activity->properties()->cmid),
             'courseid' => $this->course->id
         ));
 
@@ -191,103 +191,103 @@ class mod_lesson_events_testcase extends advanced_testcase {
         $event = reset($events);
 
         // Check that the event data is valid.
-        $this->assertInstanceOf('\mod_lesson\event\essay_attempt_viewed', $event);
-        $this->assertEquals(context_module::instance($this->lesson->properties()->cmid), $event->get_context());
-        $expected = array($this->course->id, 'lesson', 'view grade', 'essay.php?id=' . $this->lesson->properties()->cmid .
-            '&mode=grade&attemptid='.$this->lesson->id, get_string('manualgrading', 'lesson'), $this->lesson->properties()->cmid);
+        $this->assertInstanceOf('\mod_opendsa_activity\event\essay_attempt_viewed', $event);
+        $this->assertEquals(context_module::instance($this->opendsa_activity->properties()->cmid), $event->get_context());
+        $expected = array($this->course->id, 'opendsa_activity', 'view grade', 'essay.php?id=' . $this->opendsa_activity->properties()->cmid .
+            '&mode=grade&attemptid='.$this->opendsa_activity->id, get_string('manualgrading', 'opendsa_activity'), $this->opendsa_activity->properties()->cmid);
         $this->assertEventLegacyLogData($expected, $event);
         $this->assertEventContextNotUsed($event);
     }
 
     /**
-     * Test the lesson started event.
+     * Test the opendsa_activity started event.
      */
-    public function test_lesson_started() {
+    public function test_opendsa_activity_started() {
         // Trigger and capture the event.
         $sink = $this->redirectEvents();
-        $this->lesson->start_timer();
+        $this->opendsa_activity->start_timer();
         $events = $sink->get_events();
         $event = reset($events);
 
         // Check that the event data is valid.
-        $this->assertInstanceOf('\mod_lesson\event\lesson_started', $event);
-        $this->assertEquals(context_module::instance($this->lesson->properties()->cmid), $event->get_context());
-        $expected = array($this->course->id, 'lesson', 'start', 'view.php?id=' . $this->lesson->properties()->cmid,
-            $this->lesson->properties()->id, $this->lesson->properties()->cmid);
+        $this->assertInstanceOf('\mod_opendsa_activity\event\opendsa_activity_started', $event);
+        $this->assertEquals(context_module::instance($this->opendsa_activity->properties()->cmid), $event->get_context());
+        $expected = array($this->course->id, 'opendsa_activity', 'start', 'view.php?id=' . $this->opendsa_activity->properties()->cmid,
+            $this->opendsa_activity->properties()->id, $this->opendsa_activity->properties()->cmid);
         $this->assertEventLegacyLogData($expected, $event);
         $this->assertEventContextNotUsed($event);
     }
 
     /**
-     * Test the lesson restarted event.
+     * Test the opendsa_activity restarted event.
      */
-    public function test_lesson_restarted() {
+    public function test_opendsa_activity_restarted() {
 
         // Initialize timer.
-        $this->lesson->start_timer();
+        $this->opendsa_activity->start_timer();
         // Trigger and capture the event.
         $sink = $this->redirectEvents();
-        $this->lesson->update_timer(true);
+        $this->opendsa_activity->update_timer(true);
         $events = $sink->get_events();
         $event = reset($events);
 
         // Check that the event data is valid.
-        $this->assertInstanceOf('\mod_lesson\event\lesson_restarted', $event);
-        $this->assertEquals(context_module::instance($this->lesson->properties()->cmid), $event->get_context());
-        $expected = array($this->course->id, 'lesson', 'start', 'view.php?id=' . $this->lesson->properties()->cmid,
-            $this->lesson->properties()->id, $this->lesson->properties()->cmid);
+        $this->assertInstanceOf('\mod_opendsa_activity\event\opendsa_activity_restarted', $event);
+        $this->assertEquals(context_module::instance($this->opendsa_activity->properties()->cmid), $event->get_context());
+        $expected = array($this->course->id, 'opendsa_activity', 'start', 'view.php?id=' . $this->opendsa_activity->properties()->cmid,
+            $this->opendsa_activity->properties()->id, $this->opendsa_activity->properties()->cmid);
         $this->assertEventContextNotUsed($event);
         $this->assertDebuggingNotCalled();
 
     }
 
     /**
-     * Test the lesson restarted event.
+     * Test the opendsa_activity restarted event.
      */
-    public function test_lesson_resumed() {
+    public function test_opendsa_activity_resumed() {
 
         // Initialize timer.
-        $this->lesson->start_timer();
+        $this->opendsa_activity->start_timer();
         // Trigger and capture the event.
         $sink = $this->redirectEvents();
-        $this->lesson->update_timer(true, true);
+        $this->opendsa_activity->update_timer(true, true);
         $events = $sink->get_events();
         $event = reset($events);
 
         // Check that the event data is valid.
-        $this->assertInstanceOf('\mod_lesson\event\lesson_resumed', $event);
-        $this->assertEquals(context_module::instance($this->lesson->properties()->cmid), $event->get_context());
-        $expected = array($this->course->id, 'lesson', 'start', 'view.php?id=' . $this->lesson->properties()->cmid,
-            $this->lesson->properties()->id, $this->lesson->properties()->cmid);
+        $this->assertInstanceOf('\mod_opendsa_activity\event\opendsa_activity_resumed', $event);
+        $this->assertEquals(context_module::instance($this->opendsa_activity->properties()->cmid), $event->get_context());
+        $expected = array($this->course->id, 'opendsa_activity', 'start', 'view.php?id=' . $this->opendsa_activity->properties()->cmid,
+            $this->opendsa_activity->properties()->id, $this->opendsa_activity->properties()->cmid);
         $this->assertEventContextNotUsed($event);
         $this->assertDebuggingNotCalled();
 
     }
     /**
-     * Test the lesson ended event.
+     * Test the opendsa_activity ended event.
      */
-    public function test_lesson_ended() {
+    public function test_opendsa_activity_ended() {
         global $DB, $USER;
 
-        // Add a lesson timer so that stop_timer() does not complain.
-        $lessontimer = new stdClass();
-        $lessontimer->opendsa_activity_id = $this->lesson->properties()->id;
-        $lessontimer->userid = $USER->id;
-        $lessontimer->startime = time();
-        $lessontimer->lessontime = time();
-        $DB->insert_record('lesson_timer', $lessontimer);
+        // Add a opendsa_activity timer so that stop_timer() does not complain.
+        $opendsa_activitytimer = new stdClass();
+        $opendsa_activitytimer->opendsa_activity_id = $this->opendsa_activity->properties()->id;
+        $opendsa_activitytimer->userid = $USER->id;
+        $opendsa_activitytimer->startime = time();
+        $opendsa_activitytimer->opendsa_activitytime = time();
+        $DB->insert_record('opendsa_activity_timer', $opendsa_activitytimer);
 
         // Trigger and capture the event.
         $sink = $this->redirectEvents();
-        $this->lesson->stop_timer();
+        $this->opendsa_activity->stop_timer();
         $events = $sink->get_events();
         $event = reset($events);
 
         // Check that the event data is valid.
-        $this->assertInstanceOf('\mod_lesson\event\lesson_ended', $event);
-        $this->assertEquals(context_module::instance($this->lesson->properties()->cmid), $event->get_context());
-        $expected = array($this->course->id, 'lesson', 'end', 'view.php?id=' . $this->lesson->properties()->cmid,
-            $this->lesson->properties()->id, $this->lesson->properties()->cmid);
+        $this->assertInstanceOf('\mod_opendsa_activity\event\opendsa_activity_ended', $event);
+        $this->assertEquals(context_module::instance($this->opendsa_activity->properties()->cmid), $event->get_context());
+        $expected = array($this->course->id, 'opendsa_activity', 'end', 'view.php?id=' . $this->opendsa_activity->properties()->cmid,
+            $this->opendsa_activity->properties()->id, $this->opendsa_activity->properties()->cmid);
         $this->assertEventLegacyLogData($expected, $event);
         $this->assertEventContextNotUsed($event);
     }
@@ -302,13 +302,13 @@ class mod_lesson_events_testcase extends advanced_testcase {
         // Create an essay assessed event
         $gradeid = 5;
         $attemptid = 7;
-        $event = \mod_lesson\event\essay_assessed::create(array(
+        $event = \mod_opendsa_activity\event\essay_assessed::create(array(
             'objectid' => $gradeid,
             'relateduserid' => 3,
-            'context' => context_module::instance($this->lesson->properties()->cmid),
+            'context' => context_module::instance($this->opendsa_activity->properties()->cmid),
             'courseid' => $this->course->id,
             'other' => array(
-                'opendsa_activity_id' => $this->lesson->id,
+                'opendsa_activity_id' => $this->opendsa_activity->id,
                 'attemptid' => $attemptid
             )
         ));
@@ -320,10 +320,10 @@ class mod_lesson_events_testcase extends advanced_testcase {
         $event = reset($events);
 
         // Check that the event data is valid.
-        $this->assertInstanceOf('\mod_lesson\event\essay_assessed', $event);
-        $this->assertEquals(context_module::instance($this->lesson->properties()->cmid), $event->get_context());
-        $expected = array($this->course->id, 'lesson', 'update grade', 'essay.php?id=' . $this->lesson->properties()->cmid,
-                $this->lesson->name, $this->lesson->properties()->cmid);
+        $this->assertInstanceOf('\mod_opendsa_activity\event\essay_assessed', $event);
+        $this->assertEquals(context_module::instance($this->opendsa_activity->properties()->cmid), $event->get_context());
+        $expected = array($this->course->id, 'opendsa_activity', 'update grade', 'essay.php?id=' . $this->opendsa_activity->properties()->cmid,
+                $this->opendsa_activity->name, $this->opendsa_activity->properties()->cmid);
         $this->assertEventLegacyLogData($expected, $event);
         $this->assertEventContextNotUsed($event);
     }
@@ -336,27 +336,27 @@ class mod_lesson_events_testcase extends advanced_testcase {
         global $DB, $PAGE;
 
         // Set up a generator to create content.
-        $generator = $this->getDataGenerator()->get_plugin_generator('mod_lesson');
+        $generator = $this->getDataGenerator()->get_plugin_generator('mod_opendsa_activity');
         // Create a content page.
-        $pagerecord = $generator->create_content($this->lesson);
-        // Get the lesson page information.
-        $page = $this->lesson->load_page($pagerecord->id);
+        $pagerecord = $generator->create_content($this->opendsa_activity);
+        // Get the opendsa_activity page information.
+        $page = $this->opendsa_activity->load_page($pagerecord->id);
         // Get the coursemodule record to setup the $PAGE->cm.
-        $coursemodule = $DB->get_record('course_modules', array('id' => $this->lesson->properties()->cmid));
+        $coursemodule = $DB->get_record('course_modules', array('id' => $this->opendsa_activity->properties()->cmid));
         // Set the $PAGE->cm.
         $PAGE->set_cm($coursemodule);
         // Get the appropriate renderer.
-        $lessonoutput = $PAGE->get_renderer('mod_lesson');
+        $opendsa_activityoutput = $PAGE->get_renderer('mod_opendsa_activity');
 
         // Trigger and capture the event.
         $sink = $this->redirectEvents();
         // Fire the function that leads to the triggering of our event.
-        $lessonoutput->display_page($this->lesson, $page, false);
+        $opendsa_activityoutput->display_page($this->opendsa_activity, $page, false);
         $events = $sink->get_events();
         $event = reset($events);
 
         // Check that the event data is valid.
-        $this->assertInstanceOf('\mod_lesson\event\content_page_viewed', $event);
+        $this->assertInstanceOf('\mod_opendsa_activity\event\content_page_viewed', $event);
         $this->assertEquals($page->id, $event->objectid);
         $this->assertEventContextNotUsed($event);
         $this->assertDebuggingNotCalled();
@@ -370,27 +370,27 @@ class mod_lesson_events_testcase extends advanced_testcase {
         global $DB, $PAGE;
 
         // Set up a generator to create content.
-        $generator = $this->getDataGenerator()->get_plugin_generator('mod_lesson');
+        $generator = $this->getDataGenerator()->get_plugin_generator('mod_opendsa_activity');
         // Create a question page.
-        $pagerecord = $generator->create_question_truefalse($this->lesson);
-        // Get the lesson page information.
-        $page = $this->lesson->load_page($pagerecord->id);
+        $pagerecord = $generator->create_question_truefalse($this->opendsa_activity);
+        // Get the opendsa_activity page information.
+        $page = $this->opendsa_activity->load_page($pagerecord->id);
         // Get the coursemodule record to setup the $PAGE->cm.
-        $coursemodule = $DB->get_record('course_modules', array('id' => $this->lesson->properties()->cmid));
+        $coursemodule = $DB->get_record('course_modules', array('id' => $this->opendsa_activity->properties()->cmid));
         // Set the $PAGE->cm.
         $PAGE->set_cm($coursemodule);
         // Get the appropriate renderer.
-        $lessonoutput = $PAGE->get_renderer('mod_lesson');
+        $opendsa_activityoutput = $PAGE->get_renderer('mod_opendsa_activity');
 
         // Trigger and capture the event.
         $sink = $this->redirectEvents();
         // Fire the function that leads to the triggering of our event.
-        $lessonoutput->display_page($this->lesson, $page, false);
+        $opendsa_activityoutput->display_page($this->opendsa_activity, $page, false);
         $events = $sink->get_events();
         $event = reset($events);
 
         // Check that the event data is valid.
-        $this->assertInstanceOf('\mod_lesson\event\question_viewed', $event);
+        $this->assertInstanceOf('\mod_opendsa_activity\event\question_viewed', $event);
         $this->assertEquals($page->id, $event->objectid);
         $this->assertEquals('True/false', $event->other['pagetype']);
         $this->assertEventContextNotUsed($event);
@@ -407,14 +407,14 @@ class mod_lesson_events_testcase extends advanced_testcase {
 
         // Trigger an event: truefalse question answered.
         $eventparams = array(
-            'context' => context_module::instance($this->lesson->properties()->cmid),
+            'context' => context_module::instance($this->opendsa_activity->properties()->cmid),
             'objectid' => 25,
             'other' => array(
                 'pagetype' => 'True/false'
                 )
         );
 
-        $event = \mod_lesson\event\question_answered::create($eventparams);
+        $event = \mod_opendsa_activity\event\question_answered::create($eventparams);
 
         // Trigger and capture the event.
         $sink = $this->redirectEvents();
@@ -423,7 +423,7 @@ class mod_lesson_events_testcase extends advanced_testcase {
         $event = reset($events);
 
         // Check that the event data is valid.
-        $this->assertInstanceOf('\mod_lesson\event\question_answered', $event);
+        $this->assertInstanceOf('\mod_opendsa_activity\event\question_answered', $event);
         $this->assertEquals(25, $event->objectid);
         $this->assertEquals('True/false', $event->other['pagetype']);
         $this->assertEventContextNotUsed($event);
@@ -441,12 +441,12 @@ class mod_lesson_events_testcase extends advanced_testcase {
         $params = array(
             'objectid' => 1,
             'relateduserid' => 2,
-            'context' => context_module::instance($this->lesson->properties()->cmid),
+            'context' => context_module::instance($this->opendsa_activity->properties()->cmid),
             'other' => array(
-                'opendsa_activity_id' => $this->lesson->id
+                'opendsa_activity_id' => $this->opendsa_activity->id
             )
         );
-        $event = \mod_lesson\event\user_override_created::create($params);
+        $event = \mod_opendsa_activity\event\user_override_created::create($params);
 
         // Trigger and capture the event.
         $sink = $this->redirectEvents();
@@ -455,8 +455,8 @@ class mod_lesson_events_testcase extends advanced_testcase {
         $event = reset($events);
 
         // Check that the event data is valid.
-        $this->assertInstanceOf('\mod_lesson\event\user_override_created', $event);
-        $this->assertEquals(context_module::instance($this->lesson->properties()->cmid), $event->get_context());
+        $this->assertInstanceOf('\mod_opendsa_activity\event\user_override_created', $event);
+        $this->assertEquals(context_module::instance($this->opendsa_activity->properties()->cmid), $event->get_context());
         $this->assertEventContextNotUsed($event);
     }
 
@@ -470,13 +470,13 @@ class mod_lesson_events_testcase extends advanced_testcase {
 
         $params = array(
             'objectid' => 1,
-            'context' => context_module::instance($this->lesson->properties()->cmid),
+            'context' => context_module::instance($this->opendsa_activity->properties()->cmid),
             'other' => array(
-                'opendsa_activity_id' => $this->lesson->id,
+                'opendsa_activity_id' => $this->opendsa_activity->id,
                 'groupid' => 2
             )
         );
-        $event = \mod_lesson\event\group_override_created::create($params);
+        $event = \mod_opendsa_activity\event\group_override_created::create($params);
 
         // Trigger and capture the event.
         $sink = $this->redirectEvents();
@@ -485,8 +485,8 @@ class mod_lesson_events_testcase extends advanced_testcase {
         $event = reset($events);
 
         // Check that the event data is valid.
-        $this->assertInstanceOf('\mod_lesson\event\group_override_created', $event);
-        $this->assertEquals(context_module::instance($this->lesson->properties()->cmid), $event->get_context());
+        $this->assertInstanceOf('\mod_opendsa_activity\event\group_override_created', $event);
+        $this->assertEquals(context_module::instance($this->opendsa_activity->properties()->cmid), $event->get_context());
         $this->assertEventContextNotUsed($event);
     }
 
@@ -501,12 +501,12 @@ class mod_lesson_events_testcase extends advanced_testcase {
         $params = array(
             'objectid' => 1,
             'relateduserid' => 2,
-            'context' => context_module::instance($this->lesson->properties()->cmid),
+            'context' => context_module::instance($this->opendsa_activity->properties()->cmid),
             'other' => array(
-                'opendsa_activity_id' => $this->lesson->id
+                'opendsa_activity_id' => $this->opendsa_activity->id
             )
         );
-        $event = \mod_lesson\event\user_override_updated::create($params);
+        $event = \mod_opendsa_activity\event\user_override_updated::create($params);
 
         // Trigger and capture the event.
         $sink = $this->redirectEvents();
@@ -515,8 +515,8 @@ class mod_lesson_events_testcase extends advanced_testcase {
         $event = reset($events);
 
         // Check that the event data is valid.
-        $this->assertInstanceOf('\mod_lesson\event\user_override_updated', $event);
-        $this->assertEquals(context_module::instance($this->lesson->properties()->cmid), $event->get_context());
+        $this->assertInstanceOf('\mod_opendsa_activity\event\user_override_updated', $event);
+        $this->assertEquals(context_module::instance($this->opendsa_activity->properties()->cmid), $event->get_context());
         $this->assertEventContextNotUsed($event);
     }
 
@@ -530,13 +530,13 @@ class mod_lesson_events_testcase extends advanced_testcase {
 
         $params = array(
             'objectid' => 1,
-            'context' => context_module::instance($this->lesson->properties()->cmid),
+            'context' => context_module::instance($this->opendsa_activity->properties()->cmid),
             'other' => array(
-                'opendsa_activity_id' => $this->lesson->id,
+                'opendsa_activity_id' => $this->opendsa_activity->id,
                 'groupid' => 2
             )
         );
-        $event = \mod_lesson\event\group_override_updated::create($params);
+        $event = \mod_opendsa_activity\event\group_override_updated::create($params);
 
         // Trigger and capture the event.
         $sink = $this->redirectEvents();
@@ -545,8 +545,8 @@ class mod_lesson_events_testcase extends advanced_testcase {
         $event = reset($events);
 
         // Check that the event data is valid.
-        $this->assertInstanceOf('\mod_lesson\event\group_override_updated', $event);
-        $this->assertEquals(context_module::instance($this->lesson->properties()->cmid), $event->get_context());
+        $this->assertInstanceOf('\mod_opendsa_activity\event\group_override_updated', $event);
+        $this->assertEquals(context_module::instance($this->opendsa_activity->properties()->cmid), $event->get_context());
         $this->assertEventContextNotUsed($event);
     }
 
@@ -558,19 +558,19 @@ class mod_lesson_events_testcase extends advanced_testcase {
 
         // Create an override.
         $override = new stdClass();
-        $override->lesson = $this->lesson->id;
+        $override->opendsa_activity = $this->opendsa_activity->id;
         $override->userid = 2;
-        $override->id = $DB->insert_record('lesson_overrides', $override);
+        $override->id = $DB->insert_record('opendsa_activity_overrides', $override);
 
         // Trigger and capture the event.
         $sink = $this->redirectEvents();
-        $this->lesson->delete_override($override->id);
+        $this->opendsa_activity->delete_override($override->id);
         $events = $sink->get_events();
         $event = reset($events);
 
         // Check that the event data is valid.
-        $this->assertInstanceOf('\mod_lesson\event\user_override_deleted', $event);
-        $this->assertEquals(context_module::instance($this->lesson->properties()->cmid), $event->get_context());
+        $this->assertInstanceOf('\mod_opendsa_activity\event\user_override_deleted', $event);
+        $this->assertEquals(context_module::instance($this->opendsa_activity->properties()->cmid), $event->get_context());
         $this->assertEventContextNotUsed($event);
     }
 
@@ -582,19 +582,19 @@ class mod_lesson_events_testcase extends advanced_testcase {
 
         // Create an override.
         $override = new stdClass();
-        $override->lesson = $this->lesson->id;
+        $override->opendsa_activity = $this->opendsa_activity->id;
         $override->groupid = 2;
-        $override->id = $DB->insert_record('lesson_overrides', $override);
+        $override->id = $DB->insert_record('opendsa_activity_overrides', $override);
 
         // Trigger and capture the event.
         $sink = $this->redirectEvents();
-        $this->lesson->delete_override($override->id);
+        $this->opendsa_activity->delete_override($override->id);
         $events = $sink->get_events();
         $event = reset($events);
 
         // Check that the event data is valid.
-        $this->assertInstanceOf('\mod_lesson\event\group_override_deleted', $event);
-        $this->assertEquals(context_module::instance($this->lesson->properties()->cmid), $event->get_context());
+        $this->assertInstanceOf('\mod_opendsa_activity\event\group_override_deleted', $event);
+        $this->assertEquals(context_module::instance($this->opendsa_activity->properties()->cmid), $event->get_context());
         $this->assertEventContextNotUsed($event);
     }
 }

@@ -16,9 +16,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This file contains the backup task for the lesson module
+ * This file contains the backup task for the opendsa_activity module
  *
- * @package     mod_lesson
+ * @package     mod_opendsa_activity
  * @category    backup
  * @copyright   2010 Sam Hemelryk
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -26,7 +26,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot . '/mod/lesson/backup/moodle2/backup_lesson_stepslib.php');
+require_once($CFG->dirroot . '/mod/opendsa_activity/backup/moodle2/backup_opendsa_activity_stepslib.php');
 
 /**
  * Provides the steps to perform one complete backup of the Lesson instance
@@ -34,7 +34,7 @@ require_once($CFG->dirroot . '/mod/lesson/backup/moodle2/backup_lesson_stepslib.
  * @copyright  2010 Sam Hemelryk
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class backup_lesson_activity_task extends backup_activity_task {
+class backup_opendsa_activity_activity_task extends backup_activity_task {
 
     /**
      * No specific settings for this activity
@@ -43,10 +43,10 @@ class backup_lesson_activity_task extends backup_activity_task {
     }
 
     /**
-     * Defines a backup step to store the instance data in the lesson.xml file
+     * Defines a backup step to store the instance data in the opendsa_activity.xml file
      */
     protected function define_my_steps() {
-        $this->add_step(new backup_lesson_activity_structure_step('lesson structure', 'lesson.xml'));
+        $this->add_step(new backup_opendsa_activity_activity_structure_step('opendsa_activity structure', 'opendsa_activity.xml'));
     }
 
     /**
@@ -58,46 +58,46 @@ class backup_lesson_activity_task extends backup_activity_task {
     static public function encode_content_links($content) {
         global $CFG;
 
-        $base = preg_quote($CFG->wwwroot.'/mod/lesson','#');
+        $base = preg_quote($CFG->wwwroot.'/mod/opendsa_activity','#');
 
-        // Provides the interface for overall authoring of lessons
+        // Provides the interface for overall authoring of opendsa_activitys
         $pattern = '#'.$base.'/edit\.php\?id=([0-9]+)#';
-        $replacement = '$@LESSONEDIT*$1@$';
+        $replacement = '$@OPENDSA_ACTIVITYEDIT*$1@$';
         $content = preg_replace($pattern, $replacement, $content);
 
         // Action for adding a question page.  Prints an HTML form.
         $pattern = '#'.$base.'/editpage\.php\?id=([0-9]+)&(amp;)?pageid=([0-9]+)#';
-        $replacement = '$@LESSONEDITPAGE*$1*$3@$';
+        $replacement = '$@OPENDSA_ACTIVITYEDITPAGE*$1*$3@$';
         $content = preg_replace($pattern, $replacement, $content);
 
         // Provides the interface for grading essay questions
         $pattern = '#'.$base.'/essay\.php\?id=([0-9]+)#';
-        $replacement = '$@LESSONESSAY*$1@$';
+        $replacement = '$@OPENDSA_ACTIVITYESSAY*$1@$';
         $content = preg_replace($pattern, $replacement, $content);
 
         // Provides the interface for viewing the report
         $pattern = '#'.$base.'/report\.php\?id=([0-9]+)#';
-        $replacement = '$@LESSONREPORT*$1@$';
+        $replacement = '$@OPENDSA_ACTIVITYREPORT*$1@$';
         $content = preg_replace($pattern, $replacement, $content);
 
-        // This file plays the mediafile set in lesson settings.
+        // This file plays the mediafile set in opendsa_activity settings.
         $pattern = '#'.$base.'/mediafile\.php\?id=([0-9]+)#';
-        $replacement = '$@LESSONMEDIAFILE*$1@$';
+        $replacement = '$@OPENDSA_ACTIVITYMEDIAFILE*$1@$';
         $content = preg_replace($pattern, $replacement, $content);
 
-        // This page lists all the instances of lesson in a particular course
+        // This page lists all the instances of opendsa_activity in a particular course
         $pattern = '#'.$base.'/index\.php\?id=([0-9]+)#';
-        $replacement = '$@LESSONINDEX*$1@$';
+        $replacement = '$@OPENDSA_ACTIVITYINDEX*$1@$';
         $content = preg_replace($pattern, $replacement, $content);
 
-        // This page prints a particular page of lesson
+        // This page prints a particular page of opendsa_activity
         $pattern = '#'.$base.'/view\.php\?id=([0-9]+)&(amp;)?pageid=([0-9]+)#';
-        $replacement = '$@LESSONVIEWPAGE*$1*$3@$';
+        $replacement = '$@OPENDSA_ACTIVITYVIEWPAGE*$1*$3@$';
         $content = preg_replace($pattern, $replacement, $content);
 
-        // Link to one lesson by cmid
+        // Link to one opendsa_activity by cmid
         $pattern = '#'.$base.'/view\.php\?id=([0-9]+)#';
-        $replacement = '$@LESSONVIEWBYID*$1@$';
+        $replacement = '$@OPENDSA_ACTIVITYVIEWBYID*$1@$';
         $content = preg_replace($pattern, $replacement, $content);
 
         // Return the now encoded content

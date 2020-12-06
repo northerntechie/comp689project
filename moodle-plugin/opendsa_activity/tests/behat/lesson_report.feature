@@ -1,6 +1,6 @@
-@mod @mod_lesson
-Feature: In a lesson activity, teachers can review student attempts
-  To review student attempts in a lesson
+@mod @mod_opendsa_activity
+Feature: In a opendsa_activity activity, teachers can review student attempts
+  To review student attempts in a opendsa_activity
   As a Teacher
   I need to view the reports.
 
@@ -20,13 +20,13 @@ Feature: In a lesson activity, teachers can review student attempts
     And I am on "Course 1" course homepage with editing mode on
     And I add a "Lesson" to section "1"
     And I set the following fields to these values:
-      | Name | Test lesson name |
-      | Description | Test lesson description |
+      | Name | Test opendsa_activity name |
+      | Description | Test opendsa_activity description |
       | Re-takes allowed | Yes |
     And I press "Save and return to course"
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
 
-  Scenario: View student attempts in a lesson containing both content and question pages
+  Scenario: View student attempts in a opendsa_activity containing both content and question pages
     Given I follow "Add a content page"
     And I set the following fields to these values:
       | Page title | First page name |
@@ -81,7 +81,7 @@ Feature: In a lesson activity, teachers can review student attempts
     And I log out
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
     And I should see "First page contents"
     And I press "Next page"
     And I should see "Second page contents"
@@ -98,11 +98,11 @@ Feature: In a lesson activity, teachers can review student attempts
       | True | 1 |
     And I press "Submit"
     And I press "Continue"
-    And I should see "Congratulations - end of lesson reached"
+    And I should see "Congratulations - end of opendsa_activity reached"
     And I log out
     Then I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
     And I follow "Reports"
     And I should see "Student 1"
     And I should see "100%"
@@ -110,7 +110,7 @@ Feature: In a lesson activity, teachers can review student attempts
     And I should see "Average score"
     And I should see "Low score"
 
-  Scenario: View student attempts in a lesson containing only content pages
+  Scenario: View student attempts in a opendsa_activity containing only content pages
     Given I follow "Add a content page"
     And I set the following fields to these values:
       | Page title | First page name |
@@ -124,8 +124,8 @@ Feature: In a lesson activity, teachers can review student attempts
       | Page contents | Fourth page contents |
       | id_answer_editor_0 | Previous page |
       | id_jumpto_0 | Previous page |
-      | id_answer_editor_1 | End of lesson |
-      | id_jumpto_1 | End of lesson |
+      | id_answer_editor_1 | End of opendsa_activity |
+      | id_jumpto_1 | End of opendsa_activity |
     And I press "Save page"
     And I select "Add a content page" from the "qtype" singleselect
     And I set the following fields to these values:
@@ -148,7 +148,7 @@ Feature: In a lesson activity, teachers can review student attempts
     And I log out
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
     And I should see "First page contents"
     And I press "Next page"
     And I should see "Second page contents"
@@ -156,11 +156,11 @@ Feature: In a lesson activity, teachers can review student attempts
     And I should see "Third page contents"
     And I press "Next page"
     And I should see "Fourth page contents"
-    And I press "End of lesson"
+    And I press "End of opendsa_activity"
     And I log out
     Then I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
     And I follow "Reports"
     And I should see "Student 1"
     And I should not see "High score"

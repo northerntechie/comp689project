@@ -17,7 +17,7 @@
 /**
  * File browsing support.
  *
- * @package    mod_lesson
+ * @package    mod_opendsa_activity
  * @copyright  2013 Frédéric Massart
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -27,11 +27,11 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * File browsing support class.
  *
- * @package    mod_lesson
+ * @package    mod_opendsa_activity
  * @copyright  2013 Frédéric Massart
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class mod_lesson_file_info extends file_info {
+class mod_opendsa_activity_file_info extends file_info {
 
     /** @var stdClass Course object */
     protected $course;
@@ -68,7 +68,7 @@ class mod_lesson_file_info extends file_info {
      */
     public function get_params() {
         return array('contextid' => $this->context->id,
-                     'component' => 'mod_lesson',
+                     'component' => 'mod_opendsa_activity',
                      'filearea'  => $this->filearea,
                      'itemid'    => null,
                      'filepath'  => null,
@@ -121,7 +121,7 @@ class mod_lesson_file_info extends file_info {
 
         $params = array(
             'contextid' => $this->context->id,
-            'component' => 'mod_lesson',
+            'component' => 'mod_opendsa_activity',
             'filearea' => $this->filearea
         );
         $sql = 'SELECT DISTINCT itemid
@@ -146,7 +146,7 @@ class mod_lesson_file_info extends file_info {
         $rs = $DB->get_recordset_sql($sql, $params);
         $children = array();
         foreach ($rs as $record) {
-            if (($child = $this->browser->get_file_info($this->context, 'mod_lesson', $this->filearea, $record->itemid))
+            if (($child = $this->browser->get_file_info($this->context, 'mod_opendsa_activity', $this->filearea, $record->itemid))
                     && ($returnemptyfolders || $child->count_non_empty_children($extensions))) {
                 $children[] = $child;
             }

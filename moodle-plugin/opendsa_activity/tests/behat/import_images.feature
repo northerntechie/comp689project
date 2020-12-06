@@ -1,10 +1,10 @@
-@mod @mod_lesson
-Feature: In a lesson activity, teacher can import embedded images in questions answers and responses
+@mod @mod_opendsa_activity
+Feature: In a opendsa_activity activity, teacher can import embedded images in questions answers and responses
   As a teacher
-  I need to import a question with images in answers and responses in a lesson
+  I need to import a question with images in answers and responses in a opendsa_activity
 
   @javascript @_file_upload
-  Scenario: Import questions with images in answers and responses in a lesson
+  Scenario: Import questions with images in answers and responses in a opendsa_activity
     Given the following "users" exist:
       | username | firstname | lastname | email |
       | teacher1 | Teacher | 1 | teacher1@example.com |
@@ -19,12 +19,12 @@ Feature: In a lesson activity, teacher can import embedded images in questions a
     And I log in as "teacher1"
     When I am on "Course 1" course homepage with editing mode on
     And I add a "Lesson" to section "1" and I fill the form with:
-      | Name | Test lesson name |
-      | Description | Test lesson description |
-    And I follow "Test lesson name"
+      | Name | Test opendsa_activity name |
+      | Description | Test opendsa_activity description |
+    And I follow "Test opendsa_activity name"
     And I follow "Import questions"
     And I set the field "File format" to "Moodle XML format"
-    And I upload "mod/lesson/tests/fixtures/multichoice.xml" file to "Upload" filemanager
+    And I upload "mod/opendsa_activity/tests/fixtures/multichoice.xml" file to "Upload" filemanager
     And I press "Import"
     Then I should see "Importing 1 questions"
     And I should see " Listen to this greeting:"

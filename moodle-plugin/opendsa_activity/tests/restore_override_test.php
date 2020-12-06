@@ -17,7 +17,7 @@
 /**
  * Restore override tests.
  *
- * @package    mod_lesson
+ * @package    mod_opendsa_activity
  * @author   2019 Nathan Nguyen <nathannguyen@catalyst-au.net>
  * @copyright Catalyst IT
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -30,12 +30,12 @@ require_once($CFG->libdir . "/phpunit/classes/restore_date_testcase.php");
 /**
  * Restore override tests.
  *
- * @package    mod_lesson
+ * @package    mod_opendsa_activity
  * @author   2019 Nathan Nguyen <nathannguyen@catalyst-au.net>
  * @copyright Catalyst IT
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class mod_lesson_restore_override_testcase extends restore_date_testcase {
+class mod_opendsa_activity_restore_override_testcase extends restore_date_testcase {
 
     /**
      * Test restore overrides.
@@ -45,60 +45,60 @@ class mod_lesson_restore_override_testcase extends restore_date_testcase {
         $this->resetAfterTest();
 
         $course = $this->getDataGenerator()->create_course();
-        $lessongen = $this->getDataGenerator()->get_plugin_generator('mod_lesson');
-        $lesson = $lessongen->create_instance(['course' => $course->id]);
+        $opendsa_activitygen = $this->getDataGenerator()->get_plugin_generator('mod_opendsa_activity');
+        $opendsa_activity = $opendsa_activitygen->create_instance(['course' => $course->id]);
 
         $group1 = $this->getDataGenerator()->create_group(array('courseid' => $course->id));
         $group2 = $this->getDataGenerator()->create_group(array('courseid' => $course->id));
 
         $now = 100;
         $groupoverride1 = (object)[
-            'opendsa_activity_id' => $lesson->id,
+            'opendsa_activity_id' => $opendsa_activity->id,
             'groupid' => $group1->id,
             'available' => $now,
             'deadline' => $now + 20
         ];
-        $DB->insert_record('lesson_overrides', $groupoverride1);
+        $DB->insert_record('opendsa_activity_overrides', $groupoverride1);
 
         $groupoverride2 = (object)[
-            'opendsa_activity_id' => $lesson->id,
+            'opendsa_activity_id' => $opendsa_activity->id,
             'groupid' => $group2->id,
             'available' => $now,
             'deadline' => $now + 40
         ];
-        $DB->insert_record('lesson_overrides', $groupoverride2);
+        $DB->insert_record('opendsa_activity_overrides', $groupoverride2);
 
         // Current quiz overrides.
-        $overrides = $DB->get_records('lesson_overrides', ['opendsa_activity_id' => $lesson->id]);
+        $overrides = $DB->get_records('opendsa_activity_overrides', ['opendsa_activity_id' => $opendsa_activity->id]);
         $this->assertEquals(2, count($overrides));
 
         // User override.
         $useroverride = (object)[
-            'opendsa_activity_id' => $lesson->id,
+            'opendsa_activity_id' => $opendsa_activity->id,
             'userid' => $USER->id,
             'sortorder' => 1,
             'available' => 100,
             'deadline' => 200
         ];
-        $DB->insert_record('lesson_overrides', $useroverride);
+        $DB->insert_record('opendsa_activity_overrides', $useroverride);
 
         // Current quiz overrides.
-        $overrides = $DB->get_records('lesson_overrides', ['opendsa_activity_id' => $lesson->id]);
+        $overrides = $DB->get_records('opendsa_activity_overrides', ['opendsa_activity_id' => $opendsa_activity->id]);
         $this->assertEquals(3, count($overrides));
 
         // Back up and restore including group info and user info.
         set_config('backup_general_groups', 1, 'backup');
         $newcourseid = $this->backup_and_restore($course);
-        $newquiz = $DB->get_record('lesson', ['course' => $newcourseid]);
-        $overrides = $DB->get_records('lesson_overrides', ['opendsa_activity_id' => $newquiz->id]);
+        $newquiz = $DB->get_record('opendsa_activity', ['course' => $newcourseid]);
+        $overrides = $DB->get_records('opendsa_activity_overrides', ['opendsa_activity_id' => $newquiz->id]);
         // 2 groups overrides and 1 user override.
         $this->assertEquals(3, count($overrides));
 
         // Back up and restore with user info and without group info.
         set_config('backup_general_groups', 0, 'backup');
         $newcourseid = $this->backup_and_restore($course);
-        $newquiz = $DB->get_record('lesson', ['course' => $newcourseid]);
-        $overrides = $DB->get_records('lesson_overrides', ['opendsa_activity_id' => $newquiz->id]);
+        $newquiz = $DB->get_record('opendsa_activity', ['course' => $newcourseid]);
+        $overrides = $DB->get_records('opendsa_activity_overrides', ['opendsa_activity_id' => $newquiz->id]);
         // 1 user override.
         $this->assertEquals(1, count($overrides));
     }

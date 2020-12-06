@@ -15,31 +15,31 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The mod_lesson highscore added event.
+ * The mod_opendsa_activity highscore added event.
  *
- * @package    mod_lesson
+ * @package    mod_opendsa_activity
  * @deprecated since Moodle 3.0
  * @copyright  2013 Mark Nelson <markn@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 
-namespace mod_lesson\event;
+namespace mod_opendsa_activity\event;
 
 defined('MOODLE_INTERNAL') || die();
 
-debugging('mod_lesson\event\highscore_added has been deprecated. Since the functionality no longer resides in the lesson module.',
+debugging('mod_opendsa_activity\event\highscore_added has been deprecated. Since the functionality no longer resides in the opendsa_activity module.',
         DEBUG_DEVELOPER);
 /**
- * The mod_lesson highscore added event class.
+ * The mod_opendsa_activity highscore added event class.
  *
  * @property-read array $other {
  *      Extra information about event.
  *
- *      - int opendsa_activity_id: the id of the lesson in the lesson table.
+ *      - int opendsa_activity_id: the id of the opendsa_activity in the opendsa_activity table.
  *      - string nickname: the user's nickname.
  * }
  *
- * @package    mod_lesson
+ * @package    mod_opendsa_activity
  * @since      Moodle 2.7
  * @copyright  2013 Mark Nelson <markn@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
@@ -51,7 +51,7 @@ class highscore_added extends \core\event\base {
      * Set basic properties for the event.
      */
     protected function init() {
-        $this->data['objecttable'] = 'lesson_high_scores';
+        $this->data['objecttable'] = 'opendsa_activity_high_scores';
         $this->data['crud'] = 'c';
         $this->data['edulevel'] = self::LEVEL_PARTICIPATING;
     }
@@ -62,7 +62,7 @@ class highscore_added extends \core\event\base {
      * @return string
      */
     public static function get_name() {
-        return get_string('eventhighscoreadded', 'mod_lesson');
+        return get_string('eventhighscoreadded', 'mod_opendsa_activity');
     }
 
     /**
@@ -71,7 +71,7 @@ class highscore_added extends \core\event\base {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url('/mod/lesson/highscores.php', array('id' => $this->contextinstanceid));
+        return new \moodle_url('/mod/opendsa_activity/highscores.php', array('id' => $this->contextinstanceid));
     }
 
     /**
@@ -80,7 +80,7 @@ class highscore_added extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        return "The user with id '$this->userid' added a new highscore to the lesson activity with course module " .
+        return "The user with id '$this->userid' added a new highscore to the opendsa_activity activity with course module " .
             "id '$this->contextinstanceid'.";
     }
 
@@ -90,7 +90,7 @@ class highscore_added extends \core\event\base {
      * @return array of parameters to be passed to legacy add_to_log() function.
      */
     protected function get_legacy_logdata() {
-        return array($this->courseid, 'lesson', 'update highscores', 'highscores.php?id=' . $this->contextinstanceid,
+        return array($this->courseid, 'opendsa_activity', 'update highscores', 'highscores.php?id=' . $this->contextinstanceid,
             $this->other['nickname'], $this->contextinstanceid);
     }
 

@@ -1,6 +1,6 @@
-@mod @mod_lesson
+@mod @mod_opendsa_activity
 Feature: Lesson user override
-  In order to grant a student special access to a lesson
+  In order to grant a student special access to a opendsa_activity
   As a teacher
   I need to create an override for that user.
 
@@ -20,10 +20,10 @@ Feature: Lesson user override
       | student2 | C1 | student |
     And the following "activities" exist:
       | activity | name             | intro                   | course | idnumber |
-      | lesson   | Test lesson name | Test lesson description | C1     | lesson1  |
+      | opendsa_activity   | Test opendsa_activity name | Test opendsa_activity description | C1     | opendsa_activity1  |
     And I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
     And I follow "Add a question page"
     And I set the field "Select a question type" to "True/false"
     And I press "Add a question page"
@@ -43,7 +43,7 @@ Feature: Lesson user override
   Scenario: Add, modify then delete a user override
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
-    When I follow "Test lesson name"
+    When I follow "Test opendsa_activity name"
     And I navigate to "User overrides" in current page administration
     And I press "Add user override"
     And I set the following fields to these values:
@@ -69,7 +69,7 @@ Feature: Lesson user override
   Scenario: Duplicate a user override
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
-    When I follow "Test lesson name"
+    When I follow "Test opendsa_activity name"
     And I navigate to "User overrides" in current page administration
     And I press "Add user override"
     And I set the following fields to these values:
@@ -91,10 +91,10 @@ Feature: Lesson user override
     And I should see "Sam2 Student2"
 
   @javascript
-  Scenario: Allow a single user to have re-take the lesson
+  Scenario: Allow a single user to have re-take the opendsa_activity
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
-    When I follow "Test lesson name"
+    When I follow "Test opendsa_activity name"
     And I navigate to "Edit settings" in current page administration
     And I set the following fields to these values:
       | Re-takes allowed | 0 |
@@ -109,56 +109,56 @@ Feature: Lesson user override
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
     And I should see "Cat is an amphibian"
     And I set the following fields to these values:
       | False | 1 |
     And I press "Submit"
     And I press "Continue"
-    And I should see "Congratulations - end of lesson reached"
-    And I follow "Test lesson name"
-    Then I should not see "You are not allowed to retake this lesson."
+    And I should see "Congratulations - end of opendsa_activity reached"
+    And I follow "Test opendsa_activity name"
+    Then I should not see "You are not allowed to retake this opendsa_activity."
     And I should see "Cat is an amphibian"
     And I log out
     And I log in as "student2"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
     And I should see "Cat is an amphibian"
     And I set the following fields to these values:
       | False | 1 |
     And I press "Submit"
     And I press "Continue"
-    And I should see "Congratulations - end of lesson reached"
-    And I follow "Test lesson name"
-    And I should see "You are not allowed to retake this lesson."
+    And I should see "Congratulations - end of opendsa_activity reached"
+    And I follow "Test opendsa_activity name"
+    And I should see "You are not allowed to retake this opendsa_activity."
 
   @javascript
   Scenario: Allow a single user to have a different password
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
-    When I follow "Test lesson name"
+    When I follow "Test opendsa_activity name"
     And I navigate to "Edit settings" in current page administration
     And I set the following fields to these values:
-      | Password protected lesson | Yes |
+      | Password protected opendsa_activity | Yes |
       | id_password               | moodle_rules |
     And I press "Save and display"
     And I navigate to "User overrides" in current page administration
     And I press "Add user override"
     And I set the following fields to these values:
       | Override user             | Student1  |
-      | Password protected lesson | 12345 |
+      | Password protected opendsa_activity | 12345 |
     And I press "Save"
-    And I should see "Password protected lesson"
+    And I should see "Password protected opendsa_activity"
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
-    Then I should see "Test lesson name is a password protected lesson"
+    And I follow "Test opendsa_activity name"
+    Then I should see "Test opendsa_activity name is a password protected opendsa_activity"
     And I should not see "Cat is an amphibian"
     And I set the field "userpassword" to "moodle_rules"
     And I press "Continue"
     And I should see "Login failed, please try again..."
-    And I should see "Test lesson name is a password protected lesson"
+    And I should see "Test opendsa_activity name is a password protected opendsa_activity"
     And I set the field "userpassword" to "12345"
     And I press "Continue"
     And I should see "Cat is an amphibian"
@@ -166,17 +166,17 @@ Feature: Lesson user override
       | False | 1 |
     And I press "Submit"
     And I press "Continue"
-    And I should see "Congratulations - end of lesson reached"
+    And I should see "Congratulations - end of opendsa_activity reached"
     And I log out
     And I log in as "student2"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
-    And I should see "Test lesson name is a password protected lesson"
+    And I follow "Test opendsa_activity name"
+    And I should see "Test opendsa_activity name is a password protected opendsa_activity"
     And I should not see "Cat is an amphibian"
     And I set the field "userpassword" to "12345"
     And I press "Continue"
     And I should see "Login failed, please try again..."
-    And I should see "Test lesson name is a password protected lesson"
+    And I should see "Test opendsa_activity name is a password protected opendsa_activity"
     And I set the field "userpassword" to "moodle_rules"
     And I press "Continue"
 
@@ -184,7 +184,7 @@ Feature: Lesson user override
   Scenario: Allow a user to have a different due date
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
-    When I follow "Test lesson name"
+    When I follow "Test opendsa_activity name"
     And I navigate to "Edit settings" in current page administration
     And I set the following fields to these values:
       | id_deadline_enabled | 1 |
@@ -209,21 +209,21 @@ Feature: Lesson user override
     And I log out
     And I log in as "student2"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson"
+    And I follow "Test opendsa_activity"
     And I wait until the page is ready
-    Then I should see "This lesson closed on Saturday, 1 January 2000, 8:00"
+    Then I should see "This opendsa_activity closed on Saturday, 1 January 2000, 8:00"
     And I should not see "Cat is an amphibian"
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson"
+    And I follow "Test opendsa_activity"
     And I should see "Cat is an amphibian"
 
   @javascript
   Scenario: Allow a user to have a different start date
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
-    When I follow "Test lesson name"
+    When I follow "Test opendsa_activity name"
     And I navigate to "Edit settings" in current page administration
     And I set the following fields to these values:
       | id_available_enabled | 1 |
@@ -248,21 +248,21 @@ Feature: Lesson user override
     And I log out
     And I log in as "student2"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson"
+    And I follow "Test opendsa_activity"
     And I wait until the page is ready
-    Then I should see "This lesson will be open on Tuesday, 1 January 2030, 8:00"
+    Then I should see "This opendsa_activity will be open on Tuesday, 1 January 2030, 8:00"
     And I should not see "Cat is an amphibian"
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson"
+    And I follow "Test opendsa_activity"
     And I should see "Cat is an amphibian"
 
   @javascript
   Scenario: Allow a single user to have multiple attempts at each question
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
-    When I follow "Test lesson name"
+    When I follow "Test opendsa_activity name"
     And I navigate to "Edit settings" in current page administration
     And I set the following fields to these values:
       | Re-takes allowed | 1 |
@@ -277,7 +277,7 @@ Feature: Lesson user override
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
     And I should see "Cat is an amphibian"
     And I set the following fields to these values:
       | True | 1 |
@@ -288,17 +288,17 @@ Feature: Lesson user override
       | True | 1 |
     And I press "Submit"
     And I press "Continue"
-    And I should see "Congratulations - end of lesson reached"
+    And I should see "Congratulations - end of opendsa_activity reached"
     And I log out
     And I log in as "student2"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
     And I should see "Cat is an amphibian"
     And I set the following fields to these values:
       | True | 1 |
     And I press "Submit"
     Then I press "Continue"
-    And I should see "Congratulations - end of lesson reached"
+    And I should see "Congratulations - end of opendsa_activity reached"
 
   Scenario: Override a user when teacher is in no group, and does not have accessallgroups permission, and the activity's group mode is 'separate groups'
     Given the following "permission overrides" exist:
@@ -306,7 +306,7 @@ Feature: Lesson user override
       | moodle/site:accessallgroups | Prevent    | editingteacher | Course       | C1        |
     And the following "activities" exist:
       | activity | name     | intro                | course | idnumber | groupmode |
-      | lesson   | Lesson 2 | Lesson 2 description | C1     | lesson2  | 1         |
+      | opendsa_activity   | Lesson 2 | Lesson 2 description | C1     | opendsa_activity2  | 1         |
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Lesson 2"
@@ -320,7 +320,7 @@ Feature: Lesson user override
       | moodle/site:accessallgroups | Prevent    | editingteacher | Course       | C1        |
     And the following "activities" exist:
       | activity | name     | intro                | course | idnumber | groupmode |
-      | lesson   | Lesson 2 | Lesson 2 description | C1     | lesson2  | 1         |
+      | opendsa_activity   | Lesson 2 | Lesson 2 description | C1     | opendsa_activity2  | 1         |
     And the following "groups" exist:
       | name    | course | idnumber |
       | Group 1 | C1     | G1       |
@@ -345,7 +345,7 @@ Feature: Lesson user override
       | moodle/site:accessallgroups | Prevent    | editingteacher | Course       | C1        |
     And the following "activities" exist:
       | activity | name     | intro                | course | idnumber | groupmode |
-      | lesson   | Lesson 2 | Lesson 2 description | C1     | lesson2  | 1         |
+      | opendsa_activity   | Lesson 2 | Lesson 2 description | C1     | opendsa_activity2  | 1         |
     And the following "groups" exist:
       | name    | course | idnumber |
       | Group 1 | C1     | G1       |
@@ -387,10 +387,10 @@ Feature: Lesson user override
     And I should not see "Student2" in the ".generaltable" "css_element"
 
   @javascript
-  Scenario: Create a user override when the lesson is not available to the student
+  Scenario: Create a user override when the opendsa_activity is not available to the student
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
     And I navigate to "Edit settings" in current page administration
     And I expand all fieldsets
     And I set the field "Availability" to "Hide from students"

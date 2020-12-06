@@ -1,6 +1,6 @@
-@mod @mod_lesson
-Feature: In Dashboard, a student can see their current status on all lessons with an upcoming due date
-  In order to know my status on a lesson
+@mod @mod_opendsa_activity
+Feature: In Dashboard, a student can see their current status on all opendsa_activitys with an upcoming due date
+  In order to know my status on a opendsa_activity
   As a student
   I need to see it in Dashboard
 
@@ -18,12 +18,12 @@ Feature: In Dashboard, a student can see their current status on all lessons wit
       | student1 | C1 | student |
     And the following "activities" exist:
       | activity | name             | intro                   | deadline   | retake | course | idnumber |
-      | lesson   | Test lesson name | Test lesson description | 1893481200 | 1      | C1     | lesson1  |
+      | opendsa_activity   | Test opendsa_activity name | Test opendsa_activity description | 1893481200 | 1      | C1     | opendsa_activity1  |
     And I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
 
-  Scenario: A completed lesson with only questions that allows multiple attempts
-    Given I follow "Test lesson name"
+  Scenario: A completed opendsa_activity with only questions that allows multiple attempts
+    Given I follow "Test opendsa_activity name"
     And I follow "Add a question page"
     And I set the field "Select a question type" to "True/false"
     And I press "Add a question page"
@@ -53,7 +53,7 @@ Feature: In Dashboard, a student can see their current status on all lessons wit
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
     And I should see "Cat is an amphibian"
     And I set the following fields to these values:
       | False | 1 |
@@ -64,10 +64,10 @@ Feature: In Dashboard, a student can see their current status on all lessons wit
       | False | 1 |
     And I press "Submit"
     And I press "Continue"
-    And I should see "Congratulations - end of lesson reached"
+    And I should see "Congratulations - end of opendsa_activity reached"
 
-  Scenario: A completed lesson with only questions that does not allow multiple attempts
-    Given  I follow "Test lesson name"
+  Scenario: A completed opendsa_activity with only questions that does not allow multiple attempts
+    Given  I follow "Test opendsa_activity name"
     And I navigate to "Edit settings" in current page administration
     And I set the following fields to these values:
       | Re-takes allowed | 0 |
@@ -101,7 +101,7 @@ Feature: In Dashboard, a student can see their current status on all lessons wit
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
     And I should see "Cat is an amphibian"
     And I set the following fields to these values:
       | False | 1 |
@@ -112,11 +112,11 @@ Feature: In Dashboard, a student can see their current status on all lessons wit
       | False | 1 |
     And I press "Submit"
     And I press "Continue"
-    And I should see "Congratulations - end of lesson reached"
+    And I should see "Congratulations - end of opendsa_activity reached"
     And I log out
 
-  Scenario: A completed lesson with only content pages that allows multiple attempts
-    Given I follow "Test lesson name"
+  Scenario: A completed opendsa_activity with only content pages that allows multiple attempts
+    Given I follow "Test opendsa_activity name"
     And I follow "Add a content page"
     And I set the following fields to these values:
       | Page title | First page name |
@@ -130,21 +130,21 @@ Feature: In Dashboard, a student can see their current status on all lessons wit
       | Page contents | Second page contents |
       | id_answer_editor_0 | Previous page |
       | id_jumpto_0 | Previous page |
-      | id_answer_editor_1 | End of lesson |
-      | id_jumpto_1 | End of lesson |
+      | id_answer_editor_1 | End of opendsa_activity |
+      | id_jumpto_1 | End of opendsa_activity |
     And I press "Save page"
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
     And I should see "First page contents"
     And I press "Next page"
     And I should see "Second page contents"
-    And I press "End of lesson"
+    And I press "End of opendsa_activity"
     And I log out
 
-  Scenario: A completed lesson with only content pages that does not allow multiple attempts
-    Given I follow "Test lesson name"
+  Scenario: A completed opendsa_activity with only content pages that does not allow multiple attempts
+    Given I follow "Test opendsa_activity name"
     And I navigate to "Edit settings" in current page administration
     And I set the following fields to these values:
       | Re-takes allowed | 0 |
@@ -162,21 +162,21 @@ Feature: In Dashboard, a student can see their current status on all lessons wit
       | Page contents | Second page contents |
       | id_answer_editor_0 | Previous page |
       | id_jumpto_0 | Previous page |
-      | id_answer_editor_1 | End of lesson |
-      | id_jumpto_1 | End of lesson |
+      | id_answer_editor_1 | End of opendsa_activity |
+      | id_jumpto_1 | End of opendsa_activity |
     And I press "Save page"
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
     And I should see "First page contents"
     And I press "Next page"
     And I should see "Second page contents"
-    And I press "End of lesson"
+    And I press "End of opendsa_activity"
     And I log out
 
-  Scenario: An incomplete lesson with only questions.
-    Given I follow "Test lesson name"
+  Scenario: An incomplete opendsa_activity with only questions.
+    Given I follow "Test opendsa_activity name"
     And I follow "Add a question page"
     And I set the field "Select a question type" to "True/false"
     And I press "Add a question page"
@@ -206,7 +206,7 @@ Feature: In Dashboard, a student can see their current status on all lessons wit
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
     And I should see "Cat is an amphibian"
     And I set the following fields to these values:
       | False | 1 |
@@ -214,8 +214,8 @@ Feature: In Dashboard, a student can see their current status on all lessons wit
     And I press "Continue"
     And I log out
 
-  Scenario: An incomplete lesson with only content pages.
-    Given I follow "Test lesson name"
+  Scenario: An incomplete opendsa_activity with only content pages.
+    Given I follow "Test opendsa_activity name"
     And I follow "Add a content page"
     And I set the following fields to these values:
       | Page title | First page name |
@@ -229,20 +229,20 @@ Feature: In Dashboard, a student can see their current status on all lessons wit
       | Page contents | Second page contents |
       | id_answer_editor_0 | Previous page |
       | id_jumpto_0 | Previous page |
-      | id_answer_editor_1 | End of lesson |
-      | id_jumpto_1 | End of lesson |
+      | id_answer_editor_1 | End of opendsa_activity |
+      | id_jumpto_1 | End of opendsa_activity |
     And I press "Save page"
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
     And I should see "First page contents"
     And I press "Next page"
     And I should see "Second page contents"
     And I log out
 
-  Scenario: A lesson with only questions that has not been started.
-    Given I follow "Test lesson name"
+  Scenario: A opendsa_activity with only questions that has not been started.
+    Given I follow "Test opendsa_activity name"
     And I follow "Add a question page"
     And I set the field "Select a question type" to "True/false"
     And I press "Add a question page"
@@ -271,8 +271,8 @@ Feature: In Dashboard, a student can see their current status on all lessons wit
     And I press "Save page"
     And I log out
 
-  Scenario: A lesson with only content pages that has not been started.
-    Given I follow "Test lesson name"
+  Scenario: A opendsa_activity with only content pages that has not been started.
+    Given I follow "Test opendsa_activity name"
     And I follow "Add a content page"
     And I set the following fields to these values:
       | Page title | First page name |
@@ -286,12 +286,12 @@ Feature: In Dashboard, a student can see their current status on all lessons wit
       | Page contents | Second page contents |
       | id_answer_editor_0 | Previous page |
       | id_jumpto_0 | Previous page |
-      | id_answer_editor_1 | End of lesson |
-      | id_jumpto_1 | End of lesson |
+      | id_answer_editor_1 | End of opendsa_activity |
+      | id_jumpto_1 | End of opendsa_activity |
     And I press "Save page"
     And I log out
 
-  Scenario: Viewing the status for multiple lessons in multiple courses
+  Scenario: Viewing the status for multiple opendsa_activitys in multiple courses
     Given the following "courses" exist:
       | fullname | shortname | category |
       | Course 2 | C2 | 0 |
@@ -301,10 +301,10 @@ Feature: In Dashboard, a student can see their current status on all lessons wit
       | student1 | C2 | student |
     And the following "activities" exist:
       | activity | name               | intro                   | deadline   | retake | course | idnumber |
-      | lesson   | Test lesson name 2 | Test lesson description | 1893481200 | 1      | C1     | lesson1  |
-      | lesson   | Test lesson name 3 | Test lesson description | 1893481200 | 1      | C2     | lesson1  |
+      | opendsa_activity   | Test opendsa_activity name 2 | Test opendsa_activity description | 1893481200 | 1      | C1     | opendsa_activity1  |
+      | opendsa_activity   | Test opendsa_activity name 3 | Test opendsa_activity description | 1893481200 | 1      | C2     | opendsa_activity1  |
     And I turn editing mode off
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
     And I follow "Add a question page"
     And I set the field "Select a question type" to "True/false"
     And I press "Add a question page"
@@ -315,7 +315,7 @@ Feature: In Dashboard, a student can see their current status on all lessons wit
       | id_answer_editor_1 | False |
     And I press "Save page"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name 2"
+    And I follow "Test opendsa_activity name 2"
     And I follow "Add a question page"
     And I set the field "Select a question type" to "True/false"
     And I press "Add a question page"
@@ -326,7 +326,7 @@ Feature: In Dashboard, a student can see their current status on all lessons wit
       | id_answer_editor_1 | False |
     And I press "Save page"
     And I am on "Course 2" course homepage
-    And I follow "Test lesson name 3"
+    And I follow "Test opendsa_activity name 3"
     And I follow "Add a question page"
     And I set the field "Select a question type" to "True/false"
     And I press "Add a question page"
@@ -348,13 +348,13 @@ Feature: In Dashboard, a student can see their current status on all lessons wit
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
     And I should see "D035 M00d13 r0x0rz j00 b0x0rs?"
     And I set the following fields to these values:
       | True | 1 |
     And I press "Submit"
     And I am on "Course 2" course homepage
-    And I follow "Test lesson name 3"
+    And I follow "Test opendsa_activity name 3"
     And I should see "D035 M00d13 r0x0rz j00 b0x0rs?"
     And I set the following fields to these values:
       | True | 1 |

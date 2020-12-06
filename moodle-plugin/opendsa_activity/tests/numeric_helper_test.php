@@ -17,7 +17,7 @@
 /**
  * Unit tests for page types classes
  *
- * @package   mod_lesson
+ * @package   mod_opendsa_activity
  * @category  test
  * @copyright 2020 Peter Dias
  * @license   http://www.gnu.org/copyleft/gpl.html GNU Public License
@@ -26,7 +26,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-use mod_lesson\local\numeric\helper;
+use mod_opendsa_activity\local\numeric\helper;
 
 /**
  * This class contains the test cases for the numeric helper functions
@@ -34,34 +34,34 @@ use mod_lesson\local\numeric\helper;
  * @copyright 2020 Peter Dias
  * @license   http://www.gnu.org/copyleft/gpl.html GNU Public License
  */
-class mod_lesson_numeric_type_helper_test extends advanced_testcase {
+class mod_opendsa_activity_numeric_type_helper_test extends advanced_testcase {
     /**
-     * Test the lesson_unformat_numeric_value function.
+     * Test the opendsa_activity_unformat_numeric_value function.
      *
-     * @dataProvider lesson_unformat_dataprovider
+     * @dataProvider opendsa_activity_unformat_dataprovider
      * @param $decsep
      * @param $tests
      */
-    public function test_lesson_unformat_numeric_value($decsep, $tests) {
+    public function test_opendsa_activity_unformat_numeric_value($decsep, $tests) {
         $this->define_local_decimal_separator($decsep);
 
         foreach ($tests as $test) {
-            $this->assertEquals($test[1], helper::lesson_unformat_numeric_value($test[0]));
+            $this->assertEquals($test[1], helper::opendsa_activity_unformat_numeric_value($test[0]));
         }
     }
 
     /**
-     * Test the lesson_format_numeric_value function.
+     * Test the opendsa_activity_format_numeric_value function.
      *
-     * @dataProvider lesson_format_dataprovider
+     * @dataProvider opendsa_activity_format_dataprovider
      * @param $decsep
      * @param $tests
      */
-    public function test_lesson_format_numeric_value($decsep, $tests) {
+    public function test_opendsa_activity_format_numeric_value($decsep, $tests) {
         $this->define_local_decimal_separator($decsep);
 
         foreach ($tests as $test) {
-            $this->assertEquals($test[1], helper::lesson_format_numeric_value($test[0]));
+            $this->assertEquals($test[1], helper::opendsa_activity_format_numeric_value($test[0]));
         }
     }
 
@@ -70,7 +70,7 @@ class mod_lesson_numeric_type_helper_test extends advanced_testcase {
      *
      * @return array
      */
-    public function lesson_unformat_dataprovider() {
+    public function opendsa_activity_unformat_dataprovider() {
         return [
             "Using a decimal as a separator" => [
                 "decsep" => ".",
@@ -108,7 +108,7 @@ class mod_lesson_numeric_type_helper_test extends advanced_testcase {
      *
      * @return array
      */
-    public function lesson_format_dataprovider() {
+    public function opendsa_activity_format_dataprovider() {
         return [
             "Using a decimal as a separator" => [
                 "decsep" => ".",

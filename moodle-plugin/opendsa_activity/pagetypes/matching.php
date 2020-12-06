@@ -18,7 +18,7 @@
 /**
  * Matching
  *
- * @package mod_lesson
+ * @package mod_opendsa_activity
  * @copyright  2009 Sam Hemelryk
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  **/
@@ -26,12 +26,12 @@
 defined('MOODLE_INTERNAL') || die();
 
 /** Matching question type */
-define("LESSON_PAGE_MATCHING",      "5");
+define("OPENDSA_ACTIVITY_PAGE_MATCHING",      "5");
 
-class lesson_page_type_matching extends lesson_page {
+class opendsa_activity_page_type_matching extends opendsa_activity_page {
 
-    protected $type = lesson_page::TYPE_QUESTION;
-    protected $typeid = LESSON_PAGE_MATCHING;
+    protected $type = opendsa_activity_page::TYPE_QUESTION;
+    protected $typeid = OPENDSA_ACTIVITY_PAGE_MATCHING;
     protected $typeidstring = 'matching';
     protected $string = null;
 
@@ -40,7 +40,7 @@ class lesson_page_type_matching extends lesson_page {
     }
     public function get_typestring() {
         if ($this->string===null) {
-            $this->string = get_string($this->typeidstring, 'lesson');
+            $this->string = get_string($this->typeidstring, 'opendsa_activity');
         }
         return $this->string;
     }
@@ -64,7 +64,7 @@ class lesson_page_type_matching extends lesson_page {
                 )
             );
 
-        $event = \mod_lesson\event\question_viewed::create($eventparams);
+        $event = \mod_opendsa_activity\event\question_viewed::create($eventparams);
         $event->trigger();
         return $mform->display();
     }
@@ -94,16 +94,16 @@ class lesson_page_type_matching extends lesson_page {
                 $responseoptions[htmlspecialchars($response)] = $response;
             }
         }
-        if (isset($USER->modattempts[$this->lesson->id]) && !empty($attempt->useranswer)) {
+        if (isset($USER->modattempts[$this->opendsa_activity->id]) && !empty($attempt->useranswer)) {
             $useranswers = explode(',', $attempt->useranswer);
             $t = 0;
         } else {
             $useranswers = array();
         }
 
-        $action = $CFG->wwwroot.'/mod/lesson/continue.php';
-        $params = array('answers'=>$answers, 'useranswers'=>$useranswers, 'responseoptions'=>$responseoptions, 'opendsa_activity_id'=>$this->lesson->id, 'contents'=>$this->get_contents());
-        $mform = new lesson_display_answer_form_matching($action, $params);
+        $action = $CFG->wwwroot.'/mod/opendsa_activity/continue.php';
+        $params = array('answers'=>$answers, 'useranswers'=>$useranswers, 'responseoptions'=>$responseoptions, 'opendsa_activity_id'=>$this->opendsa_activity->id, 'contents'=>$this->get_contents());
+        $mform = new opendsa_activity_display_answer_form_matching($action, $params);
         return $mform;
     }
 
@@ -111,11 +111,11 @@ class lesson_page_type_matching extends lesson_page {
         global $DB, $PAGE;
         // now add the answers
         $newanswer = new stdClass;
-        $newanswer->opendsa_activity_id = $this->lesson->id;
+        $newanswer->opendsa_activity_id = $this->opendsa_activity->id;
         $newanswer->pageid = $this->properties->id;
         $newanswer->timecreated = $this->properties->timecreated;
 
-        $cm = get_coursemodule_from_instance('lesson', $this->lesson->id, $this->lesson->course);
+        $cm = get_coursemodule_from_instance('opendsa_activity', $this->opendsa_activity->id, $this->opendsa_activity->course);
         $context = context_module::instance($cm->id);
 
         // Check for duplicate response format.
@@ -131,8 +131,8 @@ class lesson_page_type_matching extends lesson_page {
         $answers = array();
 
         // need to add two to offset correct response and wrong response
-        $this->lesson->maxanswers = $this->lesson->maxanswers + 2;
-        for ($i = 0; $i < $this->lesson->maxanswers; $i++) {
+        $this->opendsa_activity->maxanswers = $this->opendsa_activity->maxanswers + 2;
+        for ($i = 0; $i < $this->opendsa_activity->maxanswers; $i++) {
             $answer = clone($newanswer);
             if (!empty($properties->answer_editor[$i]) && is_array($properties->answer_editor[$i])) {
                 $answer->answer = $properties->answer_editor[$i]['text'];
@@ -146,18 +146,18 @@ class lesson_page_type_matching extends lesson_page {
             if (isset($properties->jumpto[$i])) {
                 $answer->jumpto = $properties->jumpto[$i];
             }
-            if ($this->lesson->custom && isset($properties->score[$i])) {
+            if ($this->opendsa_activity->custom && isset($properties->score[$i])) {
                 $answer->score = $properties->score[$i];
             }
 
             if (isset($answer->answer) && $answer->answer != '') {
-                $answer->id = $DB->insert_record("lesson_answers", $answer);
+                $answer->id = $DB->insert_record("opendsa_activity_answers", $answer);
                 $this->save_answers_files($context, $PAGE->course->maxbytes,
                         $answer, $properties->answer_editor[$i]);
-                $answers[$answer->id] = new lesson_page_answer($answer);
+                $answers[$answer->id] = new opendsa_activity_page_answer($answer);
             } else if ($i < 2) {
-                $answer->id = $DB->insert_record("lesson_answers", $answer);
-                $answers[$answer->id] = new lesson_page_answer($answer);
+                $answer->id = $DB->insert_record("opendsa_activity_answers", $answer);
+                $answers[$answer->id] = new opendsa_activity_page_answer($answer);
             } else {
                 break;
             }
@@ -241,7 +241,7 @@ class lesson_page_type_matching extends lesson_page {
     }
 
     public function option_description_string() {
-        return get_string("firstanswershould", "lesson");
+        return get_string("firstanswershould", "opendsa_activity");
     }
 
     public function display_answers(html_table $table) {
@@ -258,9 +258,9 @@ class lesson_page_type_matching extends lesson_page {
                 if ($answer->answer != null) {
                     $cells = array();
                     if ($n == 0) {
-                        $cells[] = '<label>' . get_string('correctresponse', 'lesson') . '</label>';
+                        $cells[] = '<label>' . get_string('correctresponse', 'opendsa_activity') . '</label>';
                     } else {
-                        $cells[] = '<label>' . get_string('wrongresponse', 'lesson') . '</label>';
+                        $cells[] = '<label>' . get_string('wrongresponse', 'opendsa_activity') . '</label>';
                     }
                     $cells[] = format_text($answer->answer, $answer->answerformat, $options);
                     $table->data[] = new html_table_row($cells);
@@ -268,22 +268,22 @@ class lesson_page_type_matching extends lesson_page {
 
                 if ($n == 0) {
                     $cells = array();
-                    $cells[] = '<label>' . get_string('correctanswerscore', 'lesson') . '</label>: ';
+                    $cells[] = '<label>' . get_string('correctanswerscore', 'opendsa_activity') . '</label>: ';
                     $cells[] = $answer->score;
                     $table->data[] = new html_table_row($cells);
 
                     $cells = array();
-                    $cells[] = '<label>' . get_string('correctanswerjump', 'lesson') . '</label>: ';
+                    $cells[] = '<label>' . get_string('correctanswerjump', 'opendsa_activity') . '</label>: ';
                     $cells[] = $this->get_jump_name($answer->jumpto);
                     $table->data[] = new html_table_row($cells);
                 } elseif ($n == 1) {
                     $cells = array();
-                    $cells[] = '<label>' . get_string('wronganswerscore', 'lesson') . '</label>: ';
+                    $cells[] = '<label>' . get_string('wronganswerscore', 'opendsa_activity') . '</label>: ';
                     $cells[] = $answer->score;
                     $table->data[] = new html_table_row($cells);
 
                     $cells = array();
-                    $cells[] = '<label>' . get_string('wronganswerjump', 'lesson') . '</label>: ';
+                    $cells[] = '<label>' . get_string('wronganswerjump', 'opendsa_activity') . '</label>: ';
                     $cells[] = $this->get_jump_name($answer->jumpto);
                     $table->data[] = new html_table_row($cells);
                 }
@@ -295,21 +295,21 @@ class lesson_page_type_matching extends lesson_page {
                 $i--;
             } else {
                 $cells = array();
-                if ($this->lesson->custom && $answer->score > 0) {
+                if ($this->opendsa_activity->custom && $answer->score > 0) {
                     // if the score is > 0, then it is correct
-                    $cells[] = '<label class="correct">' . get_string('answer', 'lesson') . " {$i}</label>: \n";
-                } else if ($this->lesson->custom) {
-                    $cells[] = '<label>' . get_string('answer', 'lesson') . " {$i}</label>: \n";
-                } else if ($this->lesson->jumpto_is_correct($this->properties->id, $answer->jumpto)) {
-                    $cells[] = '<label class="correct">' . get_string('answer', 'lesson') . " {$i}</label>: \n";
+                    $cells[] = '<label class="correct">' . get_string('answer', 'opendsa_activity') . " {$i}</label>: \n";
+                } else if ($this->opendsa_activity->custom) {
+                    $cells[] = '<label>' . get_string('answer', 'opendsa_activity') . " {$i}</label>: \n";
+                } else if ($this->opendsa_activity->jumpto_is_correct($this->properties->id, $answer->jumpto)) {
+                    $cells[] = '<label class="correct">' . get_string('answer', 'opendsa_activity') . " {$i}</label>: \n";
                 } else {
-                    $cells[] = '<label>' . get_string('answer', 'lesson') . " {$i}</label>: \n";
+                    $cells[] = '<label>' . get_string('answer', 'opendsa_activity') . " {$i}</label>: \n";
                 }
                 $cells[] = format_text($answer->answer, $answer->answerformat, $options);
                 $table->data[] = new html_table_row($cells);
 
                 $cells = array();
-                $cells[] = '<label>' . get_string('matchesanswer', 'lesson') . " {$i}</label>: \n";
+                $cells[] = '<label>' . get_string('matchesanswer', 'opendsa_activity') . " {$i}</label>: \n";
                 $cells[] = format_text($answer->response, $answer->responseformat, $options);
                 $table->data[] = new html_table_row($cells);
             }
@@ -329,20 +329,20 @@ class lesson_page_type_matching extends lesson_page {
         global $DB, $PAGE;
         $answers  = $this->get_answers();
         $properties->id = $this->properties->id;
-        $properties->opendsa_activity_id = $this->lesson->id;
+        $properties->opendsa_activity_id = $this->opendsa_activity->id;
         $properties->timemodified = time();
-        $properties = file_postupdate_standard_editor($properties, 'contents', array('noclean'=>true, 'maxfiles'=>EDITOR_UNLIMITED_FILES, 'maxbytes'=>$PAGE->course->maxbytes), context_module::instance($PAGE->cm->id), 'mod_lesson', 'page_contents', $properties->id);
-        $DB->update_record("lesson_pages", $properties);
+        $properties = file_postupdate_standard_editor($properties, 'contents', array('noclean'=>true, 'maxfiles'=>EDITOR_UNLIMITED_FILES, 'maxbytes'=>$PAGE->course->maxbytes), context_module::instance($PAGE->cm->id), 'mod_opendsa_activity', 'page_contents', $properties->id);
+        $DB->update_record("opendsa_activity_pages", $properties);
 
         // Trigger an event: page updated.
-        \mod_lesson\event\page_updated::create_from_lesson_page($this, $context)->trigger();
+        \mod_opendsa_activity\event\page_updated::create_from_opendsa_activity_page($this, $context)->trigger();
 
         // need to add two to offset correct response and wrong response
-        $this->lesson->maxanswers += 2;
-        for ($i = 0; $i < $this->lesson->maxanswers; $i++) {
+        $this->opendsa_activity->maxanswers += 2;
+        for ($i = 0; $i < $this->opendsa_activity->maxanswers; $i++) {
             if (!array_key_exists($i, $this->answers)) {
                 $this->answers[$i] = new stdClass;
-                $this->answers[$i]->opendsa_activity_id = $this->lesson->id;
+                $this->answers[$i]->opendsa_activity_id = $this->opendsa_activity->id;
                 $this->answers[$i]->pageid = $this->id;
                 $this->answers[$i]->timecreated = $this->timecreated;
             }
@@ -359,38 +359,38 @@ class lesson_page_type_matching extends lesson_page {
             if (isset($properties->jumpto[$i])) {
                 $this->answers[$i]->jumpto = $properties->jumpto[$i];
             }
-            if ($this->lesson->custom && isset($properties->score[$i])) {
+            if ($this->opendsa_activity->custom && isset($properties->score[$i])) {
                 $this->answers[$i]->score = $properties->score[$i];
             }
 
             // we don't need to check for isset here because properties called it's own isset method.
             if ($this->answers[$i]->answer != '') {
                 if (!isset($this->answers[$i]->id)) {
-                    $this->answers[$i]->id =  $DB->insert_record("lesson_answers", $this->answers[$i]);
+                    $this->answers[$i]->id =  $DB->insert_record("opendsa_activity_answers", $this->answers[$i]);
                 } else {
-                    $DB->update_record("lesson_answers", $this->answers[$i]->properties());
+                    $DB->update_record("opendsa_activity_answers", $this->answers[$i]->properties());
                 }
                 // Save files in answers (no response_editor for matching questions).
                 $this->save_answers_files($context, $maxbytes, $this->answers[$i], $properties->answer_editor[$i]);
             } else if ($i < 2) {
                 if (!isset($this->answers[$i]->id)) {
-                    $this->answers[$i]->id =  $DB->insert_record("lesson_answers", $this->answers[$i]);
+                    $this->answers[$i]->id =  $DB->insert_record("opendsa_activity_answers", $this->answers[$i]);
                 } else {
-                    $DB->update_record("lesson_answers", $this->answers[$i]->properties());
+                    $DB->update_record("opendsa_activity_answers", $this->answers[$i]->properties());
                 }
 
                 // Save files in answers (no response_editor for matching questions).
                 $this->save_answers_files($context, $maxbytes, $this->answers[$i], $properties->answer_editor[$i]);
             } else if (isset($this->answers[$i]->id)) {
-                $DB->delete_records('lesson_answers', array('id'=>$this->answers[$i]->id));
+                $DB->delete_records('opendsa_activity_answers', array('id'=>$this->answers[$i]->id));
                 unset($this->answers[$i]);
             }
         }
         return true;
     }
     public function stats(array &$pagestats, $tries) {
-        if(count($tries) > $this->lesson->maxattempts) { // if there are more tries than the max that is allowed, grab the last "legal" attempt
-            $temp = $tries[$this->lesson->maxattempts - 1];
+        if(count($tries) > $this->opendsa_activity->maxattempts) { // if there are more tries than the max that is allowed, grab the last "legal" attempt
+            $temp = $tries[$this->opendsa_activity->maxattempts - 1];
         } else {
             // else, user attempted the question less than the max, so grab the last one
             $temp = end($tries);
@@ -419,32 +419,32 @@ class lesson_page_type_matching extends lesson_page {
         foreach ($answers as $answer) {
             if ($n == 0 && $useranswer != null && $useranswer->correct) {
                 if ($answer->response == null && $useranswer != null) {
-                    $answerdata->response = get_string("thatsthecorrectanswer", "lesson");
+                    $answerdata->response = get_string("thatsthecorrectanswer", "opendsa_activity");
                 } else {
                     $answerdata->response = $answer->response;
                 }
-                if ($this->lesson->custom) {
-                    $answerdata->score = get_string("pointsearned", "lesson").": ".$answer->score;
+                if ($this->opendsa_activity->custom) {
+                    $answerdata->score = get_string("pointsearned", "opendsa_activity").": ".$answer->score;
                 } else {
-                    $answerdata->score = get_string("receivedcredit", "lesson");
+                    $answerdata->score = get_string("receivedcredit", "opendsa_activity");
                 }
             } elseif ($n == 1 && $useranswer != null && !$useranswer->correct) {
                 if ($answer->response == null && $useranswer != null) {
-                    $answerdata->response = get_string("thatsthewronganswer", "lesson");
+                    $answerdata->response = get_string("thatsthewronganswer", "opendsa_activity");
                 } else {
                     $answerdata->response = $answer->response;
                 }
-                if ($this->lesson->custom) {
-                    $answerdata->score = get_string("pointsearned", "lesson").": ".$answer->score;
+                if ($this->opendsa_activity->custom) {
+                    $answerdata->score = get_string("pointsearned", "opendsa_activity").": ".$answer->score;
                 } else {
-                    $answerdata->score = get_string("didnotreceivecredit", "lesson");
+                    $answerdata->score = get_string("didnotreceivecredit", "opendsa_activity");
                 }
             } elseif ($n > 1) {
-                $data = '<label class="accesshide" for="answer_' . $n . '">' . get_string('answer', 'lesson') . '</label>';
+                $data = '<label class="accesshide" for="answer_' . $n . '">' . get_string('answer', 'opendsa_activity') . '</label>';
                 $data .= strip_tags(format_string($answer->answer)) . ' ';
                 if ($useranswer != null) {
                     $userresponse = explode(",", $useranswer->useranswer);
-                    $data .= '<label class="accesshide" for="stu_answer_response_' . $n . '">' . get_string('matchesanswer', 'lesson') . '</label>';
+                    $data .= '<label class="accesshide" for="stu_answer_response_' . $n . '">' . get_string('matchesanswer', 'opendsa_activity') . '</label>';
                     $data .= "<select class=\"custom-select\" id=\"stu_answer_response_" . $n . "\" " .
                              "disabled=\"disabled\"><option selected=\"selected\">";
                     if (array_key_exists($i, $userresponse)) {
@@ -452,7 +452,7 @@ class lesson_page_type_matching extends lesson_page {
                     }
                     $data .= "</option></select>";
                 } else {
-                    $data .= '<label class="accesshide" for="answer_response_' . $n . '">' . get_string('matchesanswer', 'lesson') . '</label>';
+                    $data .= '<label class="accesshide" for="answer_response_' . $n . '">' . get_string('matchesanswer', 'opendsa_activity') . '</label>';
                     $data .= "<select class=\"custom-select\" id=\"answer_response_" . $n . "\" " .
                              "disabled=\"disabled\"><option selected=\"selected\">".strip_tags(format_string($answer->response))."</option></select>";
                 }
@@ -464,9 +464,9 @@ class lesson_page_type_matching extends lesson_page {
                         }
                         $percent = $pagestats[$this->properties->id]["correct"] / $pagestats[$this->properties->id]["total"] * 100;
                         $percent = round($percent, 2);
-                        $percent .= "% ".get_string("answeredcorrectly", "lesson");
+                        $percent .= "% ".get_string("answeredcorrectly", "opendsa_activity");
                     } else {
-                        $percent = get_string("nooneansweredthisquestion", "lesson");
+                        $percent = get_string("nooneansweredthisquestion", "opendsa_activity");
                     }
                 } else {
                     $percent = '';
@@ -484,7 +484,7 @@ class lesson_page_type_matching extends lesson_page {
         global $DB;
         // The jumps for matching question type are stored in the 1st and 2nd answer record.
         $jumps = array();
-        if ($answers = $DB->get_records("lesson_answers", array("opendsa_activity_id" => $this->lesson->id, "pageid" => $this->properties->id), 'id', '*', 0, 2)) {
+        if ($answers = $DB->get_records("opendsa_activity_answers", array("opendsa_activity_id" => $this->opendsa_activity->id, "pageid" => $this->properties->id), 'id', '*', 0, 2)) {
             foreach ($answers as $answer) {
                 $jumps[] = $this->get_jump_name($answer->jumpto);
             }
@@ -495,39 +495,39 @@ class lesson_page_type_matching extends lesson_page {
     }
 }
 
-class lesson_add_page_form_matching extends lesson_add_page_form_base {
+class opendsa_activity_add_page_form_matching extends opendsa_activity_add_page_form_base {
 
     public $qtype = 'matching';
     public $qtypestring = 'matching';
-    protected $answerformat = LESSON_ANSWER_HTML;
+    protected $answerformat = OPENDSA_ACTIVITY_ANSWER_HTML;
     protected $responseformat = '';
 
     public function custom_definition() {
 
-        $this->_form->addElement('header', 'correctresponse', get_string('correctresponse', 'lesson'));
-        $this->_form->addElement('editor', 'answer_editor[0]', get_string('correctresponse', 'lesson'),
+        $this->_form->addElement('header', 'correctresponse', get_string('correctresponse', 'opendsa_activity'));
+        $this->_form->addElement('editor', 'answer_editor[0]', get_string('correctresponse', 'opendsa_activity'),
                 array('rows' => '4', 'columns' => '80'),
                 array('noclean' => true, 'maxfiles' => EDITOR_UNLIMITED_FILES, 'maxbytes' => $this->_customdata['maxbytes']));
         $this->_form->setType('answer_editor[0]', PARAM_RAW);
         $this->_form->setDefault('answer_editor[0]', array('text' => '', 'format' => FORMAT_HTML));
-        $this->add_jumpto(0, get_string('correctanswerjump','lesson'), LESSON_NEXTPAGE);
-        $this->add_score(0, get_string("correctanswerscore", "lesson"), 1);
+        $this->add_jumpto(0, get_string('correctanswerjump','opendsa_activity'), OPENDSA_ACTIVITY_NEXTPAGE);
+        $this->add_score(0, get_string("correctanswerscore", "opendsa_activity"), 1);
 
-        $this->_form->addElement('header', 'wrongresponse', get_string('wrongresponse', 'lesson'));
-        $this->_form->addElement('editor', 'answer_editor[1]', get_string('wrongresponse', 'lesson'),
+        $this->_form->addElement('header', 'wrongresponse', get_string('wrongresponse', 'opendsa_activity'));
+        $this->_form->addElement('editor', 'answer_editor[1]', get_string('wrongresponse', 'opendsa_activity'),
                 array('rows' => '4', 'columns' => '80'),
                 array('noclean' => true, 'maxfiles' => EDITOR_UNLIMITED_FILES, 'maxbytes' => $this->_customdata['maxbytes']));
         $this->_form->setType('answer_editor[1]', PARAM_RAW);
         $this->_form->setDefault('answer_editor[1]', array('text' => '', 'format' => FORMAT_HTML));
 
-        $this->add_jumpto(1, get_string('wronganswerjump','lesson'), LESSON_THISPAGE);
-        $this->add_score(1, get_string("wronganswerscore", "lesson"), 0);
+        $this->add_jumpto(1, get_string('wronganswerjump','opendsa_activity'), OPENDSA_ACTIVITY_THISPAGE);
+        $this->add_score(1, get_string("wronganswerscore", "opendsa_activity"), 0);
 
-        for ($i = 2; $i < $this->_customdata['lesson']->maxanswers+2; $i++) {
-            $this->_form->addElement('header', 'matchingpair'.($i-1), get_string('matchingpair', 'lesson', $i-1));
-            $this->add_answer($i, null, ($i < 4), LESSON_ANSWER_HTML);
+        for ($i = 2; $i < $this->_customdata['opendsa_activity']->maxanswers+2; $i++) {
+            $this->_form->addElement('header', 'matchingpair'.($i-1), get_string('matchingpair', 'opendsa_activity', $i-1));
+            $this->add_answer($i, null, ($i < 4), OPENDSA_ACTIVITY_ANSWER_HTML);
             $required = ($i < 4);
-            $label = get_string('matchesanswer','lesson');
+            $label = get_string('matchesanswer','opendsa_activity');
             $count = $i;
             $this->_form->addElement('text', 'response_editor['.$count.']', $label, array('size'=>'50'));
             $this->_form->setType('response_editor['.$count.']', PARAM_NOTAGS);
@@ -539,7 +539,7 @@ class lesson_add_page_form_matching extends lesson_add_page_form_base {
     }
 }
 
-class lesson_display_answer_form_matching extends moodleform {
+class opendsa_activity_display_answer_form_matching extends moodleform {
 
     public function definition() {
         global $USER, $OUTPUT, $PAGE;
@@ -586,7 +586,7 @@ class lesson_display_answer_form_matching extends moodleform {
                     // Temporary fixed until MDL-38885 gets integrated
                     $mform->setType('response', PARAM_TEXT);
                 }
-                $answer = lesson_page_type_matching::rewrite_answers_urls($answer);
+                $answer = opendsa_activity_page_type_matching::rewrite_answers_urls($answer);
                 $mform->addElement('select', $responseid, format_text($answer->answer,$answer->answerformat,$options), $responseoptions, $disabled);
                 $mform->setType($responseid, PARAM_TEXT);
                 if ($hasattempt) {
@@ -599,9 +599,9 @@ class lesson_display_answer_form_matching extends moodleform {
             $i++;
         }
         if ($hasattempt) {
-            $this->add_action_buttons(null, get_string("nextpage", "lesson"));
+            $this->add_action_buttons(null, get_string("nextpage", "opendsa_activity"));
         } else {
-            $this->add_action_buttons(null, get_string("submit", "lesson"));
+            $this->add_action_buttons(null, get_string("submit", "opendsa_activity"));
         }
     }
 

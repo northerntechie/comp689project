@@ -15,21 +15,21 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The mod_lesson essay attempt viewed event.
+ * The mod_opendsa_activity essay attempt viewed event.
  *
- * @package    mod_lesson
+ * @package    mod_opendsa_activity
  * @copyright  2013 Mark Nelson <markn@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 
-namespace mod_lesson\event;
+namespace mod_opendsa_activity\event;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * The mod_lesson essay attempt viewed event class.
+ * The mod_opendsa_activity essay attempt viewed event class.
  *
- * @package    mod_lesson
+ * @package    mod_opendsa_activity
  * @since      Moodle 2.7
  * @copyright  2013 Mark Nelson <markn@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
@@ -40,7 +40,7 @@ class essay_attempt_viewed extends \core\event\base {
      * Set basic properties for the event.
      */
     protected function init() {
-        $this->data['objecttable'] = 'lesson_attempts';
+        $this->data['objecttable'] = 'opendsa_activity_attempts';
         $this->data['crud'] = 'r';
         $this->data['edulevel'] = self::LEVEL_TEACHING;
     }
@@ -51,7 +51,7 @@ class essay_attempt_viewed extends \core\event\base {
      * @return string
      */
     public static function get_name() {
-        return get_string('eventessayattemptviewed', 'mod_lesson');
+        return get_string('eventessayattemptviewed', 'mod_opendsa_activity');
     }
 
     /**
@@ -60,7 +60,7 @@ class essay_attempt_viewed extends \core\event\base {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url('/mod/lesson/essay.php', array('id' => $this->contextinstanceid,
+        return new \moodle_url('/mod/opendsa_activity/essay.php', array('id' => $this->contextinstanceid,
             'mode' => 'grade', 'attemptid' =>  $this->objectid));
     }
 
@@ -71,7 +71,7 @@ class essay_attempt_viewed extends \core\event\base {
      */
     public function get_description() {
         return "The user with id '$this->userid' viewed the essay grade for the user with id '$this->relateduserid' for " .
-            "the attempt with id '$this->objectid' for the lesson activity with course module id '$this->contextinstanceid'.";
+            "the attempt with id '$this->objectid' for the opendsa_activity activity with course module id '$this->contextinstanceid'.";
     }
 
     /**
@@ -80,8 +80,8 @@ class essay_attempt_viewed extends \core\event\base {
      * @return array of parameters to be passed to legacy add_to_log() function.
      */
     protected function get_legacy_logdata() {
-        return array($this->courseid, 'lesson', 'view grade', 'essay.php?id=' . $this->contextinstanceid . '&mode=grade&attemptid='
-            . $this->objectid, get_string('manualgrading', 'lesson'), $this->contextinstanceid);
+        return array($this->courseid, 'opendsa_activity', 'view grade', 'essay.php?id=' . $this->contextinstanceid . '&mode=grade&attemptid='
+            . $this->objectid, get_string('manualgrading', 'opendsa_activity'), $this->contextinstanceid);
     }
 
     /**
@@ -99,6 +99,6 @@ class essay_attempt_viewed extends \core\event\base {
     }
 
     public static function get_objectid_mapping() {
-        return array('db' => 'lesson_attempts', 'restore' => 'lesson_attempt');
+        return array('db' => 'opendsa_activity_attempts', 'restore' => 'opendsa_activity_attempt');
     }
 }

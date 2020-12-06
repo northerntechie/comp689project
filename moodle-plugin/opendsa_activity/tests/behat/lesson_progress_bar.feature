@@ -1,6 +1,6 @@
-@mod @mod_lesson
-Feature: In a lesson activity, students can see their progress viewing a progress bar.
-  In order to create a lesson with conditional paths
+@mod @mod_opendsa_activity
+Feature: In a opendsa_activity activity, students can see their progress viewing a progress bar.
+  In order to create a opendsa_activity with conditional paths
   As a teacher
   I need to add pages and questions with links between them
 
@@ -19,10 +19,10 @@ Feature: In a lesson activity, students can see their progress viewing a progres
     And I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
     And I add a "Lesson" to section "1" and I fill the form with:
-      | Name | Test lesson name |
-      | Description | Test lesson description |
+      | Name | Test opendsa_activity name |
+      | Description | Test opendsa_activity description |
       | Progress bar | Yes |
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
     And I follow "Add a content page"
     And I set the following fields to these values:
       | Page title | First page name |
@@ -48,7 +48,7 @@ Feature: In a lesson activity, students can see their progress viewing a progres
       | Page contents | 1 + 1? |
       | id_answer_editor_0 | 2 |
       | id_response_editor_0 | Correct answer |
-      | id_jumpto_0 | End of lesson |
+      | id_jumpto_0 | End of opendsa_activity |
       | id_score_0 | 1 |
       | id_answer_editor_1 | 1 |
       | id_response_editor_1 | Incorrect answer |
@@ -58,25 +58,25 @@ Feature: In a lesson activity, students can see their progress viewing a progres
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    When I follow "Test lesson name"
+    When I follow "Test opendsa_activity name"
     Then I should see "First page contents"
-    And I should see "You have completed 0% of the lesson"
+    And I should see "You have completed 0% of the opendsa_activity"
     And I press "Next page"
     And I should see "Second page contents"
-    And I should see "You have completed 33% of the lesson"
+    And I should see "You have completed 33% of the opendsa_activity"
     And I press "Previous page"
     And I should see "First page contents"
-    And I should see "You have completed 67% of the lesson"
+    And I should see "You have completed 67% of the opendsa_activity"
     And I press "Next page"
     And I should see "Second page contents"
-    And I should see "You have completed 67% of the lesson"
+    And I should see "You have completed 67% of the opendsa_activity"
     And I press "Next page"
     And I should see "1 + 1?"
-    And I should see "You have completed 67% of the lesson"
+    And I should see "You have completed 67% of the opendsa_activity"
     And I set the following fields to these values:
       | Your answer | 2 |
     And I press "Submit"
     And I should see "Correct answer"
     And I press "Continue"
-    And I should see "Congratulations - end of lesson reached"
-    And I should see "You have completed 100% of the lesson"
+    And I should see "Congratulations - end of opendsa_activity reached"
+    And I should see "You have completed 100% of the opendsa_activity"

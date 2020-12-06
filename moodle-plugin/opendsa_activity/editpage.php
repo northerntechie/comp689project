@@ -18,13 +18,13 @@
 /**
  * Action for adding a question page.  Prints an HTML form.
  *
- * @package mod_lesson
+ * @package mod_opendsa_activity
  * @copyright  2009 Sam Hemelryk
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  **/
 
 require_once("../../config.php");
-require_once($CFG->dirroot.'/mod/lesson/locallib.php');
+require_once($CFG->dirroot.'/mod/opendsa_activity/locallib.php');
 require_once('editpage_form.php');
 
 // first get the preceeding page
@@ -37,37 +37,37 @@ $returnto = optional_param('returnto', null, PARAM_LOCALURL);
 if (!empty($returnto)) {
     $returnto = new moodle_url($returnto);
 } else {
-    $returnto = new moodle_url('/mod/lesson/edit.php', array('id' => $id));
-    $returnto->set_anchor('lesson-' . $pageid);
+    $returnto = new moodle_url('/mod/opendsa_activity/edit.php', array('id' => $id));
+    $returnto->set_anchor('opendsa_activity-' . $pageid);
 }
 
-$cm = get_coursemodule_from_id('lesson', $id, 0, false, MUST_EXIST);
+$cm = get_coursemodule_from_id('opendsa_activity', $id, 0, false, MUST_EXIST);
 $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
-$lesson = new lesson($DB->get_record('lesson', array('id' => $cm->instance), '*', MUST_EXIST));
+$opendsa_activity = new opendsa_activity($DB->get_record('opendsa_activity', array('id' => $cm->instance), '*', MUST_EXIST));
 
 require_login($course, false, $cm);
 
 $context = context_module::instance($cm->id);
-require_capability('mod/lesson:edit', $context);
+require_capability('mod/opendsa_activity:edit', $context);
 
-$PAGE->set_url('/mod/lesson/editpage.php', array('pageid'=>$pageid, 'id'=>$id, 'qtype'=>$qtype));
+$PAGE->set_url('/mod/opendsa_activity/editpage.php', array('pageid'=>$pageid, 'id'=>$id, 'qtype'=>$qtype));
 $PAGE->set_pagelayout('admin');
 
 if ($edit) {
-    $editpage = lesson_page::load($pageid, $lesson);
+    $editpage = opendsa_activity_page::load($pageid, $opendsa_activity);
     $qtype = $editpage->qtype;
     $edit = true;
 } else {
     $edit = false;
 }
 
-$jumpto = lesson_page::get_jumptooptions($pageid, $lesson);
-$manager = lesson_page_type_manager::get($lesson);
+$jumpto = opendsa_activity_page::get_jumptooptions($pageid, $opendsa_activity);
+$manager = opendsa_activity_page_type_manager::get($opendsa_activity);
 $editoroptions = array('noclean'=>true, 'maxfiles'=>EDITOR_UNLIMITED_FILES, 'maxbytes'=>$CFG->maxbytes);
 
 // If the previous page was the Question type selection form, this form
-// will have a different name (e.g. _qf__lesson_add_page_form_selection
-// versus _qf__lesson_add_page_form_multichoice). This causes confusion
+// will have a different name (e.g. _qf__opendsa_activity_add_page_form_selection
+// versus _qf__opendsa_activity_add_page_form_multichoice). This causes confusion
 // in moodleform::_process_submission because the array key check doesn't
 // tie up with the current form name, which in turn means the "submitted"
 // check ends up evaluating as false, thus it's not possible to check whether
@@ -77,7 +77,7 @@ if ($qtype) {
     $mformdummy = $manager->get_page_form(0, array(
         'editoroptions' => $editoroptions,
         'jumpto'        => $jumpto,
-        'lesson'        => $lesson,
+        'opendsa_activity'        => $opendsa_activity,
         'edit'          => $edit,
         'maxbytes'      => $PAGE->course->maxbytes,
         'returnto'      => $returnto
@@ -91,7 +91,7 @@ if ($qtype) {
 $mform = $manager->get_page_form($qtype, array(
     'editoroptions' => $editoroptions,
     'jumpto'        => $jumpto,
-    'lesson'        => $lesson,
+    'opendsa_activity'        => $opendsa_activity,
     'edit'          => $edit,
     'maxbytes'      => $PAGE->course->maxbytes,
     'returnto'      => $returnto
@@ -107,7 +107,7 @@ if ($edit) {
     $data->pageid = $editpage->id;
     $data->id = $cm->id;
     $editoroptions['context'] = $context;
-    $data = file_prepare_standard_editor($data, 'contents', $editoroptions, $context, 'mod_lesson', 'page_contents',  $editpage->id);
+    $data = file_prepare_standard_editor($data, 'contents', $editoroptions, $context, 'mod_opendsa_activity', 'page_contents',  $editpage->id);
 
     $answerscount = 0;
     $answers = $editpage->get_answers();
@@ -115,10 +115,10 @@ if ($edit) {
         $answereditor = 'answer_editor['.$answerscount.']';
         if (is_array($data->$answereditor)) {
             $answerdata = $data->$answereditor;
-            if ($mform->get_answer_format() === LESSON_ANSWER_HTML) {
+            if ($mform->get_answer_format() === OPENDSA_ACTIVITY_ANSWER_HTML) {
                 $answerdraftid = file_get_submitted_draft_itemid($answereditor);
                 $answertext = file_prepare_draft_area($answerdraftid, $PAGE->cm->context->id,
-                        'mod_lesson', 'page_answers', $answer->id, $editoroptions, $answerdata['text']);
+                        'mod_opendsa_activity', 'page_answers', $answer->id, $editoroptions, $answerdata['text']);
                 $data->$answereditor = array('text' => $answertext, 'format' => $answerdata['format'], 'itemid' => $answerdraftid);
             } else {
                 $data->$answereditor = $answerdata['text'];
@@ -128,10 +128,10 @@ if ($edit) {
         $responseeditor = 'response_editor['.$answerscount.']';
         if (is_array($data->$responseeditor)) {
             $responsedata = $data->$responseeditor;
-            if ($mform->get_response_format() === LESSON_ANSWER_HTML) {
+            if ($mform->get_response_format() === opendsa_activity_ANSWER_HTML) {
                 $responsedraftid = file_get_submitted_draft_itemid($responseeditor);
                 $responsetext = file_prepare_draft_area($responsedraftid, $PAGE->cm->context->id,
-                        'mod_lesson', 'page_responses', $answer->id, $editoroptions, $responsedata['text']);
+                        'mod_opendsa_activity', 'page_responses', $answer->id, $editoroptions, $responsedata['text']);
                 $data->$responseeditor = array('text' => $responsetext, 'format' => $responsedata['format'],
                         'itemid' => $responsedraftid);
             } else {
@@ -140,17 +140,17 @@ if ($edit) {
         }
         $answerscount++;
     }
-    // Let the lesson pages make updates if required.
+    // Let the opendsa_activity pages make updates if required.
     $data = $editpage->update_form_data($data);
 
     $mform->set_data($data);
-    $PAGE->navbar->add(get_string('edit'), new moodle_url('/mod/lesson/edit.php', array('id'=>$id)));
-    $PAGE->navbar->add(get_string('editingquestionpage', 'lesson', get_string($mform->qtypestring, 'lesson')));
+    $PAGE->navbar->add(get_string('edit'), new moodle_url('/mod/opendsa_activity/edit.php', array('id'=>$id)));
+    $PAGE->navbar->add(get_string('editingquestionpage', 'opendsa_activity', get_string($mform->qtypestring, 'opendsa_activity')));
 } else {
     // Give the page type being created a chance to override the creation process
     // this is used by endofbranch, cluster, and endofcluster to skip the creation form.
     // IT SHOULD ALWAYS CALL require_sesskey();
-    $mform->construction_override($pageid, $lesson);
+    $mform->construction_override($pageid, $opendsa_activity);
 
     $data = new stdClass;
     $data->id = $cm->id;
@@ -161,9 +161,9 @@ if ($edit) {
     }
     $data = file_prepare_standard_editor($data, 'contents', $editoroptions, null);
     $mform->set_data($data);
-    $PAGE->navbar->add(get_string('addanewpage', 'lesson'), $PAGE->url);
+    $PAGE->navbar->add(get_string('addanewpage', 'opendsa_activity'), $PAGE->url);
     if ($qtype !== 'unknown') {
-        $PAGE->navbar->add(get_string($mform->qtypestring, 'lesson'));
+        $PAGE->navbar->add(get_string($mform->qtypestring, 'opendsa_activity'));
     }
 }
 
@@ -176,12 +176,12 @@ if ($data = $mform->get_data()) {
         unset($data->edit);
         $editpage->update($data, $context, $PAGE->course->maxbytes);
     } else {
-        $editpage = lesson_page::create($data, $lesson, $context, $PAGE->course->maxbytes);
+        $editpage = opendsa_activity_page::create($data, $opendsa_activity, $context, $PAGE->course->maxbytes);
     }
     redirect($returnto);
 }
 
-$lessonoutput = $PAGE->get_renderer('mod_lesson');
-echo $lessonoutput->header($lesson, $cm, '', false, null, get_string('edit', 'lesson'));
+$opendsa_activity_output = $PAGE->get_renderer('mod_opendsa_activity');
+echo $opendsa_activity_output->header($opendsa_activity, $cm, '', false, null, get_string('edit', 'opendsa_activity'));
 $mform->display();
-echo $lessonoutput->footer();
+echo $opendsa_activityoutput->footer();

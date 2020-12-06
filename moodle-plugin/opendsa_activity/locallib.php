@@ -16,10 +16,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Local library file for Lesson.  These are non-standard functions that are used
- * only by Lesson.
+ * Local library file for opendsa_activity.  These are non-standard functions that are used
+ * only by opendsa_activity.
  *
- * @package mod_lesson
+ * @package mod_opendsa_activity
  * @copyright 1999 onwards Martin Dougiamas  {@link http://moodle.com}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or late
  **/
@@ -29,67 +29,67 @@ defined('MOODLE_INTERNAL') || die();
 
 /** Include the files that are required by this module */
 require_once($CFG->dirroot.'/course/moodleform_mod.php');
-require_once($CFG->dirroot . '/mod/lesson/lib.php');
+require_once($CFG->dirroot . '/mod/opendsa_activity/lib.php');
 require_once($CFG->libdir . '/filelib.php');
 
 /** This page */
-define('LESSON_THISPAGE', 0);
+define('OPENDSA_ACTIVITY_THISPAGE', 0);
 /** Next page -> any page not seen before */
-define("LESSON_UNSEENPAGE", 1);
+define("OPENDSA_ACTIVITY_UNSEENPAGE", 1);
 /** Next page -> any page not answered correctly */
-define("LESSON_UNANSWEREDPAGE", 2);
+define("OPENDSA_ACTIVITY_UNANSWEREDPAGE", 2);
 /** Jump to Next Page */
-define("LESSON_NEXTPAGE", -1);
-/** End of Lesson */
-define("LESSON_EOL", -9);
-/** Jump to an unseen page within a branch and end of branch or end of lesson */
-define("LESSON_UNSEENBRANCHPAGE", -50);
+define("OPENDSA_ACTIVITY_NEXTPAGE", -1);
+/** End of OPENDSA_ACTIVITY */
+define("OPENDSA_ACTIVITY_EOL", -9);
+/** Jump to an unseen page within a branch and end of branch or end of OPENDSA_ACTIVITY */
+define("OPENDSA_ACTIVITY_UNSEENBRANCHPAGE", -50);
 /** Jump to Previous Page */
-define("LESSON_PREVIOUSPAGE", -40);
-/** Jump to a random page within a branch and end of branch or end of lesson */
-define("LESSON_RANDOMPAGE", -60);
+define("OPENDSA_ACTIVITY_PREVIOUSPAGE", -40);
+/** Jump to a random page within a branch and end of branch or end of OPENDSA_ACTIVITY */
+define("OPENDSA_ACTIVITY_RANDOMPAGE", -60);
 /** Jump to a random Branch */
-define("LESSON_RANDOMBRANCH", -70);
+define("OPENDSA_ACTIVITY_RANDOMBRANCH", -70);
 /** Cluster Jump */
-define("LESSON_CLUSTERJUMP", -80);
+define("OPENDSA_ACTIVITY_CLUSTERJUMP", -80);
 /** Undefined */
-define("LESSON_UNDEFINED", -99);
+define("OPENDSA_ACTIVITY_UNDEFINED", -99);
 
-/** LESSON_MAX_EVENT_LENGTH = 432000 ; 5 days maximum */
-define("LESSON_MAX_EVENT_LENGTH", "432000");
+/** OPENDSA_ACTIVITY_MAX_EVENT_LENGTH = 432000 ; 5 days maximum */
+define("OPENDSA_ACTIVITYA_ACTIVITY_MAX_EVENT_LENGTH", "432000");
 
 /** Answer format is HTML */
-define("LESSON_ANSWER_HTML", "HTML");
+define("OPENDSA_ACTIVITY_ANSWER_HTML", "HTML");
 
 /** Placeholder answer for all other answers. */
-define("LESSON_OTHER_ANSWERS", "@#wronganswer#@");
+define("OPENDSA_ACTIVITY_OTHER_ANSWERS", "@#wronganswer#@");
 
 //////////////////////////////////////////////////////////////////////////////////////
-/// Any other lesson functions go here.  Each of them must have a name that
-/// starts with lesson_
+/// Any other opendsa_ctivity functions go here.  Each of them must have a name that
+/// starts with opendsa_activity_
 
 /**
- * Checks to see if a LESSON_CLUSTERJUMP or
- * a LESSON_UNSEENBRANCHPAGE is used in a lesson.
+ * Checks to see if a OPENDSA_ACTIVITY_CLUSTERJUMP or
+ * a OPENDSA_ACTIVITY_UNSEENBRANCHPAGE is used in a opends_activity.
  *
  * This function is only executed when a teacher is
- * checking the navigation for a lesson.
+ * checking the navigation for a opendsa_activity.
  *
- * @param stdClass $lesson Id of the lesson that is to be checked.
+ * @param stdClass $opendsa_activity Id of the opendsa_activity that is to be checked.
  * @return boolean True or false.
  **/
-function lesson_display_teacher_warning($lesson) {
+function opendsa_activity_display_teacher_warning($opendsa_activity) {
     global $DB;
 
-    // get all of the lesson answers
-    $params = array ("opendsa_activity_id" => $lesson->id);
-    if (!$lessonanswers = $DB->get_records_select("lesson_answers", "opendsa_activity_id = :opendsa_activity_id", $params)) {
+    // get all of the opendsa_activity answers
+    $params = array ("opendsa_activity_id" => $opendsa_activity->id);
+    if (!$opendsa_activityanswers = $DB->get_records_select("opendsa_activity_answers", "opendsa_activity_id = :opendsa_activity_id", $params)) {
         // no answers, then not using cluster or unseen
         return false;
     }
     // just check for the first one that fulfills the requirements
-    foreach ($lessonanswers as $lessonanswer) {
-        if ($lessonanswer->jumpto == LESSON_CLUSTERJUMP || $lessonanswer->jumpto == LESSON_UNSEENBRANCHPAGE) {
+    foreach ($opendsa_activityanswers as $opendsa_activityanswer) {
+        if ($opendsa_activityanswer->jumpto == opendsa_activity_CLUSTERJUMP || $opendsa_activityanswer->jumpto == opendsa_activity_UNSEENBRANCHPAGE) {
             return true;
         }
     }
@@ -99,25 +99,25 @@ function lesson_display_teacher_warning($lesson) {
 }
 
 /**
- * Interprets the LESSON_UNSEENBRANCHPAGE jump.
+ * Interprets the OPENDSA_ACTIVITY_UNSEENBRANCHPAGE jump.
  *
  * will return the pageid of a random unseen page that is within a branch
  *
- * @param lesson $lesson
+ * @param opendsa_activity $opendsa_activity
  * @param int $userid Id of the user.
  * @param int $pageid Id of the page from which we are jumping.
  * @return int Id of the next page.
  **/
-function lesson_unseen_question_jump($lesson, $user, $pageid) {
+function opendsa_activity_unseen_question_jump($opendsa_activitya_activity, $user, $pageid) {
     global $DB;
 
     // get the number of retakes
-    if (!$retakes = $DB->count_records("lesson_grades", array("opendsa_activity_id"=>$lesson->id, "userid"=>$user))) {
+    if (!$retakes = $DB->count_records("opendsa_activity_grades", array("opendsa_activity_id"=>$opendsa_activity->id, "userid"=>$user))) {
         $retakes = 0;
     }
 
-    // get all the lesson_attempts aka what the user has seen
-    if ($viewedpages = $DB->get_records("lesson_attempts", array("opendsa_activity_id"=>$lesson->id, "userid"=>$user, "retry"=>$retakes), "timeseen DESC")) {
+    // get all the opendsa_activity_attempts aka what the user has seen
+    if ($viewedpages = $DB->get_records("opendsa_activity_attempts", array("opendsa_activity_id"=>$opendsa_activity->id, "userid"=>$user, "retry"=>$retakes), "timeseen DESC")) {
         foreach($viewedpages as $viewed) {
             $seenpages[] = $viewed->pageid;
         }
@@ -125,22 +125,22 @@ function lesson_unseen_question_jump($lesson, $user, $pageid) {
         $seenpages = array();
     }
 
-    // get the lesson pages
-    $lessonpages = $lesson->load_all_pages();
+    // get the opendsa_activity pages
+    $opendsa_activitypages = $opendsa_activity->load_all_pages();
 
-    if ($pageid == LESSON_UNSEENBRANCHPAGE) {  // this only happens when a student leaves in the middle of an unseen question within a branch series
+    if ($pageid == opendsa_activity_UNSEENBRANCHPAGE) {  // this only happens when a student leaves in the middle of an unseen question within a branch series
         $pageid = $seenpages[0];  // just change the pageid to the last page viewed inside the branch table
     }
 
     // go up the pages till branch table
     while ($pageid != 0) { // this condition should never be satisfied... only happens if there are no branch tables above this page
-        if ($lessonpages[$pageid]->qtype == LESSON_PAGE_BRANCHTABLE) {
+        if ($opendsa_activitypages[$pageid]->qtype == opendsa_activity_PAGE_BRANCHTABLE) {
             break;
         }
-        $pageid = $lessonpages[$pageid]->prevpageid;
+        $pageid = $opendsa_activitypages[$pageid]->prevpageid;
     }
 
-    $pagesinbranch = $lesson->get_sub_pages_of($pageid, array(LESSON_PAGE_BRANCHTABLE, LESSON_PAGE_ENDOFBRANCH));
+    $pagesinbranch = $opendsa_activity->get_sub_pages_of($pageid, array(opendsa_activity_PAGE_BRANCHTABLE, opendsa_activity_PAGE_ENDOFBRANCH));
 
     // this foreach loop stores all the pages that are within the branch table but are not in the $seenpages array
     $unseen = array();
@@ -156,10 +156,10 @@ function lesson_unseen_question_jump($lesson, $user, $pageid) {
             $nextpage = $temp->nextpageid; // they have seen all the pages in the branch, so go to EOB/next branch table/EOL
         } else {
             // there are no pages inside the branch, so return the next page
-            $nextpage = $lessonpages[$pageid]->nextpageid;
+            $nextpage = $opendsa_activitypages[$pageid]->nextpageid;
         }
         if ($nextpage == 0) {
-            return LESSON_EOL;
+            return OPENDSA_ACTIVITY_EOL;
         } else {
             return $nextpage;
         }
@@ -171,23 +171,23 @@ function lesson_unseen_question_jump($lesson, $user, $pageid) {
 /**
  * Handles the unseen branch table jump.
  *
- * @param lesson $lesson
+ * @param opendsa_activity $opendsa_activity
  * @param int $userid User id.
- * @return int Will return the page id of a branch table or end of lesson
+ * @return int Will return the page id of a branch table or end of opendsa_activity
  **/
-function lesson_unseen_branch_jump($lesson, $userid) {
+function opendsa_activity_unseen_branch_jump($opendsa_activitya_activity, $userid) {
     global $DB;
 
-    if (!$retakes = $DB->count_records("lesson_grades", array("opendsa_activity_id"=>$lesson->id, "userid"=>$userid))) {
+    if (!$retakes = $DB->count_records("opendsa_activitya_activity_grades", array("opendsa_activopendsa_acopendsa_activity"=>$opendsa_activity->id, "userid"=>$userid))) {
         $retakes = 0;
     }
 
-    if (!$seenbranches = $lesson->get_content_pages_viewed($retakes, $userid, 'timeseen DESC')) {
-        print_error('cannotfindrecords', 'lesson');
+    if (!$seenbranches = $opendsa_activity->get_content_pages_viewed($retakes, $userid, 'timeseen DESC')) {
+        print_error('cannotfindrecords', 'opendsa_activity');
     }
 
-    // get the lesson pages
-    $lessonpages = $lesson->load_all_pages();
+    // get the opendsa_activity pages
+    $opendsa_activitypages = $opendsa_activity->load_all_pages();
 
     // this loads all the viewed branch tables into $seen until it finds the branch table with the flag
     // which is the branch table that starts the unseenbranch function
@@ -200,15 +200,15 @@ function lesson_unseen_branch_jump($lesson, $userid) {
             break;
         }
     }
-    // this function searches through the lesson pages to find all the branch tables
+    // this function searches through the opendsa_activity pages to find all the branch tables
     // that follow the flagged branch table
-    $pageid = $lessonpages[$start]->nextpageid; // move down from the flagged branch table
+    $pageid = $opendsa_activitya_activitypages[$start]->nextpageid; // move down from the flagged branch table
     $branchtables = array();
     while ($pageid != 0) {  // grab all of the branch table till eol
-        if ($lessonpages[$pageid]->qtype == LESSON_PAGE_BRANCHTABLE) {
-            $branchtables[] = $lessonpages[$pageid]->id;
+        if ($opendsa_activitya_activitypages[$pageid]->qtype == opendsa_activity_PAGE_BRANCHTABLE) {
+            $branchtables[] = $opendsa_activitypages[$pageid]->id;
         }
-        $pageid = $lessonpages[$pageid]->nextpageid;
+        $pageid = $opendsa_activitypages[$pageid]->nextpageid;
     }
     $unseen = array();
     foreach ($branchtables as $branchtable) {
@@ -220,50 +220,50 @@ function lesson_unseen_branch_jump($lesson, $userid) {
     if (count($unseen) > 0) {
         return $unseen[rand(0, count($unseen)-1)];  // returns a random page id for the next page
     } else {
-        return LESSON_EOL;  // has viewed all of the branch tables
+        return opendsa_activity_EOL;  // has viewed all of the branch tables
     }
 }
 
 /**
- * Handles the random jump between a branch table and end of branch or end of lesson (LESSON_RANDOMPAGE).
+ * Handles the random jump between a branch table and end of branch or end of opendsa_activity (OPENDSA_ACTIVITY_RANDOMPAGE).
  *
- * @param lesson $lesson
+ * @param opendsa_activity $opendsa_activity
  * @param int $pageid The id of the page that we are jumping from (?)
  * @return int The pageid of a random page that is within a branch table
  **/
-function lesson_random_question_jump($lesson, $pageid) {
+function opendsa_activity_random_question_jump($opendsa_activity, $pageid) {
     global $DB;
 
-    // get the lesson pages
-    $params = array ("opendsa_activity_id" => $lesson->id);
-    if (!$lessonpages = $DB->get_records_select("lesson_pages", "opendsa_activity_id = :opendsa_activity_id", $params)) {
-        print_error('cannotfindpages', 'lesson');
+    // get the opendsa_activity pages
+    $params = array ("opendsa_activity_id" => $opendsa_activity->id);
+    if (!$opendsa_activitypages = $DB->get_records_select("opendsa_activity_pages", "opendsa_activity_id = :opendsa_activity_id", $params)) {
+        print_error('cannotfindpages', 'opendsa_activity');
     }
 
     // go up the pages till branch table
     while ($pageid != 0) { // this condition should never be satisfied... only happens if there are no branch tables above this page
 
-        if ($lessonpages[$pageid]->qtype == LESSON_PAGE_BRANCHTABLE) {
+        if ($opendsa_activitypages[$pageid]->qtype == OPENDSA_ACTIVITY_PAGE_BRANCHTABLE) {
             break;
         }
-        $pageid = $lessonpages[$pageid]->prevpageid;
+        $pageid = $opendsa_activitypages[$pageid]->prevpageid;
     }
 
     // get the pages within the branch
-    $pagesinbranch = $lesson->get_sub_pages_of($pageid, array(LESSON_PAGE_BRANCHTABLE, LESSON_PAGE_ENDOFBRANCH));
+    $pagesinbranch = $opendsa_activity->get_sub_pages_of($pageid, array(OPENDSA_ACTIVITY_PAGE_BRANCHTABLE, OPENDSA_ACTIVITY_PAGE_ENDOFBRANCH));
 
     if(count($pagesinbranch) == 0) {
         // there are no pages inside the branch, so return the next page
-        return $lessonpages[$pageid]->nextpageid;
+        return $opendsa_activitypages[$pageid]->nextpageid;
     } else {
         return $pagesinbranch[rand(0, count($pagesinbranch)-1)]->id;  // returns a random page id for the next page
     }
 }
 
 /**
- * Calculates a user's grade for a lesson.
+ * Calculates a user's grade for a opendsa_activity.
  *
- * @param object $lesson The lesson that the user is taking.
+ * @param object $opendsa_activity The opendsa_activity that the user is taking.
  * @param int $retries The attempt number.
  * @param int $userid Id of the user (optional, default current user).
  * @return object { nquestions => number of questions answered
@@ -274,7 +274,7 @@ function lesson_random_question_jump($lesson, $pageid) {
                     nmanual => number of manually graded questions
                     manualpoints => point value for manually graded questions }
  */
-function lesson_grade($lesson, $ntries, $userid = 0) {
+function opendsa_activity_grade($opendsa_activity, $ntries, $userid = 0) {
     global $USER, $DB;
 
     if (empty($userid)) {
@@ -292,8 +292,8 @@ function lesson_grade($lesson, $ntries, $userid = 0) {
     $total        = 0;
     $earned       = 0;
 
-    $params = array ("opendsa_activity_id" => $lesson->id, "userid" => $userid, "retry" => $ntries);
-    if ($useranswers = $DB->get_records_select("lesson_attempts",  "opendsa_activity_id = :opendsa_activity_id AND
+    $params = array ("opendsa_activity_id" => $opendsa_activity->id, "userid" => $userid, "retry" => $ntries);
+    if ($useranswers = $DB->get_records_select("opendsa_activity_attempts",  "opendsa_activity_id = :opendsa_activity_id AND
             userid = :userid AND retry = :retry", $params, "timeseen")) {
         // group each try with its page
         $attemptset = array();
@@ -301,23 +301,23 @@ function lesson_grade($lesson, $ntries, $userid = 0) {
             $attemptset[$useranswer->pageid][] = $useranswer;
         }
 
-        // Drop all attempts that go beyond max attempts for the lesson
+        // Drop all attempts that go beyond max attempts for the opendsa_activity
         foreach ($attemptset as $key => $set) {
-            $attemptset[$key] = array_slice($set, 0, $lesson->maxattempts);
+            $attemptset[$key] = array_slice($set, 0, $opendsa_activity->maxattempts);
         }
 
         // get only the pages and their answers that the user answered
         list($usql, $parameters) = $DB->get_in_or_equal(array_keys($attemptset));
-        array_unshift($parameters, $lesson->id);
-        $pages = $DB->get_records_select("lesson_pages", "opendsa_activity_id = ? AND id $usql", $parameters);
-        $answers = $DB->get_records_select("lesson_answers", "opendsa_activity_id = ? AND pageid $usql", $parameters);
+        array_unshift($parameters, $opendsa_activity->id);
+        $pages = $DB->get_records_select("opendsa_activity_pages", "opendsa_activity_id = ? AND id $usql", $parameters);
+        $answers = $DB->get_records_select("opendsa_activity_answers", "opendsa_activity_id = ? AND pageid $usql", $parameters);
 
         // Number of pages answered
         $nquestions = count($pages);
 
         foreach ($attemptset as $attempts) {
-            $page = lesson_page::load($pages[end($attempts)->pageid], $lesson);
-            if ($lesson->custom) {
+            $page = opendsa_activity_page::load($pages[end($attempts)->pageid], $opendsa_activity);
+            if ($opendsa_activity->custom) {
                 $attempt = end($attempts);
                 // If essay question, handle it, otherwise add to score
                 if ($page->requires_manual_grading()) {
@@ -345,7 +345,7 @@ function lesson_grade($lesson, $ntries, $userid = 0) {
             $nviewed += count($attempts);
         }
 
-        if ($lesson->custom) {
+        if ($opendsa_activity->custom) {
             $bestscores = array();
             // Find the highest possible score per page to get our total
             foreach ($answers as $answer) {
@@ -358,9 +358,9 @@ function lesson_grade($lesson, $ntries, $userid = 0) {
             $total = array_sum($bestscores);
         } else {
             // Check to make sure the student has answered the minimum questions
-            if ($lesson->minquestions and $nquestions < $lesson->minquestions) {
+            if ($opendsa_activity->minquestions and $nquestions < $opendsa_activity->minquestions) {
                 // Nope, increase number viewed by the amount of unanswered questions
-                $total =  $nviewed + ($lesson->minquestions - $nquestions);
+                $total =  $nviewed + ($opendsa_activity->minquestions - $nquestions);
             } else {
                 $total = $nviewed;
             }
@@ -386,20 +386,20 @@ function lesson_grade($lesson, $ntries, $userid = 0) {
 
 /**
  * Determines if a user can view the left menu.  The determining factor
- * is whether a user has a grade greater than or equal to the lesson setting
+ * is whether a user has a grade greater than or equal to the opendsa_activity setting
  * of displayleftif
  *
- * @param object $lesson Lesson object of the current lesson
- * @return boolean 0 if the user cannot see, or $lesson->displayleft to keep displayleft unchanged
+ * @param object $opendsa_activity Lesson object of the current opendsa_activity
+ * @return boolean 0 if the user cannot see, or $opendsa_activity->displayleft to keep displayleft unchanged
  **/
-function lesson_displayleftif($lesson) {
+function opendsa_activity_displayleftif($opendsa_activity) {
     global $CFG, $USER, $DB;
 
-    if (!empty($lesson->displayleftif)) {
-        // get the current user's max grade for this lesson
-        $params = array ("userid" => $USER->id, "opendsa_activity_id" => $lesson->id);
-        if ($maxgrade = $DB->get_record_sql('SELECT userid, MAX(grade) AS maxgrade FROM {lesson_grades} WHERE userid = :userid AND opendsa_activity_id = :opendsa_activity_id GROUP BY userid', $params)) {
-            if ($maxgrade->maxgrade < $lesson->displayleftif) {
+    if (!empty($opendsa_activity->displayleftif)) {
+        // get the current user's max grade for this opendsa_activity
+        $params = array ("userid" => $USER->id, "opendsa_activity_id" => $opendsa_activity->id);
+        if ($maxgrade = $DB->get_record_sql('SELECT userid, MAX(grade) AS maxgrade FROM {opendsa_activity_grades} WHERE userid = :userid AND opendsa_activity_id = :opendsa_activity_id GROUP BY userid', $params)) {
+            if ($maxgrade->maxgrade < $opendsa_activity->displayleftif) {
                 return 0;  // turn off the displayleft
             }
         } else {
@@ -407,32 +407,32 @@ function lesson_displayleftif($lesson) {
         }
     }
 
-    // if we get to here, keep the original state of displayleft lesson setting
-    return $lesson->displayleft;
+    // if we get to here, keep the original state of displayleft opendsa_activity setting
+    return $opendsa_activity->displayleft;
 }
 
 /**
  *
  * @param $cm
- * @param $lesson
+ * @param $opendsa_activity
  * @param $page
  * @return unknown_type
  */
-function lesson_add_fake_blocks($page, $cm, $lesson, $timer = null) {
-    $bc = lesson_menu_block_contents($cm->id, $lesson);
+function opendsa_activity_add_fake_blocks($page, $cm, $opendsa_activity, $timer = null) {
+    $bc = opendsa_activity_menu_block_contents($cm->id, $opendsa_activity);
     if (!empty($bc)) {
         $regions = $page->blocks->get_regions();
         $firstregion = reset($regions);
         $page->blocks->add_fake_block($bc, $firstregion);
     }
 
-    $bc = lesson_mediafile_block_contents($cm->id, $lesson);
+    $bc = opendsa_activity_mediafile_block_contents($cm->id, $opendsa_activity);
     if (!empty($bc)) {
         $page->blocks->add_fake_block($bc, $page->blocks->get_default_region());
     }
 
     if (!empty($timer)) {
-        $bc = lesson_clock_block_contents($cm->id, $lesson, $timer, $page);
+        $bc = opendsa_activity_clock_block_contents($cm->id, $opendsa_activity, $timer, $page);
         if (!empty($bc)) {
             $page->blocks->add_fake_block($bc, $page->blocks->get_default_region());
         }
@@ -441,15 +441,15 @@ function lesson_add_fake_blocks($page, $cm, $lesson, $timer = null) {
 
 /**
  * If there is a media file associated with this
- * lesson, return a block_contents that displays it.
+ * opendsa_activity, return a block_contents that displays it.
  *
- * @param int $cmid Course Module ID for this lesson
- * @param object $lesson Full lesson record object
+ * @param int $cmid Course Module ID for this opendsa_activity
+ * @param object $opendsa_activity Full opendsa_activity record object
  * @return block_contents
  **/
-function lesson_mediafile_block_contents($cmid, $lesson) {
+function opendsa_activity_mediafile_block_contents($cmid, $opendsa_activity) {
     global $OUTPUT;
-    if (empty($lesson->mediafile)) {
+    if (empty($opendsa_activity->mediafile)) {
         return null;
     }
 
@@ -460,15 +460,15 @@ function lesson_mediafile_block_contents($cmid, $lesson) {
     $options['top'] = 5;
     $options['scrollbars'] = 1;
     $options['resizable'] = 1;
-    $options['width'] = $lesson->mediawidth;
-    $options['height'] = $lesson->mediaheight;
+    $options['width'] = $opendsa_activity->mediawidth;
+    $options['height'] = $opendsa_activity->mediaheight;
 
-    $link = new moodle_url('/mod/lesson/mediafile.php?id='.$cmid);
-    $action = new popup_action('click', $link, 'lessonmediafile', $options);
-    $content = $OUTPUT->action_link($link, get_string('mediafilepopup', 'lesson'), $action, array('title'=>get_string('mediafilepopup', 'lesson')));
+    $link = new moodle_url('/mod/opendsa_activity/mediafile.php?id='.$cmid);
+    $action = new popup_action('click', $link, 'opendsa_activitymediafile', $options);
+    $content = $OUTPUT->action_link($link, get_string('mediafilepopup', 'opendsa_activity'), $action, array('title'=>get_string('mediafilepopup', 'opendsa_activity')));
 
     $bc = new block_contents();
-    $bc->title = get_string('linkedmedia', 'lesson');
+    $bc->title = get_string('linkedmedia', 'opendsa_activity');
     $bc->attributes['class'] = 'mediafile block';
     $bc->content = $content;
 
@@ -476,33 +476,33 @@ function lesson_mediafile_block_contents($cmid, $lesson) {
 }
 
 /**
- * If a timed lesson and not a teacher, then
+ * If a timed opendsa_activity and not a teacher, then
  * return a block_contents containing the clock.
  *
- * @param int $cmid Course Module ID for this lesson
- * @param object $lesson Full lesson record object
+ * @param int $cmid Course Module ID for this opendsa_activity
+ * @param object $opendsa_activity Full opendsa_activity record object
  * @param object $timer Full timer record object
  * @return block_contents
  **/
-function lesson_clock_block_contents($cmid, $lesson, $timer, $page) {
-    // Display for timed lessons and for students only
+function opendsa_activity_clock_block_contents($cmid, $opendsa_activity, $timer, $page) {
+    // Display for timed opendsa_activitys and for students only
     $context = context_module::instance($cmid);
-    if ($lesson->timelimit == 0 || has_capability('mod/lesson:manage', $context)) {
+    if ($opendsa_activity->timelimit == 0 || has_capability('mod/opendsa_activity:manage', $context)) {
         return null;
     }
 
-    $content = '<div id="lesson-timer">';
-    $content .=  $lesson->time_remaining($timer->starttime);
+    $content = '<div id="opendsa_activity-timer">';
+    $content .=  $opendsa_activity->time_remaining($timer->starttime);
     $content .= '</div>';
 
-    $clocksettings = array('starttime' => $timer->starttime, 'servertime' => time(), 'testlength' => $lesson->timelimit);
+    $clocksettings = array('starttime' => $timer->starttime, 'servertime' => time(), 'testlength' => $opendsa_activity->timelimit);
     $page->requires->data_for_js('clocksettings', $clocksettings, true);
-    $page->requires->strings_for_js(array('timeisup'), 'lesson');
-    $page->requires->js('/mod/lesson/timer.js');
+    $page->requires->strings_for_js(array('timeisup'), 'opendsa_activity');
+    $page->requires->js('/mod/opendsa_activity/timer.js');
     $page->requires->js_init_call('show_clock');
 
     $bc = new block_contents();
-    $bc->title = get_string('timeremaining', 'lesson');
+    $bc->title = get_string('timeremaining', 'opendsa_activity');
     $bc->attributes['class'] = 'clock block';
     $bc->content = $content;
 
@@ -513,18 +513,18 @@ function lesson_clock_block_contents($cmid, $lesson, $timer, $page) {
  * If left menu is turned on, then this will
  * print the menu in a block
  *
- * @param int $cmid Course Module ID for this lesson
- * @param lesson $lesson Full lesson record object
+ * @param int $cmid Course Module ID for this opendsa_activity
+ * @param opendsa_activity $opendsa_activity Full opendsa_activity record object
  * @return void
  **/
-function lesson_menu_block_contents($cmid, $lesson) {
+function opendsa_activity_menu_block_contents($cmid, $opendsa_activity) {
     global $CFG, $DB;
 
-    if (!$lesson->displayleft) {
+    if (!$opendsa_activity->displayleft) {
         return null;
     }
 
-    $pages = $lesson->load_all_pages();
+    $pages = $opendsa_activity->load_all_pages();
     foreach ($pages as $page) {
         if ((int)$page->prevpageid === 0) {
             $pageid = $page->id;
@@ -538,7 +538,7 @@ function lesson_menu_block_contents($cmid, $lesson) {
     }
 
     $content = '<a href="#maincontent" class="accesshide">' .
-        get_string('skip', 'lesson') .
+        get_string('skip', 'opendsa_activity') .
         "</a>\n<div class=\"menuwrapper\">\n<ul>\n";
 
     while ($pageid != 0) {
@@ -549,7 +549,7 @@ function lesson_menu_block_contents($cmid, $lesson) {
             if ($page->id == $currentpageid) {
                 $content .= '<li class="selected">'.format_string($page->title,true)."</li>\n";
             } else {
-                $content .= "<li class=\"notselected\"><a href=\"$CFG->wwwroot/mod/lesson/view.php?id=$cmid&amp;pageid=$page->id\">".format_string($page->title,true)."</a></li>\n";
+                $content .= "<li class=\"notselected\"><a href=\"$CFG->wwwroot/mod/opendsa_activity/view.php?id=$cmid&amp;pageid=$page->id\">".format_string($page->title,true)."</a></li>\n";
             }
 
         }
@@ -558,7 +558,7 @@ function lesson_menu_block_contents($cmid, $lesson) {
     $content .= "</ul>\n</div>\n";
 
     $bc = new block_contents();
-    $bc->title = get_string('lessonmenu', 'lesson');
+    $bc->title = get_string('opendsa_activitymenu', 'opendsa_activity');
     $bc->attributes['class'] = 'menu block';
     $bc->content = $content;
 
@@ -566,27 +566,27 @@ function lesson_menu_block_contents($cmid, $lesson) {
 }
 
 /**
- * Adds header buttons to the page for the lesson
+ * Adds header buttons to the page for the opendsa_activity
  *
  * @param object $cm
  * @param object $context
  * @param bool $extraeditbuttons
- * @param int $lessonpageid
+ * @param int $opendsa_activitypageid
  */
-function lesson_add_header_buttons($cm, $context, $extraeditbuttons=false, $lessonpageid=null) {
+function opendsa_activity_add_header_buttons($cm, $context, $extraeditbuttons=false, $opendsa_activitypageid=null) {
     global $CFG, $PAGE, $OUTPUT;
-    if (has_capability('mod/lesson:edit', $context) && $extraeditbuttons) {
-        if ($lessonpageid === null) {
-            print_error('invalidpageid', 'lesson');
+    if (has_capability('mod/opendsa_activity:edit', $context) && $extraeditbuttons) {
+        if ($opendsa_activitypageid === null) {
+            print_error('invalidpageid', 'opendsa_activity');
         }
-        if (!empty($lessonpageid) && $lessonpageid != LESSON_EOL) {
-            $url = new moodle_url('/mod/lesson/editpage.php', array(
+        if (!empty($opendsa_activitypageid) && $opendsa_activitypageid != OPENDSA_ACTIVITY_EOL) {
+            $url = new moodle_url('/mod/opendsa_activity/editpage.php', array(
                 'id'       => $cm->id,
-                'pageid'   => $lessonpageid,
+                'pageid'   => $opendsa_activitypageid,
                 'edit'     => 1,
                 'returnto' => $PAGE->url->out_as_local_url(false)
             ));
-            $PAGE->set_button($OUTPUT->single_button($url, get_string('editpagecontent', 'lesson')));
+            $PAGE->set_button($OUTPUT->single_button($url, get_string('editpagecontent', 'opendsa_activity')));
         }
     }
 }
@@ -596,22 +596,22 @@ function lesson_add_header_buttons($cm, $context, $extraeditbuttons=false, $less
  *
  * @global object $CFG
  * @global object $PAGE
- * @param object $lesson
+ * @param object $opendsa_activity
  * @param object $context
  * @return string $code the html code of media
  */
-function lesson_get_media_html($lesson, $context) {
+function opendsa_activity_get_media_html($opendsa_activity, $context) {
     global $CFG, $PAGE, $OUTPUT;
     require_once("$CFG->libdir/resourcelib.php");
 
     // get the media file link
-    if (strpos($lesson->mediafile, '://') !== false) {
-        $url = new moodle_url($lesson->mediafile);
+    if (strpos($opendsa_activity->mediafile, '://') !== false) {
+        $url = new moodle_url($opendsa_activity->mediafile);
     } else {
         // the timemodified is used to prevent caching problems, instead of '/' we should better read from files table and use sortorder
-        $url = moodle_url::make_pluginfile_url($context->id, 'mod_lesson', 'mediafile', $lesson->timemodified, '/', ltrim($lesson->mediafile, '/'));
+        $url = moodle_url::make_pluginfile_url($context->id, 'mod_opendsa_activity', 'mediafile', $opendsa_activity->timemodified, '/', ltrim($opendsa_activity->mediafile, '/'));
     }
-    $title = $lesson->mediafile;
+    $title = $opendsa_activity->mediafile;
 
     $clicktoopen = html_writer::link($url, get_string('download'));
 
@@ -648,7 +648,7 @@ function lesson_get_media_html($lesson, $context) {
  * @param int $groupid The group id if it is known
  * @return void
  */
-function lesson_process_group_deleted_in_course($courseid, $groupid = null) {
+function opendsa_activity_process_group_deleted_in_course($courseid, $groupid = null) {
     global $DB;
 
     $params = array('courseid' => $courseid);
@@ -656,17 +656,17 @@ function lesson_process_group_deleted_in_course($courseid, $groupid = null) {
         $params['groupid'] = $groupid;
         // We just update the group that was deleted.
         $sql = "SELECT o.id, o.opendsa_activity_id
-                  FROM {lesson_overrides} o
-                  JOIN {lesson} lesson ON lesson.id = o.opendsa_activity_id
-                 WHERE lesson.course = :courseid
+                  FROM {opendsa_activity_overrides} o
+                  JOIN {opendsa_activity} opendsa_activity ON opendsa_activity.id = o.opendsa_activity_id
+                 WHERE opendsa_activity.course = :courseid
                    AND o.groupid = :groupid";
     } else {
-        // No groupid, we update all orphaned group overrides for all lessons in course.
+        // No groupid, we update all orphaned group overrides for all opendsa_activitys in course.
         $sql = "SELECT o.id, o.opendsa_activity_id
-                  FROM {lesson_overrides} o
-                  JOIN {lesson} lesson ON lesson.id = o.opendsa_activity_id
+                  FROM {opendsa_activity_overrides} o
+                  JOIN {opendsa_activity} opendsa_activity ON opendsa_activity.id = o.opendsa_activity_id
              LEFT JOIN {groups} grp ON grp.id = o.groupid
-                 WHERE lesson.course = :courseid
+                 WHERE opendsa_activity.course = :courseid
                    AND o.groupid IS NOT NULL
                    AND grp.id IS NULL";
     }
@@ -674,51 +674,51 @@ function lesson_process_group_deleted_in_course($courseid, $groupid = null) {
     if (!$records) {
         return; // Nothing to do.
     }
-    $DB->delete_records_list('lesson_overrides', 'id', array_keys($records));
+    $DB->delete_records_list('opendsa_activity_overrides', 'id', array_keys($records));
 }
 
 /**
  * Return the overview report table and data.
  *
- * @param  lesson $lesson       lesson instance
+ * @param  opendsa_activity $opendsa_activity       opendsa_activity instance
  * @param  mixed $currentgroup  false if not group used, 0 for all groups, group id (int) to filter by that groups
  * @return mixed false if there is no information otherwise html_table and stdClass with the table and data
  * @since  Moodle 3.3
  */
-function lesson_get_overview_report_table_and_data(lesson $lesson, $currentgroup) {
+function opendsa_activity_get_overview_report_table_and_data(opendsa_activity $opendsa_activity, $currentgroup) {
     global $DB, $CFG, $OUTPUT;
-    require_once($CFG->dirroot . '/mod/lesson/pagetypes/branchtable.php');
+    require_once($CFG->dirroot . '/mod/opendsa_activity/pagetypes/branchtable.php');
 
-    $context = $lesson->context;
-    $cm = $lesson->cm;
-    // Count the number of branch and question pages in this lesson.
-    $branchcount = $DB->count_records('lesson_pages', array('opendsa_activity_id' => $lesson->id, 'qtype' => LESSON_PAGE_BRANCHTABLE));
-    $questioncount = ($DB->count_records('lesson_pages', array('opendsa_activity_id' => $lesson->id)) - $branchcount);
+    $context = $opendsa_activity->context;
+    $cm = $opendsa_activity->cm;
+    // Count the number of branch and question pages in this opendsa_activity.
+    $branchcount = $DB->count_records('opendsa_activity_pages', array('opendsa_activity_id' => $opendsa_activity->id, 'qtype' => OPENDSA_ACTIVITY_PAGE_BRANCHTABLE));
+    $questioncount = ($DB->count_records('opendsa_activity_pages', array('opendsa_activity_id' => $opendsa_activity->id)) - $branchcount);
 
-    // Only load students if there attempts for this lesson.
-    $attempts = $DB->record_exists('lesson_attempts', array('opendsa_activity_id' => $lesson->id));
-    $branches = $DB->record_exists('lesson_branch', array('opendsa_activity_id' => $lesson->id));
-    $timer = $DB->record_exists('lesson_timer', array('opendsa_activity_id' => $lesson->id));
+    // Only load students if there attempts for this opendsa_activity.
+    $attempts = $DB->record_exists('opendsa_activity_attempts', array('opendsa_activity_id' => $opendsa_activity->id));
+    $branches = $DB->record_exists('opendsa_activity_branch', array('opendsa_activity_id' => $opendsa_activity->id));
+    $timer = $DB->record_exists('opendsa_activity_timer', array('opendsa_activity_id' => $opendsa_activity->id));
     if ($attempts or $branches or $timer) {
         list($esql, $params) = get_enrolled_sql($context, '', $currentgroup, true);
         list($sort, $sortparams) = users_order_by_sql('u');
 
         $extrafields = get_extra_user_fields($context);
 
-        $params['a1opendsa_activity_id'] = $lesson->id;
-        $params['b1opendsa_activity_id'] = $lesson->id;
-        $params['c1opendsa_activity_id'] = $lesson->id;
+        $params['a1opendsa_activity_id'] = $opendsa_activity->id;
+        $params['b1opendsa_activity_id'] = $opendsa_activity->id;
+        $params['c1opendsa_activity_id'] = $opendsa_activity->id;
         $ufields = user_picture::fields('u', $extrafields);
         $sql = "SELECT DISTINCT $ufields
                 FROM {user} u
                 JOIN (
-                    SELECT userid, opendsa_activity_id FROM {lesson_attempts} a1
+                    SELECT userid, opendsa_activity_id FROM {opendsa_activity_attempts} a1
                     WHERE a1.opendsa_activity_id = :a1opendsa_activity_id
                         UNION
-                    SELECT userid, opendsa_activity_id FROM {lesson_branch} b1
+                    SELECT userid, opendsa_activity_id FROM {opendsa_activity_branch} b1
                     WHERE b1.opendsa_activity_id = :b1opendsa_activity_id
                         UNION
-                    SELECT userid, opendsa_activity_id FROM {lesson_timer} c1
+                    SELECT userid, opendsa_activity_id FROM {opendsa_activity_timer} c1
                     WHERE c1.opendsa_activity_id = :c1opendsa_activity_id
                     ) a ON u.id = a.userid
                 JOIN ($esql) ue ON ue.id = a.userid
@@ -733,18 +733,18 @@ function lesson_get_overview_report_table_and_data(lesson $lesson, $currentgroup
         return array(false, false);
     }
 
-    if (! $grades = $DB->get_records('lesson_grades', array('opendsa_activity_id' => $lesson->id), 'completed')) {
+    if (! $grades = $DB->get_records('opendsa_activity_grades', array('opendsa_activity_id' => $opendsa_activity->id), 'completed')) {
         $grades = array();
     }
 
-    if (! $times = $DB->get_records('lesson_timer', array('opendsa_activity_id' => $lesson->id), 'starttime')) {
+    if (! $times = $DB->get_records('opendsa_activity_timer', array('opendsa_activity_id' => $opendsa_activity->id), 'starttime')) {
         $times = array();
     }
 
     // Build an array for output.
     $studentdata = array();
 
-    $attempts = $DB->get_recordset('lesson_attempts', array('opendsa_activity_id' => $lesson->id), 'timeseen');
+    $attempts = $DB->get_recordset('opendsa_activity_attempts', array('opendsa_activity_id' => $opendsa_activity->id), 'timeseen');
     foreach ($attempts as $attempt) {
         // if the user is not in the array or if the retry number is not in the sub array, add the data for that try.
         if (empty($studentdata[$attempt->userid]) || empty($studentdata[$attempt->userid][$attempt->retry])) {
@@ -776,7 +776,7 @@ function lesson_get_overview_report_table_and_data(lesson $lesson, $currentgroup
                     // see if n is = to the retry
                     if ($n == $attempt->retry) {
                         // get grade info
-                        $timeend = $time->lessontime;
+                        $timeend = $time->opendsa_activitytime;
                         $timestart = $time->starttime;
                         $eol = $time->completed;
                         break;
@@ -786,7 +786,7 @@ function lesson_get_overview_report_table_and_data(lesson $lesson, $currentgroup
             }
 
             // build up the array.
-            // this array represents each student and all of their tries at the lesson
+            // this array represents each student and all of their tries at the opendsa_activity
             $studentdata[$attempt->userid][$attempt->retry] = array( "timestart" => $timestart,
                                                                     "timeend" => $timeend,
                                                                     "grade" => $usergrade,
@@ -797,7 +797,7 @@ function lesson_get_overview_report_table_and_data(lesson $lesson, $currentgroup
     }
     $attempts->close();
 
-    $branches = $DB->get_recordset('lesson_branch', array('opendsa_activity_id' => $lesson->id), 'timeseen');
+    $branches = $DB->get_recordset('opendsa_activity_branch', array('opendsa_activity_id' => $opendsa_activity->id), 'timeseen');
     foreach ($branches as $branch) {
         // If the user is not in the array or if the retry number is not in the sub array, add the data for that try.
         if (empty($studentdata[$branch->userid]) || empty($studentdata[$branch->userid][$branch->retry])) {
@@ -814,7 +814,7 @@ function lesson_get_overview_report_table_and_data(lesson $lesson, $currentgroup
                     // See if n is = to the retry.
                     if ($n == $branch->retry) {
                         // Get grade info.
-                        $timeend = $time->lessontime;
+                        $timeend = $time->opendsa_activitytime;
                         $timestart = $time->starttime;
                         $eol = $time->completed;
                         break;
@@ -824,7 +824,7 @@ function lesson_get_overview_report_table_and_data(lesson $lesson, $currentgroup
             }
 
             // Build up the array.
-            // This array represents each student and all of their tries at the lesson.
+            // This array represents each student and all of their tries at the opendsa_activity.
             $studentdata[$branch->userid][$branch->retry] = array( "timestart" => $timestart,
                                                                     "timeend" => $timeend,
                                                                     "grade" => $usergrade,
@@ -837,7 +837,7 @@ function lesson_get_overview_report_table_and_data(lesson $lesson, $currentgroup
 
     // Need the same thing for timed entries that were not completed.
     foreach ($times as $time) {
-        $endoflesson = $time->completed;
+        $endofopendsa_activity = $time->completed;
         // If the time start is the same with another record then we shouldn't be adding another item to this array.
         if (isset($studentdata[$time->userid])) {
             $foundmatch = false;
@@ -854,9 +854,9 @@ function lesson_get_overview_report_table_and_data(lesson $lesson, $currentgroup
                 // Add a record.
                 $studentdata[$time->userid][] = array(
                                 "timestart" => $time->starttime,
-                                "timeend" => $time->lessontime,
+                                "timeend" => $time->opendsa_activitytime,
                                 "grade" => null,
-                                "end" => $endoflesson,
+                                "end" => $endofopendsa_activity,
                                 "try" => $n,
                                 "userid" => $time->userid
                             );
@@ -864,9 +864,9 @@ function lesson_get_overview_report_table_and_data(lesson $lesson, $currentgroup
         } else {
             $studentdata[$time->userid][] = array(
                                 "timestart" => $time->starttime,
-                                "timeend" => $time->lessontime,
+                                "timeend" => $time->opendsa_activitytime,
                                 "grade" => null,
-                                "end" => $endoflesson,
+                                "end" => $endofopendsa_activity,
                                 "try" => 0,
                                 "userid" => $time->userid
                             );
@@ -876,13 +876,13 @@ function lesson_get_overview_report_table_and_data(lesson $lesson, $currentgroup
     // To store all the data to be returned by the function.
     $data = new stdClass();
 
-    // Determine if lesson should have a score.
+    // Determine if opendsa_activity should have a score.
     if ($branchcount > 0 AND $questioncount == 0) {
-        // This lesson only contains content pages and is not graded.
-        $data->lessonscored = false;
+        // This opendsa_activity only contains content pages and is not graded.
+        $data->opendsa_activityscored = false;
     } else {
-        // This lesson is graded.
-        $data->lessonscored = true;
+        // This opendsa_activity is graded.
+        $data->opendsa_activityscored = true;
     }
     // set all the stats variables
     $data->numofattempts = 0;
@@ -902,14 +902,14 @@ function lesson_get_overview_report_table_and_data(lesson $lesson, $currentgroup
         $headers[] = get_user_field_name($field);
     }
 
-    $caneditlesson = has_capability('mod/lesson:edit', $context);
-    $attemptsheader = get_string('attempts', 'lesson');
-    if ($caneditlesson) {
-        $selectall = get_string('selectallattempts', 'lesson');
-        $deselectall = get_string('deselectallattempts', 'lesson');
+    $caneditopendsa_activity = has_capability('mod/opendsa_activity:edit', $context);
+    $attemptsheader = get_string('attempts', 'opendsa_activity');
+    if ($caneditopendsa_activity) {
+        $selectall = get_string('selectallattempts', 'opendsa_activity');
+        $deselectall = get_string('deselectallattempts', 'opendsa_activity');
         // Build the select/deselect all control.
         $selectallid = 'selectall-attempts';
-        $mastercheckbox = new \core\output\checkbox_toggleall('lesson-attempts', true, [
+        $mastercheckbox = new \core\output\checkbox_toggleall('opendsa_activity-attempts', true, [
             'id' => $selectallid,
             'name' => $selectallid,
             'value' => 1,
@@ -923,8 +923,8 @@ function lesson_get_overview_report_table_and_data(lesson $lesson, $currentgroup
     $headers [] = $attemptsheader;
 
     // Set up the table object.
-    if ($data->lessonscored) {
-        $headers [] = get_string('highscore', 'lesson');
+    if ($data->opendsa_activityscored) {
+        $headers [] = get_string('highscore', 'opendsa_activity');
     }
 
     $colcount = count($headers);
@@ -935,7 +935,7 @@ function lesson_get_overview_report_table_and_data(lesson $lesson, $currentgroup
     $table->align = array_pad($table->align, $colcount, 'center');
     $table->align[$colcount - 1] = 'left';
 
-    if ($data->lessonscored) {
+    if ($data->opendsa_activityscored) {
         $table->align[$colcount - 2] = 'left';
     }
 
@@ -945,7 +945,7 @@ function lesson_get_overview_report_table_and_data(lesson $lesson, $currentgroup
     $table->attributes['class'] = 'table table-striped';
 
     // print out the $studentdata array
-    // going through each student that has attempted the lesson, so, each student should have something to be displayed
+    // going through each student that has attempted the opendsa_activity, so, each student should have something to be displayed
     foreach ($students as $student) {
         // check to see if the student has attempts to print out
         if (array_key_exists($student->id, $studentdata)) {
@@ -984,36 +984,36 @@ function lesson_get_overview_report_table_and_data(lesson $lesson, $currentgroup
                         'timestart' => userdate($try["timestart"]),
                         'duration' => format_time($timetotake),
                     ];
-                    $attemptlinkcontents = get_string('attemptinfowithgrade', 'lesson', $attemptdata);
+                    $attemptlinkcontents = get_string('attemptinfowithgrade', 'opendsa_activity', $attemptdata);
 
                 } else {
                     if ($try["end"]) {
-                        // User finished the lesson but has no grade. (Happens when there are only content pages).
+                        // User finished the opendsa_activity but has no grade. (Happens when there are only content pages).
                         $timetotake = $try["timeend"] - $try["timestart"];
                         $attemptdata = (object)[
                             'timestart' => userdate($try["timestart"]),
                             'duration' => format_time($timetotake),
                         ];
-                        $attemptlinkcontents = get_string('attemptinfonograde', 'lesson', $attemptdata);
+                        $attemptlinkcontents = get_string('attemptinfonograde', 'opendsa_activity', $attemptdata);
                     } else {
                         // This is what the link does/looks like when the user has not completed the attempt.
                         if ($try['timestart'] !== 0) {
                             // Teacher previews do not track time spent.
-                            $attemptlinkcontents = get_string("notcompletedwithdate", "lesson", userdate($try["timestart"]));
+                            $attemptlinkcontents = get_string("notcompletedwithdate", "opendsa_activity", userdate($try["timestart"]));
                         } else {
-                            $attemptlinkcontents = get_string("notcompleted", "lesson");
+                            $attemptlinkcontents = get_string("notcompleted", "opendsa_activity");
                         }
                         $timetotake = null;
                     }
                 }
-                $attempturl = new moodle_url('/mod/lesson/report.php', $attempturlparams);
-                $attemptlink = html_writer::link($attempturl, $attemptlinkcontents, ['class' => 'lesson-attempt-link']);
+                $attempturl = new moodle_url('/mod/opendsa_activity/report.php', $attempturlparams);
+                $attemptlink = html_writer::link($attempturl, $attemptlinkcontents, ['class' => 'opendsa_activity-attempt-link']);
 
-                if ($caneditlesson) {
+                if ($caneditopendsa_activity) {
                     $attemptid = 'attempt-' . $try['userid'] . '-' . $try['try'];
                     $attemptname = 'attempts[' . $try['userid'] . '][' . $try['try'] . ']';
 
-                    $checkbox = new \core\output\checkbox_toggleall('lesson-attempts', false, [
+                    $checkbox = new \core\output\checkbox_toggleall('opendsa_activity-attempts', false, [
                         'id' => $attemptid,
                         'name' => $attemptname,
                         'label' => $attemptlink
@@ -1024,9 +1024,9 @@ function lesson_get_overview_report_table_and_data(lesson $lesson, $currentgroup
                 // build up the attempts array
                 $attempts[] = $attemptlink;
 
-                // Run these lines for the stats only if the user finnished the lesson.
+                // Run these lines for the stats only if the user finnished the opendsa_activity.
                 if ($try["end"]) {
-                    // User has completed the lesson.
+                    // User has completed the opendsa_activity.
                     $data->numofattempts++;
                     $data->avetime += $timetotake;
                     if ($timetotake > $data->hightime || $data->hightime == null) {
@@ -1036,7 +1036,7 @@ function lesson_get_overview_report_table_and_data(lesson $lesson, $currentgroup
                         $data->lowtime = $timetotake;
                     }
                     if ($try["grade"] !== null) {
-                        // The lesson was scored.
+                        // The opendsa_activity was scored.
                         $data->avescore += $try["grade"];
                         if ($try["grade"] > $data->highscore || $data->highscore === null) {
                             $data->highscore = $try["grade"];
@@ -1058,8 +1058,8 @@ function lesson_get_overview_report_table_and_data(lesson $lesson, $currentgroup
 
             $row[] = $attempts;
 
-            if ($data->lessonscored) {
-                // Add the grade if the lesson is graded.
+            if ($data->opendsa_activityscored) {
+                // Add the grade if the opendsa_activity is graded.
                 $row[] = $bestgrade."%";
             }
 
@@ -1082,26 +1082,26 @@ function lesson_get_overview_report_table_and_data(lesson $lesson, $currentgroup
 
 /**
  * Return information about one user attempt (including answers)
- * @param  lesson $lesson  lesson instance
+ * @param  opendsa_activity $opendsa_activity  opendsa_activity instance
  * @param  int $userid     the user id
  * @param  int $attempt    the attempt number
  * @return array the user answers (array) and user data stats (object)
  * @since  Moodle 3.3
  */
-function lesson_get_user_detailed_report_data(lesson $lesson, $userid, $attempt) {
+function opendsa_activity_get_user_detailed_report_data(opendsa_activity $opendsa_activity, $userid, $attempt) {
     global $DB;
 
-    $context = $lesson->context;
+    $context = $opendsa_activity->context;
     if (!empty($userid)) {
         // Apply overrides.
-        $lesson->update_effective_access($userid);
+        $opendsa_activity->update_effective_access($userid);
     }
 
     $pageid = 0;
-    $lessonpages = $lesson->load_all_pages();
-    foreach ($lessonpages as $lessonpage) {
-        if ($lessonpage->prevpageid == 0) {
-            $pageid = $lessonpage->id;
+    $opendsa_activitypages = $opendsa_activity->load_all_pages();
+    foreach ($opendsa_activitypages as $opendsa_activitypage) {
+        if ($opendsa_activitypage->prevpageid == 0) {
+            $pageid = $opendsa_activitypage->id;
         }
     }
 
@@ -1109,9 +1109,9 @@ function lesson_get_user_detailed_report_data(lesson $lesson, $userid, $attempt)
     $firstpageid = $pageid;
     $pagestats = array();
     while ($pageid != 0) { // EOL
-        $page = $lessonpages[$pageid];
-        $params = array ("opendsa_activity_id" => $lesson->id, "pageid" => $page->id);
-        if ($allanswers = $DB->get_records_select("lesson_attempts", "opendsa_activity_id = :opendsa_activity_id AND pageid = :pageid", $params, "timeseen")) {
+        $page = $opendsa_activitypages[$pageid];
+        $params = array ("opendsa_activity_id" => $opendsa_activity->id, "pageid" => $page->id);
+        if ($allanswers = $DB->get_records_select("opendsa_activity_attempts", "opendsa_activity_id = :opendsa_activity_id AND pageid = :pageid", $params, "timeseen")) {
             // get them ready for processing
             $orderedanswers = array();
             foreach ($allanswers as $singleanswer) {
@@ -1131,7 +1131,7 @@ function lesson_get_user_detailed_report_data(lesson $lesson, $userid, $attempt)
         $pageid = $page->nextpageid;
     }
 
-    $manager = lesson_page_type_manager::get($lesson);
+    $manager = opendsa_activity_page_type_manager::get($opendsa_activity);
     $qtypes = $manager->get_page_type_strings();
 
     $answerpages = array();
@@ -1143,7 +1143,7 @@ function lesson_get_user_detailed_report_data(lesson $lesson, $userid, $attempt)
     // grayout pages that the user did not answer and Branch, end of branch, cluster
     // and end of cluster pages
     while ($pageid != 0) { // EOL
-        $page = $lessonpages[$pageid];
+        $page = $opendsa_activitypages[$pageid];
         $answerpage = new stdClass;
         // Keep the original page object.
         $answerpage->page = $page;
@@ -1171,14 +1171,14 @@ function lesson_get_user_detailed_report_data(lesson $lesson, $userid, $attempt)
             // there is no userid, so set these vars and display stats.
             $answerpage->grayout = 0;
             $useranswer = null;
-        } elseif ($useranswers = $DB->get_records("lesson_attempts",array("opendsa_activity_id"=>$lesson->id, "userid"=>$userid, "retry"=>$attempt,"pageid"=>$page->id), "timeseen")) {
+        } elseif ($useranswers = $DB->get_records("opendsa_activity_attempts",array("opendsa_activity_id"=>$opendsa_activity->id, "userid"=>$userid, "retry"=>$attempt,"pageid"=>$page->id), "timeseen")) {
             // get the user's answer for this page
             // need to find the right one
             $i = 0;
             foreach ($useranswers as $userattempt) {
                 $useranswer = $userattempt;
                 $i++;
-                if ($lesson->maxattempts == $i) {
+                if ($opendsa_activity->maxattempts == $i) {
                     break; // reached maxattempts, break out
                 }
             }
@@ -1195,11 +1195,11 @@ function lesson_get_user_detailed_report_data(lesson $lesson, $userid, $attempt)
 
     $userstats = new stdClass;
     if (!empty($userid)) {
-        $params = array("opendsa_activity_id"=>$lesson->id, "userid"=>$userid);
+        $params = array("opendsa_activity_id"=>$opendsa_activity->id, "userid"=>$userid);
 
         $alreadycompleted = true;
 
-        if (!$grades = $DB->get_records_select("lesson_grades", "opendsa_activity_id = :opendsa_activity_id and userid = :userid", $params, "completed", "*", $attempt, 1)) {
+        if (!$grades = $DB->get_records_select("opendsa_activity_grades", "opendsa_activity_id = :opendsa_activity_id and userid = :userid", $params, "completed", "*", $attempt, 1)) {
             $userstats->grade = -1;
             $userstats->completed = -1;
             $alreadycompleted = false;
@@ -1209,16 +1209,16 @@ function lesson_get_user_detailed_report_data(lesson $lesson, $userid, $attempt)
             $userstats->grade = round($userstats->grade->grade, 2);
         }
 
-        if (!$times = $lesson->get_user_timers($userid, 'starttime', '*', $attempt, 1)) {
+        if (!$times = $opendsa_activity->get_user_timers($userid, 'starttime', '*', $attempt, 1)) {
             $userstats->timetotake = -1;
             $alreadycompleted = false;
         } else {
             $userstats->timetotake = current($times);
-            $userstats->timetotake = $userstats->timetotake->lessontime - $userstats->timetotake->starttime;
+            $userstats->timetotake = $userstats->timetotake->opendsa_activitytime - $userstats->timetotake->starttime;
         }
 
         if ($alreadycompleted) {
-            $userstats->gradeinfo = lesson_grade($lesson, $attempt, $userid);
+            $userstats->gradeinfo = opendsa_activity_grade($opendsa_activity, $attempt, $userid);
         }
     }
 
@@ -1226,20 +1226,20 @@ function lesson_get_user_detailed_report_data(lesson $lesson, $userid, $attempt)
 }
 
 /**
- * Return user's deadline for all lessons in a course, hereby taking into account group and user overrides.
+ * Return user's deadline for all opendsa_activitys in a course, hereby taking into account group and user overrides.
  *
  * @param int $courseid the course id.
- * @return object An object with of all lessonsids and close unixdates in this course,
+ * @return object An object with of all opendsa_activitysids and close unixdates in this course,
  * taking into account the most lenient overrides, if existing and 0 if no close date is set.
  */
-function lesson_get_user_deadline($courseid) {
+function opendsa_activity_get_user_deadline($courseid) {
     global $DB, $USER;
 
-    // For teacher and manager/admins return lesson's deadline.
+    // For teacher and manager/admins return opendsa_activity's deadline.
     if (has_capability('moodle/course:update', context_course::instance($courseid))) {
-        $sql = "SELECT lesson.id, lesson.deadline AS userdeadline
-                  FROM {lesson} lesson
-                 WHERE lesson.course = :courseid";
+        $sql = "SELECT opendsa_activity.id, opendsa_activity.deadline AS userdeadline
+                  FROM {opendsa_activity} opendsa_activity
+                 WHERE opendsa_activity.course = :courseid";
 
         $results = $DB->get_records_sql($sql, array('courseid' => $courseid));
         return $results;
@@ -1248,16 +1248,16 @@ function lesson_get_user_deadline($courseid) {
     $sql = "SELECT a.id,
                    COALESCE(v.userclose, v.groupclose, a.deadline, 0) AS userdeadline
               FROM (
-                      SELECT lesson.id as opendsa_activity_id,
+                      SELECT opendsa_activity.id as opendsa_activity_id,
                              MAX(leo.deadline) AS userclose, MAX(qgo.deadline) AS groupclose
-                        FROM {lesson} lesson
-                   LEFT JOIN {lesson_overrides} leo on lesson.id = leo.opendsa_activity_id AND leo.userid = :userid
+                        FROM {opendsa_activity} opendsa_activity
+                   LEFT JOIN {opendsa_activity_overrides} leo on opendsa_activity.id = leo.opendsa_activity_id AND leo.userid = :userid
                    LEFT JOIN {groups_members} gm ON gm.userid = :useringroupid
-                   LEFT JOIN {lesson_overrides} qgo on lesson.id = qgo.opendsa_activity_id AND qgo.groupid = gm.groupid
-                       WHERE lesson.course = :courseid
-                    GROUP BY lesson.id
+                   LEFT JOIN {opendsa_activity_overrides} qgo on opendsa_activity.id = qgo.opendsa_activity_id AND qgo.groupid = gm.groupid
+                       WHERE opendsa_activity.course = :courseid
+                    GROUP BY opendsa_activity.id
                    ) v
-              JOIN {lesson} a ON a.id = v.opendsa_activity_id";
+              JOIN {opendsa_activity} a ON a.id = v.opendsa_activity_id";
 
     $results = $DB->get_records_sql($sql, array('userid' => $USER->id, 'useringroupid' => $USER->id, 'courseid' => $courseid));
     return $results;
@@ -1276,11 +1276,11 @@ function lesson_get_user_deadline($courseid) {
  * @copyright  2009 Sam Hemelryk
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-abstract class lesson_add_page_form_base extends moodleform {
+abstract class opendsa_activity_add_page_form_base extends moodleform {
 
     /**
      * This is the classic define that is used to identify this pagetype.
-     * Will be one of LESSON_*
+     * Will be one of OPENDSA_ACTIVITY_*
      * @var int
      */
     public $qtype;
@@ -1355,9 +1355,9 @@ abstract class lesson_add_page_form_base extends moodleform {
 
         if ($this->qtypestring != 'selectaqtype') {
             if ($this->_customdata['edit']) {
-                $mform->addElement('header', 'qtypeheading', get_string('edit'. $this->qtypestring, 'lesson'));
+                $mform->addElement('header', 'qtypeheading', get_string('edit'. $this->qtypestring, 'opendsa_activity'));
             } else {
-                $mform->addElement('header', 'qtypeheading', get_string('add'. $this->qtypestring, 'lesson'));
+                $mform->addElement('header', 'qtypeheading', get_string('add'. $this->qtypestring, 'opendsa_activity'));
             }
         }
 
@@ -1376,7 +1376,7 @@ abstract class lesson_add_page_form_base extends moodleform {
             $mform->addElement('hidden', 'qtype');
             $mform->setType('qtype', PARAM_INT);
 
-            $mform->addElement('text', 'title', get_string('pagetitle', 'lesson'), array('size'=>70));
+            $mform->addElement('text', 'title', get_string('pagetitle', 'opendsa_activity'), array('size'=>70));
             $mform->addRule('title', get_string('required'), 'required', null, 'client');
             if (!empty($CFG->formatstringstriptags)) {
                 $mform->setType('title', PARAM_TEXT);
@@ -1385,7 +1385,7 @@ abstract class lesson_add_page_form_base extends moodleform {
             }
 
             $this->editoroptions = array('noclean'=>true, 'maxfiles'=>EDITOR_UNLIMITED_FILES, 'maxbytes'=>$this->_customdata['maxbytes']);
-            $mform->addElement('editor', 'contents_editor', get_string('pagecontents', 'lesson'), null, $this->editoroptions);
+            $mform->addElement('editor', 'contents_editor', get_string('pagecontents', 'opendsa_activity'), null, $this->editoroptions);
             $mform->setType('contents_editor', PARAM_RAW);
             $mform->addRule('contents_editor', get_string('required'), 'required', null, 'client');
         }
@@ -1395,11 +1395,11 @@ abstract class lesson_add_page_form_base extends moodleform {
         if ($this->_customdata['edit'] === true) {
             $mform->addElement('hidden', 'edit', 1);
             $mform->setType('edit', PARAM_BOOL);
-            $this->add_action_buttons(get_string('cancel'), get_string('savepage', 'lesson'));
+            $this->add_action_buttons(get_string('cancel'), get_string('savepage', 'opendsa_activity'));
         } else if ($this->qtype === 'questiontype') {
-            $this->add_action_buttons(get_string('cancel'), get_string('addaquestionpage', 'lesson'));
+            $this->add_action_buttons(get_string('cancel'), get_string('addaquestionpage', 'opendsa_activity'));
         } else {
-            $this->add_action_buttons(get_string('cancel'), get_string('savepage', 'lesson'));
+            $this->add_action_buttons(get_string('cancel'), get_string('savepage', 'opendsa_activity'));
         }
     }
 
@@ -1410,8 +1410,8 @@ abstract class lesson_add_page_form_base extends moodleform {
      * @param string|null $label
      * @param int $selected The page to select by default
      */
-    protected final function add_jumpto($name, $label=null, $selected=LESSON_NEXTPAGE) {
-        $title = get_string("jump", "lesson");
+    protected final function add_jumpto($name, $label=null, $selected=OPENDSA_ACTIVITY_NEXTPAGE) {
+        $title = get_string("jump", "opendsa_activity");
         if ($label === null) {
             $label = $title;
         }
@@ -1420,7 +1420,7 @@ abstract class lesson_add_page_form_base extends moodleform {
         }
         $this->_form->addElement('select', $name, $label, $this->_customdata['jumpto']);
         $this->_form->setDefault($name, $selected);
-        $this->_form->addHelpButton($name, 'jumps', 'lesson');
+        $this->_form->addHelpButton($name, 'jumps', 'opendsa_activity');
     }
 
     /**
@@ -1432,7 +1432,7 @@ abstract class lesson_add_page_form_base extends moodleform {
      */
     protected final function add_score($name, $label=null, $value=null) {
         if ($label === null) {
-            $label = get_string("score", "lesson");
+            $label = get_string("score", "opendsa_activity");
         }
 
         if (is_int($name)) {
@@ -1443,10 +1443,10 @@ abstract class lesson_add_page_form_base extends moodleform {
         if ($value !== null) {
             $this->_form->setDefault($name, $value);
         }
-        $this->_form->addHelpButton($name, 'score', 'lesson');
+        $this->_form->addHelpButton($name, 'score', 'opendsa_activity');
 
         // Score is only used for custom scoring. Disable the element when not in use to stop some confusion.
-        if (!$this->_customdata['lesson']->custom) {
+        if (!$this->_customdata['opendsa_activity']->custom) {
             $this->_form->freeze($name);
         }
     }
@@ -1464,10 +1464,10 @@ abstract class lesson_add_page_form_base extends moodleform {
      */
     protected final function add_answer($count, $label = null, $required = false, $format= '', array $help = []) {
         if ($label === null) {
-            $label = get_string('answer', 'lesson');
+            $label = get_string('answer', 'opendsa_activity');
         }
 
-        if ($format == LESSON_ANSWER_HTML) {
+        if ($format == OPENDSA_ACTIVITY_ANSWER_HTML) {
             $this->_form->addElement('editor', 'answer_editor['.$count.']', $label,
                     array('rows' => '4', 'columns' => '80'),
                     array('noclean' => true, 'maxfiles' => EDITOR_UNLIMITED_FILES, 'maxbytes' => $this->_customdata['maxbytes']));
@@ -1497,7 +1497,7 @@ abstract class lesson_add_page_form_base extends moodleform {
      */
     protected final function add_response($count, $label = null, $required = false) {
         if ($label === null) {
-            $label = get_string('response', 'lesson');
+            $label = get_string('response', 'opendsa_activity');
         }
         $this->_form->addElement('editor', 'response_editor['.$count.']', $label,
                  array('rows' => '4', 'columns' => '80'),
@@ -1518,7 +1518,7 @@ abstract class lesson_add_page_form_base extends moodleform {
      *
      * @return bool
      */
-    public function construction_override($pageid, lesson $lesson) {
+    public function construction_override($pageid, opendsa_activity $opendsa_activity) {
         return true;
     }
 }
@@ -1526,30 +1526,30 @@ abstract class lesson_add_page_form_base extends moodleform {
 
 
 /**
- * Class representation of a lesson
+ * Class representation of a opendsa_activity
  *
- * This class is used the interact with, and manage a lesson once instantiated.
- * If you need to fetch a lesson object you can do so by calling
+ * This class is used the interact with, and manage a opendsa_activity once instantiated.
+ * If you need to fetch a opendsa_activity object you can do so by calling
  *
  * <code>
- * lesson::load($opendsa_activity_id);
+ * opendsa_activity::load($opendsa_activity_id);
  * // or
- * $lessonrecord = $DB->get_record('lesson', $opendsa_activity_id);
- * $lesson = new lesson($lessonrecord);
+ * $opendsa_activityrecord = $DB->get_record('opendsa_activity', $opendsa_activity_id);
+ * $opendsa_activity = new opendsa_activity($opendsa_activityrecord);
  * </code>
  *
- * The class itself extends lesson_base as all classes within the lesson module should
+ * The class itself extends opendsa_activity_base as all classes within the opendsa_activity module should
  *
  * These properties are from the database
- * @property int $id The id of this lesson
- * @property int $course The ID of the course this lesson belongs to
- * @property string $name The name of this lesson
- * @property int $practice Flag to toggle this as a practice lesson
+ * @property int $id The id of this opendsa_activity
+ * @property int $course The ID of the course this opendsa_activity belongs to
+ * @property string $name The name of this opendsa_activity
+ * @property int $practice Flag to toggle this as a practice opendsa_activity
  * @property int $modattempts Toggle to allow the user to go back and review answers
  * @property int $usepassword Toggle the use of a password for entry
  * @property string $password The password to require users to enter
- * @property int $dependency ID of another lesson this lesson is dependent on
- * @property string $conditions Conditions of the lesson dependency
+ * @property int $dependency ID of another opendsa_activity this opendsa_activity is dependent on
+ * @property string $conditions Conditions of the opendsa_activity dependency
  * @property int $grade The maximum grade a user can achieve (%)
  * @property int $custom Toggle custom scoring on or off
  * @property int $ongoing Toggle display of an ongoing score
@@ -1560,9 +1560,9 @@ abstract class lesson_add_page_form_base extends moodleform {
  * @property int $nextpagedefault Override the default next page
  * @property int $feedback Toggles display of default feedback
  * @property int $minquestions Sets a minimum value of pages seen when calculating grades
- * @property int $maxpages Maximum number of pages this lesson can contain
- * @property int $retake Flag to allow users to retake a lesson
- * @property int $activitylink Relate this lesson to another lesson
+ * @property int $maxpages Maximum number of pages this opendsa_activity can contain
+ * @property int $retake Flag to allow users to retake a opendsa_activity
+ * @property int $activitylink Relate this opendsa_activity to another opendsa_activity
  * @property string $mediafile File to pop up to or webpage to display
  * @property int $mediaheight Sets the height of the media file popup
  * @property int $mediawidth Sets the width of the media file popup
@@ -1573,65 +1573,65 @@ abstract class lesson_add_page_form_base extends moodleform {
  * @property string $bgcolor Background colour of slideshow
  * @property int $displayleft Display a left menu
  * @property int $displayleftif Sets the condition on which the left menu is displayed
- * @property int $progressbar Flag to toggle display of a lesson progress bar
- * @property int $available Timestamp of when this lesson becomes available
- * @property int $deadline Timestamp of when this lesson is no longer available
- * @property int $timemodified Timestamp when lesson was last modified
- * @property int $allowofflineattempts Whether to allow the lesson to be attempted offline in the mobile app
+ * @property int $progressbar Flag to toggle display of a opendsa_activity progress bar
+ * @property int $available Timestamp of when this opendsa_activity becomes available
+ * @property int $deadline Timestamp of when this opendsa_activity is no longer available
+ * @property int $timemodified Timestamp when opendsa_activity was last modified
+ * @property int $allowofflineattempts Whether to allow the opendsa_activity to be attempted offline in the mobile app
  *
  * These properties are calculated
- * @property int $firstpageid Id of the first page of this lesson (prevpageid=0)
- * @property int $lastpageid Id of the last page of this lesson (nextpageid=0)
+ * @property int $firstpageid Id of the first page of this opendsa_activity (prevpageid=0)
+ * @property int $lastpageid Id of the last page of this opendsa_activity (nextpageid=0)
  *
  * @copyright  2009 Sam Hemelryk
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class lesson extends lesson_base {
+class opendsa_activity extends opendsa_activity_base {
 
     /**
      * The id of the first page (where prevpageid = 0) gets set and retrieved by
-     * {@see get_firstpageid()} by directly calling <code>$lesson->firstpageid;</code>
+     * {@see get_firstpageid()} by directly calling <code>$opendsa_activity->firstpageid;</code>
      * @var int
      */
     protected $firstpageid = null;
     /**
      * The id of the last page (where nextpageid = 0) gets set and retrieved by
-     * {@see get_lastpageid()} by directly calling <code>$lesson->lastpageid;</code>
+     * {@see get_lastpageid()} by directly calling <code>$opendsa_activity->lastpageid;</code>
      * @var int
      */
     protected $lastpageid = null;
     /**
-     * An array used to cache the pages associated with this lesson after the first
+     * An array used to cache the pages associated with this opendsa_activity after the first
      * time they have been loaded.
      * A note to developers: If you are going to be working with MORE than one or
-     * two pages from a lesson you should probably call {@see $lesson->load_all_pages()}
+     * two pages from a opendsa_activity you should probably call {@see $opendsa_activity->load_all_pages()}
      * in order to save excess database queries.
-     * @var array An array of lesson_page objects
+     * @var array An array of opendsa_activity_page objects
      */
     protected $pages = array();
     /**
-     * Flag that gets set to true once all of the pages associated with the lesson
+     * Flag that gets set to true once all of the pages associated with the opendsa_activity
      * have been loaded.
      * @var bool
      */
     protected $loadedallpages = false;
 
     /**
-     * Course module object gets set and retrieved by directly calling <code>$lesson->cm;</code>
+     * Course module object gets set and retrieved by directly calling <code>$opendsa_activity->cm;</code>
      * @see get_cm()
      * @var stdClass
      */
     protected $cm = null;
 
     /**
-     * Course object gets set and retrieved by directly calling <code>$lesson->courserecord;</code>
+     * Course object gets set and retrieved by directly calling <code>$opendsa_activity->courserecord;</code>
      * @see get_courserecord()
      * @var stdClass
      */
     protected $courserecord = null;
 
     /**
-     * Context object gets set and retrieved by directly calling <code>$lesson->context;</code>
+     * Context object gets set and retrieved by directly calling <code>$opendsa_activity->context;</code>
      * @see get_context()
      * @var stdClass
      */
@@ -1652,55 +1652,55 @@ class lesson extends lesson_base {
     }
 
     /**
-     * Simply generates a lesson object given an array/object of properties
-     * Overrides {@see lesson_base->create()}
+     * Simply generates a opendsa_activity object given an array/object of properties
+     * Overrides {@see opendsa_activity_base->create()}
      * @static
      * @param object|array $properties
-     * @return lesson
+     * @return opendsa_activity
      */
     public static function create($properties) {
-        return new lesson($properties);
+        return new opendsa_activity($properties);
     }
 
     /**
-     * Generates a lesson object from the database given its id
+     * Generates a opendsa_activity object from the database given its id
      * @static
      * @param int $opendsa_activity_id
-     * @return lesson
+     * @return opendsa_activity
      */
     public static function load($opendsa_activity_id) {
         global $DB;
 
-        if (!$lesson = $DB->get_record('lesson', array('id' => $opendsa_activity_id))) {
+        if (!$opendsa_activity = $DB->get_record('opendsa_activity', array('id' => $opendsa_activity_id))) {
             print_error('invalidcoursemodule');
         }
-        return new lesson($lesson);
+        return new opendsa_activity($opendsa_activity);
     }
 
     /**
-     * Deletes this lesson from the database
+     * Deletes this opendsa_activity from the database
      */
     public function delete() {
         global $CFG, $DB;
         require_once($CFG->libdir.'/gradelib.php');
         require_once($CFG->dirroot.'/calendar/lib.php');
 
-        $cm = get_coursemodule_from_instance('lesson', $this->properties->id, $this->properties->course);
+        $cm = get_coursemodule_from_instance('opendsa_activity', $this->properties->id, $this->properties->course);
         $context = context_module::instance($cm->id);
 
         $this->delete_all_overrides();
 
-        grade_update('mod/lesson', $this->properties->course, 'mod', 'lesson', $this->properties->id, 0, null, array('deleted'=>1));
+        grade_update('mod/opendsa_activity', $this->properties->course, 'mod', 'opendsa_activity', $this->properties->id, 0, null, array('deleted'=>1));
 
         // We must delete the module record after we delete the grade item.
-        $DB->delete_records("lesson", array("id"=>$this->properties->id));
-        $DB->delete_records("lesson_pages", array("opendsa_activity_id"=>$this->properties->id));
-        $DB->delete_records("lesson_answers", array("opendsa_activity_id"=>$this->properties->id));
-        $DB->delete_records("lesson_attempts", array("opendsa_activity_id"=>$this->properties->id));
-        $DB->delete_records("lesson_grades", array("opendsa_activity_id"=>$this->properties->id));
-        $DB->delete_records("lesson_timer", array("opendsa_activity_id"=>$this->properties->id));
-        $DB->delete_records("lesson_branch", array("opendsa_activity_id"=>$this->properties->id));
-        if ($events = $DB->get_records('event', array("modulename"=>'lesson', "instance"=>$this->properties->id))) {
+        $DB->delete_records("opendsa_activity", array("id"=>$this->properties->id));
+        $DB->delete_records("opendsa_activity_pages", array("opendsa_activity_id"=>$this->properties->id));
+        $DB->delete_records("opendsa_activity_answers", array("opendsa_activity_id"=>$this->properties->id));
+        $DB->delete_records("opendsa_activity_attempts", array("opendsa_activity_id"=>$this->properties->id));
+        $DB->delete_records("opendsa_activity_grades", array("opendsa_activity_id"=>$this->properties->id));
+        $DB->delete_records("opendsa_activity_timer", array("opendsa_activity_id"=>$this->properties->id));
+        $DB->delete_records("opendsa_activity_branch", array("opendsa_activity_id"=>$this->properties->id));
+        if ($events = $DB->get_records('event', array("modulename"=>'opendsa_activity', "instance"=>$this->properties->id))) {
             $coursecontext = context_course::instance($cm->course);
             foreach($events as $event) {
                 $event->context = $coursecontext;
@@ -1717,7 +1717,7 @@ class lesson extends lesson_base {
     }
 
     /**
-     * Deletes a lesson override from the database and clears any corresponding calendar events
+     * Deletes a opendsa_activity override from the database and clears any corresponding calendar events
      *
      * @param int $overrideid The id of the override being deleted
      * @return bool true on success
@@ -1727,12 +1727,12 @@ class lesson extends lesson_base {
 
         require_once($CFG->dirroot . '/calendar/lib.php');
 
-        $cm = get_coursemodule_from_instance('lesson', $this->properties->id, $this->properties->course);
+        $cm = get_coursemodule_from_instance('opendsa_activity', $this->properties->id, $this->properties->course);
 
-        $override = $DB->get_record('lesson_overrides', array('id' => $overrideid), '*', MUST_EXIST);
+        $override = $DB->get_record('opendsa_activity_overrides', array('id' => $overrideid), '*', MUST_EXIST);
 
         // Delete the events.
-        $conds = array('modulename' => 'lesson',
+        $conds = array('modulename' => 'opendsa_activity',
                 'instance' => $this->properties->id);
         if (isset($override->userid)) {
             $conds['userid'] = $override->userid;
@@ -1745,7 +1745,7 @@ class lesson extends lesson_base {
             $eventold->delete();
         }
 
-        $DB->delete_records('lesson_overrides', array('id' => $overrideid));
+        $DB->delete_records('opendsa_activity_overrides', array('id' => $overrideid));
 
         // Set the common parameters for one of the events we will be triggering.
         $params = array(
@@ -1758,26 +1758,26 @@ class lesson extends lesson_base {
         // Determine which override deleted event to fire.
         if (!empty($override->userid)) {
             $params['relateduserid'] = $override->userid;
-            $event = \mod_lesson\event\user_override_deleted::create($params);
+            $event = \mod_opendsa_activity\event\user_override_deleted::create($params);
         } else {
             $params['other']['groupid'] = $override->groupid;
-            $event = \mod_lesson\event\group_override_deleted::create($params);
+            $event = \mod_opendsa_activity\event\group_override_deleted::create($params);
         }
 
         // Trigger the override deleted event.
-        $event->add_record_snapshot('lesson_overrides', $override);
+        $event->add_record_snapshot('opendsa_activity_overrides', $override);
         $event->trigger();
 
         return true;
     }
 
     /**
-     * Deletes all lesson overrides from the database and clears any corresponding calendar events
+     * Deletes all opendsa_activity overrides from the database and clears any corresponding calendar events
      */
     public function delete_all_overrides() {
         global $DB;
 
-        $overrides = $DB->get_records('lesson_overrides', array('opendsa_activity_id' => $this->properties->id), 'id');
+        $overrides = $DB->get_records('opendsa_activity_overrides', array('opendsa_activity_id' => $this->properties->id), 'id');
         foreach ($overrides as $override) {
             $this->delete_override($override->id);
         }
@@ -1790,7 +1790,7 @@ class lesson extends lesson_base {
      * @return null|stdClass user record
      */
     public function is_participant($userid) {
-        return is_enrolled($this->get_context(), $userid, 'mod/lesson:view', $this->show_only_active_users());
+        return is_enrolled($this->get_context(), $userid, 'mod/opendsa_activity:view', $this->show_only_active_users());
     }
 
     /**
@@ -1803,14 +1803,14 @@ class lesson extends lesson_base {
     }
 
     /**
-     * Updates the lesson properties with override information for a user.
+     * Updates the opendsa_activity properties with override information for a user.
      *
-     * Algorithm:  For each lesson setting, if there is a matching user-specific override,
+     * Algorithm:  For each opendsa_activity setting, if there is a matching user-specific override,
      *   then use that otherwise, if there are group-specific overrides, return the most
      *   lenient combination of them.  If neither applies, leave the quiz setting unchanged.
      *
      *   Special case: if there is more than one password that applies to the user, then
-     *   lesson->extrapasswords will contain an array of strings giving the remaining
+     *   opendsa_activity->extrapasswords will contain an array of strings giving the remaining
      *   passwords.
      *
      * @param int $userid The userid.
@@ -1819,7 +1819,7 @@ class lesson extends lesson_base {
         global $DB;
 
         // Check for user override.
-        $override = $DB->get_record('lesson_overrides', array('opendsa_activity_id' => $this->properties->id, 'userid' => $userid));
+        $override = $DB->get_record('opendsa_activity_overrides', array('opendsa_activity_id' => $this->properties->id, 'userid' => $userid));
 
         if (!$override) {
             $override = new stdClass();
@@ -1838,7 +1838,7 @@ class lesson extends lesson_base {
         if (!empty($groupings[0])) {
             // Select all overrides that apply to the User's groups.
             list($extra, $params) = $DB->get_in_or_equal(array_values($groupings[0]));
-            $sql = "SELECT * FROM {lesson_overrides}
+            $sql = "SELECT * FROM {opendsa_activity_overrides}
                     WHERE groupid $extra AND opendsa_activity_id = ?";
             $params[] = $this->properties->id;
             $records = $DB->get_records_sql($sql, $params);
@@ -1911,7 +1911,7 @@ class lesson extends lesson_base {
 
         }
 
-        // Merge with lesson defaults.
+        // Merge with opendsa_activity defaults.
         $keys = array('available', 'deadline', 'timelimit', 'maxattempts', 'review', 'retake');
         foreach ($keys as $key) {
             if (isset($override->{$key})) {
@@ -1919,7 +1919,7 @@ class lesson extends lesson_base {
             }
         }
 
-        // Special handling of lesson usepassword and password.
+        // Special handling of opendsa_activity usepassword and password.
         if (isset($override->password)) {
             if ($override->password == '') {
                 $this->properties->usepassword = 0;
@@ -1939,7 +1939,7 @@ class lesson extends lesson_base {
      *
      * <code>
      * // Do not call this method directly instead use
-     * $lesson->messages;
+     * $opendsa_activity->messages;
      * </code>
      *
      * @return array
@@ -1948,9 +1948,9 @@ class lesson extends lesson_base {
         global $SESSION;
 
         $messages = array();
-        if (!empty($SESSION->lesson_messages) && is_array($SESSION->lesson_messages) && array_key_exists($this->properties->id, $SESSION->lesson_messages)) {
-            $messages = $SESSION->lesson_messages[$this->properties->id];
-            unset($SESSION->lesson_messages[$this->properties->id]);
+        if (!empty($SESSION->opendsa_activity_messages) && is_array($SESSION->opendsa_activity_messages) && array_key_exists($this->properties->id, $SESSION->opendsa_activity_messages)) {
+            $messages = $SESSION->opendsa_activity_messages[$this->properties->id];
+            unset($SESSION->opendsa_activity_messages[$this->properties->id]);
         }
 
         return $messages;
@@ -1977,39 +1977,39 @@ class lesson extends lesson_base {
         if ($userid === null) {
             $params['userid'] = $USER->id;
         }
-        return $DB->get_records('lesson_attempts', $params, 'timeseen ASC');
+        return $DB->get_records('opendsa_activity_attempts', $params, 'timeseen ASC');
     }
 
 
     /**
-     * Get a list of content pages (formerly known as branch tables) viewed in the lesson for the given user during an attempt.
+     * Get a list of content pages (formerly known as branch tables) viewed in the opendsa_activity for the given user during an attempt.
      *
-     * @param  int $lessonattempt the lesson attempt number (also known as retries)
+     * @param  int $opendsa_activityattempt the opendsa_activity attempt number (also known as retries)
      * @param  int $userid        the user id to retrieve the data from
      * @param  string $sort          an order to sort the results in (a valid SQL ORDER BY parameter)
      * @param  string $fields        a comma separated list of fields to return
      * @return array of pages
      * @since  Moodle 3.3
      */
-    public function get_content_pages_viewed($lessonattempt, $userid = null, $sort = '', $fields = '*') {
+    public function get_content_pages_viewed($opendsa_activityattempt, $userid = null, $sort = '', $fields = '*') {
         global $USER, $DB;
 
         if ($userid === null) {
             $userid = $USER->id;
         }
-        $conditions = array("opendsa_activity_id" => $this->properties->id, "userid" => $userid, "retry" => $lessonattempt);
-        return $DB->get_records('lesson_branch', $conditions, $sort, $fields);
+        $conditions = array("opendsa_activity_id" => $this->properties->id, "userid" => $userid, "retry" => $opendsa_activityattempt);
+        return $DB->get_records('opendsa_activity_branch', $conditions, $sort, $fields);
     }
 
     /**
-     * Returns the first page for the lesson or false if there isn't one.
+     * Returns the first page for the opendsa_activity or false if there isn't one.
      *
      * This method should be called via the magic method __get();
      * <code>
-     * $firstpage = $lesson->firstpage;
+     * $firstpage = $opendsa_activity->firstpage;
      * </code>
      *
-     * @return lesson_page|bool Returns the lesson_page specialised object or false
+     * @return opendsa_activity_page|bool Returns the opendsa_activity_page specialised object or false
      */
     protected function get_firstpage() {
         $pages = $this->load_all_pages();
@@ -2024,14 +2024,14 @@ class lesson extends lesson_base {
     }
 
     /**
-     * Returns the last page for the lesson or false if there isn't one.
+     * Returns the last page for the opendsa_activity or false if there isn't one.
      *
      * This method should be called via the magic method __get();
      * <code>
-     * $lastpage = $lesson->lastpage;
+     * $lastpage = $opendsa_activity->lastpage;
      * </code>
      *
-     * @return lesson_page|bool Returns the lesson_page specialised object or false
+     * @return opendsa_activity_page|bool Returns the opendsa_activity_page specialised object or false
      */
     protected function get_lastpage() {
         $pages = $this->load_all_pages();
@@ -2046,16 +2046,16 @@ class lesson extends lesson_base {
     }
 
     /**
-     * Returns the id of the first page of this lesson. (prevpageid = 0)
+     * Returns the id of the first page of this opendsa_activity. (prevpageid = 0)
      * @return int
      */
     protected function get_firstpageid() {
         global $DB;
         if ($this->firstpageid == null) {
             if (!$this->loadedallpages) {
-                $firstpageid = $DB->get_field('lesson_pages', 'id', array('opendsa_activity_id'=>$this->properties->id, 'prevpageid'=>0));
+                $firstpageid = $DB->get_field('opendsa_activity_pages', 'id', array('opendsa_activity_id'=>$this->properties->id, 'prevpageid'=>0));
                 if (!$firstpageid) {
-                    print_error('cannotfindfirstpage', 'lesson');
+                    print_error('cannotfindfirstpage', 'opendsa_activity');
                 }
                 $this->firstpageid = $firstpageid;
             } else {
@@ -2067,16 +2067,16 @@ class lesson extends lesson_base {
     }
 
     /**
-     * Returns the id of the last page of this lesson. (nextpageid = 0)
+     * Returns the id of the last page of this opendsa_activity. (nextpageid = 0)
      * @return int
      */
     public function get_lastpageid() {
         global $DB;
         if ($this->lastpageid == null) {
             if (!$this->loadedallpages) {
-                $lastpageid = $DB->get_field('lesson_pages', 'id', array('opendsa_activity_id'=>$this->properties->id, 'nextpageid'=>0));
+                $lastpageid = $DB->get_field('opendsa_activity_pages', 'id', array('opendsa_activity_id'=>$this->properties->id, 'nextpageid'=>0));
                 if (!$lastpageid) {
-                    print_error('cannotfindlastpage', 'lesson');
+                    print_error('cannotfindlastpage', 'opendsa_activity');
                 }
                 $this->lastpageid = $lastpageid;
             } else {
@@ -2098,19 +2098,19 @@ class lesson extends lesson_base {
         $allpages = $this->load_all_pages();
         if ($this->properties->nextpagedefault) {
             // in Flash Card mode...first get number of retakes
-            $nretakes = $DB->count_records("lesson_grades", array("opendsa_activity_id" => $this->properties->id, "userid" => $USER->id));
+            $nretakes = $DB->count_records("opendsa_activity_grades", array("opendsa_activity_id" => $this->properties->id, "userid" => $USER->id));
             shuffle($allpages);
             $found = false;
-            if ($this->properties->nextpagedefault == LESSON_UNSEENPAGE) {
+            if ($this->properties->nextpagedefault == OPENDSA_ACTIVITY_UNSEENPAGE) {
                 foreach ($allpages as $nextpage) {
-                    if (!$DB->count_records("lesson_attempts", array("pageid" => $nextpage->id, "userid" => $USER->id, "retry" => $nretakes))) {
+                    if (!$DB->count_records("opendsa_activity_attempts", array("pageid" => $nextpage->id, "userid" => $USER->id, "retry" => $nretakes))) {
                         $found = true;
                         break;
                     }
                 }
-            } elseif ($this->properties->nextpagedefault == LESSON_UNANSWEREDPAGE) {
+            } elseif ($this->properties->nextpagedefault == OPENDSA_ACTIVITY_UNANSWEREDPAGE) {
                 foreach ($allpages as $nextpage) {
-                    if (!$DB->count_records("lesson_attempts", array('pageid' => $nextpage->id, 'userid' => $USER->id, 'correct' => 1, 'retry' => $nretakes))) {
+                    if (!$DB->count_records("opendsa_activity_attempts", array('pageid' => $nextpage->id, 'userid' => $USER->id, 'correct' => 1, 'retry' => $nretakes))) {
                         $found = true;
                         break;
                     }
@@ -2118,26 +2118,26 @@ class lesson extends lesson_base {
             }
             if ($found) {
                 if ($this->properties->maxpages) {
-                    // check number of pages viewed (in the lesson)
-                    if ($DB->count_records("lesson_attempts", array("opendsa_activity_id" => $this->properties->id, "userid" => $USER->id, "retry" => $nretakes)) >= $this->properties->maxpages) {
-                        return LESSON_EOL;
+                    // check number of pages viewed (in the opendsa_activity)
+                    if ($DB->count_records("opendsa_activity_attempts", array("opendsa_activity_id" => $this->properties->id, "userid" => $USER->id, "retry" => $nretakes)) >= $this->properties->maxpages) {
+                        return OPENDSA_ACTIVITY_EOL;
                     }
                 }
                 return $nextpage->id;
             }
         }
-        // In a normal lesson mode
+        // In a normal opendsa_activity mode
         foreach ($allpages as $nextpage) {
             if ((int)$nextpage->id === (int)$nextpageid) {
                 return $nextpage->id;
             }
         }
-        return LESSON_EOL;
+        return OPENDSA_ACTIVITY_EOL;
     }
 
     /**
-     * Sets a message against the session for this lesson that will displayed next
-     * time the lesson processes messages
+     * Sets a message against the session for this opendsa_activity that will displayed next
+     * time the opendsa_activity processes messages
      *
      * @param string $message
      * @param string $class
@@ -2147,21 +2147,21 @@ class lesson extends lesson_base {
     public function add_message($message, $class="notifyproblem", $align='center') {
         global $SESSION;
 
-        if (empty($SESSION->lesson_messages) || !is_array($SESSION->lesson_messages)) {
-            $SESSION->lesson_messages = array();
-            $SESSION->lesson_messages[$this->properties->id] = array();
-        } else if (!array_key_exists($this->properties->id, $SESSION->lesson_messages)) {
-            $SESSION->lesson_messages[$this->properties->id] = array();
+        if (empty($SESSION->opendsa_activity_messages) || !is_array($SESSION->opendsa_activity_messages)) {
+            $SESSION->opendsa_activity_messages = array();
+            $SESSION->opendsa_activity_messages[$this->properties->id] = array();
+        } else if (!array_key_exists($this->properties->id, $SESSION->opendsa_activity_messages)) {
+            $SESSION->opendsa_activity_messages[$this->properties->id] = array();
         }
 
-        $SESSION->lesson_messages[$this->properties->id][] = array($message, $class, $align);
+        $SESSION->opendsa_activity_messages[$this->properties->id][] = array($message, $class, $align);
 
         return true;
     }
 
     /**
-     * Check if the lesson is accessible at the present time
-     * @return bool True if the lesson is accessible, false otherwise
+     * Check if the opendsa_activity is accessible at the present time
+     * @return bool True if the opendsa_activity is accessible, false otherwise
      */
     public function is_accessible() {
         $available = $this->properties->available;
@@ -2170,37 +2170,37 @@ class lesson extends lesson_base {
     }
 
     /**
-     * Starts the lesson time for the current user
+     * Starts the opendsa_activity time for the current user
      * @return bool Returns true
      */
     public function start_timer() {
         global $USER, $DB;
 
-        $cm = get_coursemodule_from_instance('lesson', $this->properties()->id, $this->properties()->course,
+        $cm = get_coursemodule_from_instance('opendsa_activity', $this->properties()->id, $this->properties()->course,
             false, MUST_EXIST);
 
-        // Trigger lesson started event.
-        $event = \mod_lesson\event\lesson_started::create(array(
+        // Trigger opendsa_activity started event.
+        $event = \mod_opendsa_activity\event\opendsa_activity_started::create(array(
             'objectid' => $this->properties()->id,
             'context' => context_module::instance($cm->id),
             'courseid' => $this->properties()->course
         ));
         $event->trigger();
 
-        $USER->startlesson[$this->properties->id] = true;
+        $USER->startopendsa_activity[$this->properties->id] = true;
 
         $timenow = time();
-        $startlesson = new stdClass;
-        $startlesson->opendsa_activity_id = $this->properties->id;
-        $startlesson->userid = $USER->id;
-        $startlesson->starttime = $timenow;
-        $startlesson->lessontime = $timenow;
+        $startopendsa_activity = new stdClass;
+        $startopendsa_activity->opendsa_activity_id = $this->properties->id;
+        $startopendsa_activity->userid = $USER->id;
+        $startopendsa_activity->starttime = $timenow;
+        $startopendsa_activity->opendsa_activitytime = $timenow;
         if (WS_SERVER) {
-            $startlesson->timemodifiedoffline = $timenow;
+            $startopendsa_activity->timemodifiedoffline = $timenow;
         }
-        $DB->insert_record('lesson_timer', $startlesson);
+        $DB->insert_record('opendsa_activity_timer', $startopendsa_activity);
         if ($this->properties->timelimit) {
-            $this->add_message(get_string('timelimitwarning', 'lesson', format_time($this->properties->timelimit)), 'center');
+            $this->add_message(get_string('timelimitwarning', 'opendsa_activity', format_time($this->properties->timelimit)), 'center');
         }
         return true;
     }
@@ -2215,7 +2215,7 @@ class lesson extends lesson_base {
     public function update_timer($restart=false, $continue=false, $endreached =false) {
         global $USER, $DB;
 
-        $cm = get_coursemodule_from_instance('lesson', $this->properties->id, $this->properties->course);
+        $cm = get_coursemodule_from_instance('opendsa_activity', $this->properties->id, $this->properties->course);
 
         // clock code
         // get time information for this user
@@ -2228,10 +2228,10 @@ class lesson extends lesson_base {
         if ($restart) {
             if ($continue) {
                 // continue a previous test, need to update the clock  (think this option is disabled atm)
-                $timer->starttime = time() - ($timer->lessontime - $timer->starttime);
+                $timer->starttime = time() - ($timer->opendsa_activitytime - $timer->starttime);
 
-                // Trigger lesson resumed event.
-                $event = \mod_lesson\event\lesson_resumed::create(array(
+                // Trigger opendsa_activity resumed event.
+                $event = \mod_opendsa_activity\event\opendsa_activity_resumed::create(array(
                     'objectid' => $this->properties->id,
                     'context' => context_module::instance($cm->id),
                     'courseid' => $this->properties->course
@@ -2242,8 +2242,8 @@ class lesson extends lesson_base {
                 // starting over, so reset the clock
                 $timer->starttime = time();
 
-                // Trigger lesson restarted event.
-                $event = \mod_lesson\event\lesson_restarted::create(array(
+                // Trigger opendsa_activity restarted event.
+                $event = \mod_opendsa_activity\event\opendsa_activity_restarted::create(array(
                     'objectid' => $this->properties->id,
                     'context' => context_module::instance($cm->id),
                     'courseid' => $this->properties->course
@@ -2254,15 +2254,15 @@ class lesson extends lesson_base {
         }
 
         $timenow = time();
-        $timer->lessontime = $timenow;
+        $timer->opendsa_activitytime = $timenow;
         if (WS_SERVER) {
             $timer->timemodifiedoffline = $timenow;
         }
         $timer->completed = $endreached;
-        $DB->update_record('lesson_timer', $timer);
+        $DB->update_record('opendsa_activity_timer', $timer);
 
         // Update completion state.
-        $cm = get_coursemodule_from_instance('lesson', $this->properties()->id, $this->properties()->course,
+        $cm = get_coursemodule_from_instance('opendsa_activity', $this->properties()->id, $this->properties()->course,
             false, MUST_EXIST);
         $course = get_course($cm->course);
         $completion = new completion_info($course);
@@ -2278,13 +2278,13 @@ class lesson extends lesson_base {
      */
     public function stop_timer() {
         global $USER, $DB;
-        unset($USER->startlesson[$this->properties->id]);
+        unset($USER->startopendsa_activity[$this->properties->id]);
 
-        $cm = get_coursemodule_from_instance('lesson', $this->properties()->id, $this->properties()->course,
+        $cm = get_coursemodule_from_instance('opendsa_activity', $this->properties()->id, $this->properties()->course,
             false, MUST_EXIST);
 
-        // Trigger lesson ended event.
-        $event = \mod_lesson\event\lesson_ended::create(array(
+        // Trigger opendsa_activity ended event.
+        $event = \mod_opendsa_activity\event\opendsa_activity_ended::create(array(
             'objectid' => $this->properties()->id,
             'context' => context_module::instance($cm->id),
             'courseid' => $this->properties()->course
@@ -2295,11 +2295,11 @@ class lesson extends lesson_base {
     }
 
     /**
-     * Checks to see if the lesson has pages
+     * Checks to see if the opendsa_activity has pages
      */
     public function has_pages() {
         global $DB;
-        $pagecount = $DB->count_records('lesson_pages', array('opendsa_activity_id'=>$this->properties->id));
+        $pagecount = $DB->count_records('opendsa_activity_pages', array('opendsa_activity_id'=>$this->properties->id));
         return ($pagecount>0);
     }
 
@@ -2317,7 +2317,7 @@ class lesson extends lesson_base {
                 if ($instancename) {
                     return html_writer::link(new moodle_url('/mod/'.$modname.'/view.php',
                         array('id' => $this->properties->activitylink)), get_string('activitylinkname',
-                        'lesson', $instancename), array('class' => 'centerpadded lessonbutton standardbutton p-r-1'));
+                        'opendsa_activity', $instancename), array('class' => 'centerpadded opendsa_activitybutton standardbutton p-r-1'));
                 }
             }
         }
@@ -2328,29 +2328,29 @@ class lesson extends lesson_base {
      * Loads the requested page.
      *
      * This function will return the requested page id as either a specialised
-     * lesson_page object OR as a generic lesson_page.
+     * opendsa_activity_page object OR as a generic opendsa_activity_page.
      * If the page has been loaded previously it will be returned from the pages
      * array, otherwise it will be loaded from the database first
      *
      * @param int $pageid
-     * @return lesson_page A lesson_page object or an object that extends it
+     * @return opendsa_activity_page A opendsa_activity_page object or an object that extends it
      */
     public function load_page($pageid) {
         if (!array_key_exists($pageid, $this->pages)) {
-            $manager = lesson_page_type_manager::get($this);
+            $manager = opendsa_activity_page_type_manager::get($this);
             $this->pages[$pageid] = $manager->load_page($pageid, $this);
         }
         return $this->pages[$pageid];
     }
 
     /**
-     * Loads ALL of the pages for this lesson
+     * Loads ALL of the pages for this opendsa_activity
      *
-     * @return array An array containing all pages from this lesson
+     * @return array An array containing all pages from this opendsa_activity
      */
     public function load_all_pages() {
         if (!$this->loadedallpages) {
-            $manager = lesson_page_type_manager::get($this);
+            $manager = opendsa_activity_page_type_manager::get($this);
             $this->pages = $manager->load_all_pages($this);
             $this->loadedallpages = true;
         }
@@ -2358,14 +2358,14 @@ class lesson extends lesson_base {
     }
 
     /**
-     * Duplicate the lesson page.
+     * Duplicate the opendsa_activity page.
      *
      * @param  int $pageid Page ID of the page to duplicate.
      * @return void.
      */
     public function duplicate_page($pageid) {
         global $PAGE;
-        $cm = get_coursemodule_from_instance('lesson', $this->properties->id, $this->properties->course);
+        $cm = get_coursemodule_from_instance('opendsa_activity', $this->properties->id, $this->properties->course);
         $context = context_module::instance($cm->id);
         // Load the page.
         $page = $this->load_page($pageid);
@@ -2410,10 +2410,10 @@ class lesson extends lesson_base {
             $i++;
         }
         // Create the duplicate page.
-        $newlessonpage = lesson_page::create($properties, $this, $context, $PAGE->course->maxbytes);
-        $newanswers = $newlessonpage->get_answers();
+        $newopendsa_activitypage = opendsa_activity_page::create($properties, $this, $context, $PAGE->course->maxbytes);
+        $newanswers = $newopendsa_activitypage->get_answers();
         // Copy over the file areas as well.
-        $this->copy_page_files('page_contents', $pageid, $newlessonpage->id, $context->id);
+        $this->copy_page_files('page_contents', $pageid, $newopendsa_activitypage->id, $context->id);
         $j = 0;
         foreach ($newanswers as $answer) {
             if (isset($answer->answer) && strpos($answer->answer, '@@PLUGINFILE@@') !== false) {
@@ -2437,7 +2437,7 @@ class lesson extends lesson_base {
      */
     protected function copy_page_files($filearea, $itemid, $newitemid, $contextid) {
         $fs = get_file_storage();
-        $files = $fs->get_area_files($contextid, 'mod_lesson', $filearea, $itemid);
+        $files = $fs->get_area_files($contextid, 'mod_opendsa_activity', $filearea, $itemid);
         foreach ($files as $file) {
             $fieldupdates = array('itemid' => $newitemid);
             $fs->create_file_from_storedfile($fieldupdates, $file);
@@ -2461,15 +2461,15 @@ class lesson extends lesson_base {
         if (!$jumpto) {
             // same page
             return false;
-        } elseif ($jumpto == LESSON_NEXTPAGE) {
+        } elseif ($jumpto == OPENDSA_ACTIVITY_NEXTPAGE) {
             return true;
-        } elseif ($jumpto == LESSON_UNSEENBRANCHPAGE) {
+        } elseif ($jumpto == OPENDSA_ACTIVITY_UNSEENBRANCHPAGE) {
             return true;
-        } elseif ($jumpto == LESSON_RANDOMPAGE) {
+        } elseif ($jumpto == OPENDSA_ACTIVITY_RANDOMPAGE) {
             return true;
-        } elseif ($jumpto == LESSON_CLUSTERJUMP) {
+        } elseif ($jumpto == OPENDSA_ACTIVITY_CLUSTERJUMP) {
             return true;
-        } elseif ($jumpto == LESSON_EOL) {
+        } elseif ($jumpto == OPENDSA_ACTIVITY_EOL) {
             return true;
         }
 
@@ -2485,7 +2485,7 @@ class lesson extends lesson_base {
     }
 
     /**
-     * Returns the time a user has remaining on this lesson
+     * Returns the time a user has remaining on this opendsa_activity
      * @param int $starttime Starttime timestamp
      * @return string
      */
@@ -2511,10 +2511,10 @@ class lesson extends lesson_base {
     }
 
     /**
-     * Interprets LESSON_CLUSTERJUMP jumpto value.
+     * Interprets OPENDSA_ACTIVITY_CLUSTERJUMP jumpto value.
      *
      * This will select a page randomly
-     * and the page selected will be inbetween a cluster page and end of clutter or end of lesson
+     * and the page selected will be inbetween a cluster page and end of clutter or end of opendsa_activity
      * and the page selected will be a page that has not been viewed already
      * and if any pages are within a branch table or end of branch then only 1 page within
      * the branch table or end of branch will be randomly selected (sub clustering).
@@ -2530,10 +2530,10 @@ class lesson extends lesson_base {
             $userid = $USER->id;
         }
         // get the number of retakes
-        if (!$retakes = $DB->count_records("lesson_grades", array("opendsa_activity_id"=>$this->properties->id, "userid"=>$userid))) {
+        if (!$retakes = $DB->count_records("opendsa_activity_grades", array("opendsa_activity_id"=>$this->properties->id, "userid"=>$userid))) {
             $retakes = 0;
         }
-        // get all the lesson_attempts aka what the user has seen
+        // get all the opendsa_activity_attempts aka what the user has seen
         $seenpages = array();
         if ($attempts = $this->get_attempts($retakes)) {
             foreach ($attempts as $attempt) {
@@ -2542,28 +2542,28 @@ class lesson extends lesson_base {
 
         }
 
-        // get the lesson pages
-        $lessonpages = $this->load_all_pages();
+        // get the opendsa_activity pages
+        $opendsa_activitypages = $this->load_all_pages();
         // find the start of the cluster
         while ($pageid != 0) { // this condition should not be satisfied... should be a cluster page
-            if ($lessonpages[$pageid]->qtype == LESSON_PAGE_CLUSTER) {
+            if ($opendsa_activitypages[$pageid]->qtype == OPENDSA_ACTIVITY_PAGE_CLUSTER) {
                 break;
             }
-            $pageid = $lessonpages[$pageid]->prevpageid;
+            $pageid = $opendsa_activitypages[$pageid]->prevpageid;
         }
 
         $clusterpages = array();
-        $clusterpages = $this->get_sub_pages_of($pageid, array(LESSON_PAGE_ENDOFCLUSTER));
+        $clusterpages = $this->get_sub_pages_of($pageid, array(OPENDSA_ACTIVITY_PAGE_ENDOFCLUSTER));
         $unseen = array();
         foreach ($clusterpages as $key=>$cluster) {
             // Remove the page if  it is in a branch table or is an endofbranch.
             if ($this->is_sub_page_of_type($cluster->id,
-                    array(LESSON_PAGE_BRANCHTABLE), array(LESSON_PAGE_ENDOFBRANCH, LESSON_PAGE_CLUSTER))
-                    || $cluster->qtype == LESSON_PAGE_ENDOFBRANCH) {
+                    array(OPENDSA_ACTIVITY_PAGE_BRANCHTABLE), array(OPENDSA_ACTIVITY_PAGE_ENDOFBRANCH, OPENDSA_ACTIVITY_PAGE_CLUSTER))
+                    || $cluster->qtype == OPENDSA_ACTIVITY_PAGE_ENDOFBRANCH) {
                 unset($clusterpages[$key]);
-            } else if ($cluster->qtype == LESSON_PAGE_BRANCHTABLE) {
+            } else if ($cluster->qtype == OPENDSA_ACTIVITY_PAGE_BRANCHTABLE) {
                 // If branchtable, check to see if any pages inside have been viewed.
-                $branchpages = $this->get_sub_pages_of($cluster->id, array(LESSON_PAGE_BRANCHTABLE, LESSON_PAGE_ENDOFBRANCH));
+                $branchpages = $this->get_sub_pages_of($cluster->id, array(OPENDSA_ACTIVITY_PAGE_BRANCHTABLE, OPENDSA_ACTIVITY_PAGE_ENDOFBRANCH));
                 $flag = true;
                 foreach ($branchpages as $branchpage) {
                     if (array_key_exists($branchpage->id, $seenpages)) {  // Check if any of the pages have been viewed.
@@ -2582,9 +2582,9 @@ class lesson extends lesson_base {
         if (count($unseen) > 0) {
             // it does not contain elements, then use exitjump, otherwise find out next page/branch
             $nextpage = $unseen[rand(0, count($unseen)-1)];
-            if ($nextpage->qtype == LESSON_PAGE_BRANCHTABLE) {
+            if ($nextpage->qtype == OPENDSA_ACTIVITY_PAGE_BRANCHTABLE) {
                 // if branch table, then pick a random page inside of it
-                $branchpages = $this->get_sub_pages_of($nextpage->id, array(LESSON_PAGE_BRANCHTABLE, LESSON_PAGE_ENDOFBRANCH));
+                $branchpages = $this->get_sub_pages_of($nextpage->id, array(OPENDSA_ACTIVITY_PAGE_BRANCHTABLE, OPENDSA_ACTIVITY_PAGE_ENDOFBRANCH));
                 return $branchpages[rand(0, count($branchpages)-1)]->id;
             } else { // otherwise, return the page's id
                 return $nextpage->id;
@@ -2592,43 +2592,43 @@ class lesson extends lesson_base {
         } else {
             // seen all there is to see, leave the cluster
             if (end($clusterpages)->nextpageid == 0) {
-                return LESSON_EOL;
+                return OPENDSA_ACTIVITY_EOL;
             } else {
                 $clusterendid = $pageid;
                 while ($clusterendid != 0) { // This condition should not be satisfied... should be an end of cluster page.
-                    if ($lessonpages[$clusterendid]->qtype == LESSON_PAGE_ENDOFCLUSTER) {
+                    if ($opendsa_activitypages[$clusterendid]->qtype == OPENDSA_ACTIVITY_PAGE_ENDOFCLUSTER) {
                         break;
                     }
-                    $clusterendid = $lessonpages[$clusterendid]->nextpageid;
+                    $clusterendid = $opendsa_activitypages[$clusterendid]->nextpageid;
                 }
-                $exitjump = $DB->get_field("lesson_answers", "jumpto", array("pageid" => $clusterendid, "opendsa_activity_id" => $this->properties->id));
-                if ($exitjump == LESSON_NEXTPAGE) {
-                    $exitjump = $lessonpages[$clusterendid]->nextpageid;
+                $exitjump = $DB->get_field("opendsa_activity_answers", "jumpto", array("pageid" => $clusterendid, "opendsa_activity_id" => $this->properties->id));
+                if ($exitjump == OPENDSA_ACTIVITY_NEXTPAGE) {
+                    $exitjump = $opendsa_activitypages[$clusterendid]->nextpageid;
                 }
                 if ($exitjump == 0) {
-                    return LESSON_EOL;
-                } else if (in_array($exitjump, array(LESSON_EOL, LESSON_PREVIOUSPAGE))) {
+                    return OPENDSA_ACTIVITY_EOL;
+                } else if (in_array($exitjump, array(OPENDSA_ACTIVITY_EOL, OPENDSA_ACTIVITY_PREVIOUSPAGE))) {
                     return $exitjump;
                 } else {
-                    if (!array_key_exists($exitjump, $lessonpages)) {
+                    if (!array_key_exists($exitjump, $opendsa_activitypages)) {
                         $found = false;
-                        foreach ($lessonpages as $page) {
+                        foreach ($opendsa_activitypages as $page) {
                             if ($page->id === $clusterendid) {
                                 $found = true;
-                            } else if ($page->qtype == LESSON_PAGE_ENDOFCLUSTER) {
-                                $exitjump = $DB->get_field("lesson_answers", "jumpto", array("pageid" => $page->id, "opendsa_activity_id" => $this->properties->id));
-                                if ($exitjump == LESSON_NEXTPAGE) {
-                                    $exitjump = $lessonpages[$page->id]->nextpageid;
+                            } else if ($page->qtype == OPENDSA_ACTIVITY_PAGE_ENDOFCLUSTER) {
+                                $exitjump = $DB->get_field("opendsa_activity_answers", "jumpto", array("pageid" => $page->id, "opendsa_activity_id" => $this->properties->id));
+                                if ($exitjump == OPENDSA_ACTIVITY_NEXTPAGE) {
+                                    $exitjump = $opendsa_activitypages[$page->id]->nextpageid;
                                 }
                                 break;
                             }
                         }
                     }
-                    if (!array_key_exists($exitjump, $lessonpages)) {
-                        return LESSON_EOL;
+                    if (!array_key_exists($exitjump, $opendsa_activitypages)) {
+                        return OPENDSA_ACTIVITY_EOL;
                     }
                     // Check to see that the return type is not a cluster.
-                    if ($lessonpages[$exitjump]->qtype == LESSON_PAGE_CLUSTER) {
+                    if ($opendsa_activitypages[$exitjump]->qtype == OPENDSA_ACTIVITY_PAGE_CLUSTER) {
                         // If the exitjump is a cluster then go through this function again and try to find an unseen question.
                         $exitjump = $this->cluster_jump($exitjump, $userid);
                     }
@@ -2643,21 +2643,21 @@ class lesson extends lesson_base {
      * an end point specified within $ends is encountered or no more pages exist
      *
      * @param int $pageid
-     * @param array $ends An array of LESSON_PAGE_* types that signify an end of
+     * @param array $ends An array of OPENDSA_ACTIVITY_PAGE_* types that signify an end of
      *               the subtype
-     * @return array An array of specialised lesson_page objects
+     * @return array An array of specialised opendsa_activity_page objects
      */
     public function get_sub_pages_of($pageid, array $ends) {
-        $lessonpages = $this->load_all_pages();
-        $pageid = $lessonpages[$pageid]->nextpageid;  // move to the first page after the branch table
+        $opendsa_activitypages = $this->load_all_pages();
+        $pageid = $opendsa_activitypages[$pageid]->nextpageid;  // move to the first page after the branch table
         $pages = array();
 
         while (true) {
-            if ($pageid == 0 || in_array($lessonpages[$pageid]->qtype, $ends)) {
+            if ($pageid == 0 || in_array($opendsa_activitypages[$pageid]->qtype, $ends)) {
                 break;
             }
-            $pages[] = $lessonpages[$pageid];
-            $pageid = $lessonpages[$pageid]->nextpageid;
+            $pages[] = $opendsa_activitypages[$pageid];
+            $pageid = $opendsa_activitypages[$pageid]->nextpageid;
         }
 
         return $pages;
@@ -2699,13 +2699,13 @@ class lesson extends lesson_base {
     public function resort_pages($pageid, $after) {
         global $CFG;
 
-        $cm = get_coursemodule_from_instance('lesson', $this->properties->id, $this->properties->course);
+        $cm = get_coursemodule_from_instance('opendsa_activity', $this->properties->id, $this->properties->course);
         $context = context_module::instance($cm->id);
 
         $pages = $this->load_all_pages();
 
         if (!array_key_exists($pageid, $pages) || ($after!=0 && !array_key_exists($after, $pages))) {
-            print_error('cannotfindpages', 'lesson', "$CFG->wwwroot/mod/lesson/edit.php?id=$cm->id");
+            print_error('cannotfindpages', 'opendsa_activity', "$CFG->wwwroot/mod/opendsa_activity/edit.php?id=$cm->id");
         }
 
         $pagetomove = clone($pages[$pageid]);
@@ -2759,14 +2759,14 @@ class lesson extends lesson_base {
                     'nextpageid' => $pageupdated['next']
                 )
             );
-            $event = \mod_lesson\event\page_moved::create($eventparams);
+            $event = \mod_opendsa_activity\event\page_moved::create($eventparams);
             $event->trigger();
         }
 
     }
 
     /**
-     * Return the lesson context object.
+     * Return the opendsa_activity context object.
      *
      * @return stdClass context
      * @since  Moodle 3.3
@@ -2779,7 +2779,7 @@ class lesson extends lesson_base {
     }
 
     /**
-     * Set the lesson course module object.
+     * Set the opendsa_activity course module object.
      *
      * @param stdClass $cm course module objct
      * @since  Moodle 3.3
@@ -2789,20 +2789,20 @@ class lesson extends lesson_base {
     }
 
     /**
-     * Return the lesson course module object.
+     * Return the opendsa_activity course module object.
      *
      * @return stdClass course module
      * @since  Moodle 3.3
      */
     public function get_cm() {
         if ($this->cm == null) {
-            $this->cm = get_coursemodule_from_instance('lesson', $this->properties->id);
+            $this->cm = get_coursemodule_from_instance('opendsa_activity', $this->properties->id);
         }
         return $this->cm;
     }
 
     /**
-     * Set the lesson course object.
+     * Set the opendsa_activity course object.
      *
      * @param stdClass $course course objct
      * @since  Moodle 3.3
@@ -2812,7 +2812,7 @@ class lesson extends lesson_base {
     }
 
     /**
-     * Return the lesson course object.
+     * Return the opendsa_activity course object.
      *
      * @return stdClass course
      * @since  Moodle 3.3
@@ -2827,13 +2827,13 @@ class lesson extends lesson_base {
     }
 
     /**
-     * Check if the user can manage the lesson activity.
+     * Check if the user can manage the opendsa_activity activity.
      *
-     * @return bool true if the user can manage the lesson
+     * @return bool true if the user can manage the opendsa_activity
      * @since  Moodle 3.3
      */
     public function can_manage() {
-        return has_capability('mod/lesson:manage', $this->get_context());
+        return has_capability('mod/opendsa_activity:manage', $this->get_context());
     }
 
     /**
@@ -2849,9 +2849,9 @@ class lesson extends lesson_base {
 
         if (!$this->is_accessible()) {
             if ($this->properties->deadline != 0 && time() > $this->properties->deadline) {
-                $status = ['reason' => 'lessonclosed', 'time' => $this->properties->deadline];
+                $status = ['reason' => 'opendsa_activityclosed', 'time' => $this->properties->deadline];
             } else {
-                $status = ['reason' => 'lessonopen', 'time' => $this->properties->available];
+                $status = ['reason' => 'opendsa_activityopen', 'time' => $this->properties->available];
             }
             return (object) $status;
         }
@@ -2871,19 +2871,19 @@ class lesson extends lesson_base {
             return false;
         }
 
-        if ($this->properties->usepassword && empty($USER->lessonloggedin[$this->id])) {
+        if ($this->properties->usepassword && empty($USER->opendsa_activityloggedin[$this->id])) {
             $correctpass = false;
             if (!empty($userpassword) &&
                     (($this->properties->password == md5(trim($userpassword))) || ($this->properties->password == trim($userpassword)))) {
                 // With or without md5 for backward compatibility (MDL-11090).
                 $correctpass = true;
-                $USER->lessonloggedin[$this->id] = true;
+                $USER->opendsa_activityloggedin[$this->id] = true;
             } else if (isset($this->properties->extrapasswords)) {
                 // Group overrides may have additional passwords.
                 foreach ($this->properties->extrapasswords as $password) {
                     if (strcmp($password, md5(trim($userpassword))) === 0 || strcmp($password, trim($userpassword)) === 0) {
                         $correctpass = true;
-                        $USER->lessonloggedin[$this->id] = true;
+                        $USER->opendsa_activityloggedin[$this->id] = true;
                     }
                 }
             }
@@ -2904,7 +2904,7 @@ class lesson extends lesson_base {
             return false;
         }
 
-        if ($dependentlesson = $DB->get_record('lesson', array('id' => $this->properties->dependency))) {
+        if ($dependentopendsa_activity = $DB->get_record('opendsa_activity', array('id' => $this->properties->dependency))) {
             // Lesson exists, so we can proceed.
             $conditions = unserialize($this->properties->conditions);
             // Assume false for all.
@@ -2912,23 +2912,23 @@ class lesson extends lesson_base {
             // Check for the timespent condition.
             if ($conditions->timespent) {
                 $timespent = false;
-                if ($attempttimes = $DB->get_records('lesson_timer', array("userid" => $USER->id, "opendsa_activity_id" => $dependentlesson->id))) {
+                if ($attempttimes = $DB->get_records('opendsa_activity_timer', array("userid" => $USER->id, "opendsa_activity_id" => $dependentopendsa_activity->id))) {
                     // Go through all the times and test to see if any of them satisfy the condition.
                     foreach ($attempttimes as $attempttime) {
-                        $duration = $attempttime->lessontime - $attempttime->starttime;
+                        $duration = $attempttime->opendsa_activitytime - $attempttime->starttime;
                         if ($conditions->timespent < $duration / 60) {
                             $timespent = true;
                         }
                     }
                 }
                 if (!$timespent) {
-                    $errors[] = get_string('timespenterror', 'lesson', $conditions->timespent);
+                    $errors[] = get_string('timespenterror', 'opendsa_activity', $conditions->timespent);
                 }
             }
             // Check for the gradebetterthan condition.
             if ($conditions->gradebetterthan) {
                 $gradebetterthan = false;
-                if ($studentgrades = $DB->get_records('lesson_grades', array("userid" => $USER->id, "opendsa_activity_id" => $dependentlesson->id))) {
+                if ($studentgrades = $DB->get_records('opendsa_activity_grades', array("userid" => $USER->id, "opendsa_activity_id" => $dependentopendsa_activity->id))) {
                     // Go through all the grades and test to see if any of them satisfy the condition.
                     foreach ($studentgrades as $studentgrade) {
                         if ($studentgrade->grade >= $conditions->gradebetterthan) {
@@ -2937,24 +2937,24 @@ class lesson extends lesson_base {
                     }
                 }
                 if (!$gradebetterthan) {
-                    $errors[] = get_string('gradebetterthanerror', 'lesson', $conditions->gradebetterthan);
+                    $errors[] = get_string('gradebetterthanerror', 'opendsa_activity', $conditions->gradebetterthan);
                 }
             }
             // Check for the completed condition.
             if ($conditions->completed) {
-                if (!$DB->count_records('lesson_grades', array('userid' => $USER->id, 'opendsa_activity_id' => $dependentlesson->id))) {
-                    $errors[] = get_string('completederror', 'lesson');
+                if (!$DB->count_records('opendsa_activity_grades', array('userid' => $USER->id, 'opendsa_activity_id' => $dependentopendsa_activity->id))) {
+                    $errors[] = get_string('completederror', 'opendsa_activity');
                 }
             }
             if (!empty($errors)) {
-                return (object) ['errors' => $errors, 'dependentlesson' => $dependentlesson];
+                return (object) ['errors' => $errors, 'dependentopendsa_activity' => $dependentopendsa_activity];
             }
         }
         return false;
     }
 
     /**
-     * Check if the lesson is in review mode. (The user already finished it and retakes are not allowed).
+     * Check if the opendsa_activity is in review mode. (The user already finished it and retakes are not allowed).
      *
      * @return bool true if is in review mode
      * @since  Moodle 3.3
@@ -2962,7 +2962,7 @@ class lesson extends lesson_base {
     public function is_in_review_mode() {
         global $DB, $USER;
 
-        $userhasgrade = $DB->count_records("lesson_grades", array("opendsa_activity_id" => $this->properties->id, "userid" => $USER->id));
+        $userhasgrade = $DB->count_records("opendsa_activity_grades", array("opendsa_activity_id" => $this->properties->id, "userid" => $USER->id));
         if ($userhasgrade && !$this->properties->retake) {
             return true;
         }
@@ -2972,8 +2972,8 @@ class lesson extends lesson_base {
     /**
      * Return the last page the current user saw.
      *
-     * @param int $retriescount the number of retries for the lesson (the last retry number).
-     * @return mixed false if the user didn't see the lesson or the last page id
+     * @param int $retriescount the number of retries for the opendsa_activity (the last retry number).
+     * @return mixed false if the user didn't see the opendsa_activity or the last page id
      */
     public function get_last_page_seen($retriescount) {
         global $DB, $USER;
@@ -2983,7 +2983,7 @@ class lesson extends lesson_base {
         if (!empty($allattempts)) {
             $attempt = end($allattempts);
             $attemptpage = $this->load_page($attempt->pageid);
-            $jumpto = $DB->get_field('lesson_answers', 'jumpto', array('id' => $attempt->answerid));
+            $jumpto = $DB->get_field('opendsa_activity_answers', 'jumpto', array('id' => $attempt->answerid));
             // Convert the jumpto to a proper page id.
             if ($jumpto == 0) {
                 // Check if a question has been incorrectly answered AND no more attempts at it are left.
@@ -2993,9 +2993,9 @@ class lesson extends lesson_base {
                 } else {
                     $lastpageseen = $attempt->pageid;
                 }
-            } else if ($jumpto == LESSON_NEXTPAGE) {
+            } else if ($jumpto == OPENDSA_ACTIVITY_NEXTPAGE) {
                 $lastpageseen = $this->get_next_page($attemptpage->nextpageid);
-            } else if ($jumpto == LESSON_CLUSTERJUMP) {
+            } else if ($jumpto == OPENDSA_ACTIVITY_CLUSTERJUMP) {
                 $lastpageseen = $this->cluster_jump($attempt->pageid);
             } else {
                 $lastpageseen = $jumpto;
@@ -3029,7 +3029,7 @@ class lesson extends lesson_base {
     }
 
     /**
-     * Return the number of retries in a lesson for a given user.
+     * Return the number of retries in a opendsa_activity for a given user.
      *
      * @param  int $userid the user id
      * @return int the retries count
@@ -3038,13 +3038,13 @@ class lesson extends lesson_base {
     public function count_user_retries($userid) {
         global $DB;
 
-        return $DB->count_records('lesson_grades', array("opendsa_activity_id" => $this->properties->id, "userid" => $userid));
+        return $DB->count_records('opendsa_activity_grades', array("opendsa_activity_id" => $this->properties->id, "userid" => $userid));
     }
 
     /**
      * Check if a user left a timed session.
      *
-     * @param int $retriescount the number of retries for the lesson (the last retry number).
+     * @param int $retriescount the number of retries for the opendsa_activity (the last retry number).
      * @return true if the user left the timed session
      * @since  Moodle 3.3
      */
@@ -3052,7 +3052,7 @@ class lesson extends lesson_base {
         global $DB, $USER;
 
         $conditions = array('opendsa_activity_id' => $this->properties->id, 'userid' => $USER->id, 'retry' => $retriescount);
-        return $DB->count_records('lesson_attempts', $conditions) > 0 || $DB->count_records('lesson_branch', $conditions) > 0;
+        return $DB->count_records('opendsa_activity_attempts', $conditions) > 0 || $DB->count_records('opendsa_activity_branch', $conditions) > 0;
     }
 
     /**
@@ -3065,7 +3065,7 @@ class lesson extends lesson_base {
         require_once($CFG->libdir . '/completionlib.php');
 
         // Trigger module viewed event.
-        $event = \mod_lesson\event\course_module_viewed::create(array(
+        $event = \mod_opendsa_activity\event\course_module_viewed::create(array(
             'objectid' => $this->properties->id,
             'context' => $this->get_context()
         ));
@@ -3079,14 +3079,14 @@ class lesson extends lesson_base {
     }
 
     /**
-     * Return the timers in the current lesson for the given user.
+     * Return the timers in the current opendsa_activity for the given user.
      *
      * @param  int      $userid    the user id
      * @param  string   $sort      an order to sort the results in (optional, a valid SQL ORDER BY parameter).
      * @param  string   $fields    a comma separated list of fields to return
      * @param  int      $limitfrom return a subset of records, starting at this point (optional).
      * @param  int      $limitnum  return a subset comprising this many records in total (optional, required if $limitfrom is set).
-     * @return array    list of timers for the given user in the lesson
+     * @return array    list of timers for the given user in the opendsa_activity
      * @since  Moodle 3.3
      */
     public function get_user_timers($userid = null, $sort = '', $fields = '*', $limitfrom = 0, $limitnum = 0) {
@@ -3097,11 +3097,11 @@ class lesson extends lesson_base {
         }
 
         $params = array('opendsa_activity_id' => $this->properties->id, 'userid' => $userid);
-        return $DB->get_records('lesson_timer', $params, $sort, $fields, $limitfrom, $limitnum);
+        return $DB->get_records('opendsa_activity_timer', $params, $sort, $fields, $limitfrom, $limitnum);
     }
 
     /**
-     * Check if the user is out of time in a timed lesson.
+     * Check if the user is out of time in a timed opendsa_activity.
      *
      * @param  stdClass $timer timer object
      * @return bool True if the user is on time, false is the user ran out of time
@@ -3112,11 +3112,11 @@ class lesson extends lesson_base {
             $timeleft = $timer->starttime + $this->properties->timelimit - time();
             if ($timeleft <= 0) {
                 // Out of time.
-                $this->add_message(get_string('eolstudentoutoftime', 'lesson'));
+                $this->add_message(get_string('eolstudentoutoftime', 'opendsa_activity'));
                 return false;
             } else if ($timeleft < 60) {
                 // One minute warning.
-                $this->add_message(get_string('studentoneminwarning', 'lesson'));
+                $this->add_message(get_string('studentoneminwarning', 'opendsa_activity'));
             }
         }
         return true;
@@ -3125,54 +3125,54 @@ class lesson extends lesson_base {
     /**
      * Add different informative messages to the given page.
      *
-     * @param lesson_page $page page object
+     * @param opendsa_activity_page $page page object
      * @param reviewmode $bool whether we are in review mode or not
      * @since  Moodle 3.3
      */
-    public function add_messages_on_page_view(lesson_page $page, $reviewmode) {
+    public function add_messages_on_page_view(opendsa_activity_page $page, $reviewmode) {
         global $DB, $USER;
 
         if (!$this->can_manage()) {
-            if ($page->qtype == LESSON_PAGE_BRANCHTABLE && $this->properties->minquestions) {
+            if ($page->qtype == OPENDSA_ACTIVITY_PAGE_BRANCHTABLE && $this->properties->minquestions) {
                 // Tell student how many questions they have seen, how many are required and their grade.
-                $ntries = $DB->count_records("lesson_grades", array("opendsa_activity_id" => $this->properties->id, "userid" => $USER->id));
-                $gradeinfo = lesson_grade($this, $ntries);
+                $ntries = $DB->count_records("opendsa_activity_grades", array("opendsa_activity_id" => $this->properties->id, "userid" => $USER->id));
+                $gradeinfo = opendsa_activity_grade($this, $ntries);
                 if ($gradeinfo->attempts) {
                     if ($gradeinfo->nquestions < $this->properties->minquestions) {
                         $a = new stdClass;
                         $a->nquestions   = $gradeinfo->nquestions;
                         $a->minquestions = $this->properties->minquestions;
-                        $this->add_message(get_string('numberofpagesviewednotice', 'lesson', $a));
+                        $this->add_message(get_string('numberofpagesviewednotice', 'opendsa_activity', $a));
                     }
 
                     if (!$reviewmode && $this->properties->ongoing) {
-                        $this->add_message(get_string("numberofcorrectanswers", "lesson", $gradeinfo->earned), 'notify');
+                        $this->add_message(get_string("numberofcorrectanswers", "opendsa_activity", $gradeinfo->earned), 'notify');
                         if ($this->properties->grade != GRADE_TYPE_NONE) {
                             $a = new stdClass;
                             $a->grade = number_format($gradeinfo->grade * $this->properties->grade / 100, 1);
                             $a->total = $this->properties->grade;
-                            $this->add_message(get_string('yourcurrentgradeisoutof', 'lesson', $a), 'notify');
+                            $this->add_message(get_string('yourcurrentgradeisoutof', 'opendsa_activity', $a), 'notify');
                         }
                     }
                 }
             }
         } else {
             if ($this->properties->timelimit) {
-                $this->add_message(get_string('teachertimerwarning', 'lesson'));
+                $this->add_message(get_string('teachertimerwarning', 'opendsa_activity'));
             }
-            if (lesson_display_teacher_warning($this)) {
+            if (opendsa_activity_display_teacher_warning($this)) {
                 // This is the warning msg for teachers to inform them that cluster
                 // and unseen does not work while logged in as a teacher.
                 $warningvars = new stdClass();
-                $warningvars->cluster = get_string('clusterjump', 'lesson');
-                $warningvars->unseen = get_string('unseenpageinbranch', 'lesson');
-                $this->add_message(get_string('teacherjumpwarning', 'lesson', $warningvars));
+                $warningvars->cluster = get_string('clusterjump', 'opendsa_activity');
+                $warningvars->unseen = get_string('unseenpageinbranch', 'opendsa_activity');
+                $this->add_message(get_string('teacherjumpwarning', 'opendsa_activity', $warningvars));
             }
         }
     }
 
     /**
-     * Get the ongoing score message for the user (depending on the user permission and lesson settings).
+     * Get the ongoing score message for the user (depending on the user permission and opendsa_activity settings).
      *
      * @return str the ongoing score message
      * @since  Moodle 3.3
@@ -3182,29 +3182,29 @@ class lesson extends lesson_base {
 
         $context = $this->get_context();
 
-        if (has_capability('mod/lesson:manage', $context)) {
-            return get_string('teacherongoingwarning', 'lesson');
+        if (has_capability('mod/opendsa_activity:manage', $context)) {
+            return get_string('teacherongoingwarning', 'opendsa_activity');
         } else {
-            $ntries = $DB->count_records("lesson_grades", array("opendsa_activity_id" => $this->properties->id, "userid" => $USER->id));
+            $ntries = $DB->count_records("opendsa_activity_grades", array("opendsa_activity_id" => $this->properties->id, "userid" => $USER->id));
             if (isset($USER->modattempts[$this->properties->id])) {
                 $ntries--;
             }
-            $gradeinfo = lesson_grade($this, $ntries);
+            $gradeinfo = opendsa_activity_grade($this, $ntries);
             $a = new stdClass;
             if ($this->properties->custom) {
                 $a->score = $gradeinfo->earned;
                 $a->currenthigh = $gradeinfo->total;
-                return get_string("ongoingcustom", "lesson", $a);
+                return get_string("ongoingcustom", "opendsa_activity", $a);
             } else {
                 $a->correct = $gradeinfo->earned;
                 $a->viewed = $gradeinfo->attempts;
-                return get_string("ongoingnormal", "lesson", $a);
+                return get_string("ongoingnormal", "opendsa_activity", $a);
             }
         }
     }
 
     /**
-     * Calculate the progress of the current user in the lesson.
+     * Calculate the progress of the current user in the opendsa_activity.
      *
      * @return int the progress (scale 0-100)
      * @since  Moodle 3.3
@@ -3217,7 +3217,7 @@ class lesson extends lesson_base {
             return 100;
         }
 
-        // All of the lesson pages.
+        // All of the opendsa_activity pages.
         $pages = $this->load_all_pages();
         foreach ($pages as $page) {
             if ($page->prevpageid == 0) {
@@ -3227,7 +3227,7 @@ class lesson extends lesson_base {
         }
 
         // Current attempt number.
-        if (!$ntries = $DB->count_records("lesson_grades", array("opendsa_activity_id" => $this->properties->id, "userid" => $USER->id))) {
+        if (!$ntries = $DB->count_records("opendsa_activity_grades", array("opendsa_activity_id" => $this->properties->id, "userid" => $USER->id))) {
             $ntries = 0;  // May not be necessary.
         }
 
@@ -3267,14 +3267,14 @@ class lesson extends lesson_base {
      * Calculate the correct page and prepare contents for a given page id (could be a page jump id).
      *
      * @param  int $pageid the given page id
-     * @param  mod_lesson_renderer $lessonoutput the lesson output rendered
+     * @param  mod_opendsa_activity_renderer $opendsa_activityoutput the opendsa_activity output rendered
      * @param  bool $reviewmode whether we are in review mode or not
      * @param  bool $redirect  Optional, default to true. Set to false to avoid redirection and return the page to redirect.
      * @return array the page object and contents
      * @throws moodle_exception
      * @since  Moodle 3.3
      */
-    public function prepare_page_and_contents($pageid, $lessonoutput, $reviewmode, $redirect = true) {
+    public function prepare_page_and_contents($pageid, $opendsa_activityoutput, $reviewmode, $redirect = true) {
         global $USER, $CFG;
 
         $page = $this->load_page($pageid);
@@ -3299,16 +3299,16 @@ class lesson extends lesson_base {
             if (isset($USER->modattempts[$this->properties->id])) {
                 $retries = $this->count_user_retries($USER->id);
                 if (!$attempts = $this->get_attempts($retries - 1, false, $page->id)) {
-                    throw new moodle_exception('cannotfindpreattempt', 'lesson');
+                    throw new moodle_exception('cannotfindpreattempt', 'opendsa_activity');
                 }
                 $attempt = end($attempts);
                 $USER->modattempts[$this->properties->id] = $attempt;
             } else {
                 $attempt = false;
             }
-            $lessoncontent = $lessonoutput->display_page($this, $page, $attempt);
+            $opendsa_activitycontent = $opendsa_activityoutput->display_page($this, $page, $attempt);
         } else {
-            require_once($CFG->dirroot . '/mod/lesson/view_form.php');
+            require_once($CFG->dirroot . '/mod/opendsa_activity/view_form.php');
             $data = new stdClass;
             $data->id = $this->get_cm()->id;
             $data->pageid = $page->id;
@@ -3318,26 +3318,26 @@ class lesson extends lesson_base {
                 'title'     => $page->title,
                 'contents'  => $page->get_contents()
             );
-            $mform = new lesson_page_without_answers($CFG->wwwroot.'/mod/lesson/continue.php', $customdata);
+            $mform = new opendsa_activity_page_without_answers($CFG->wwwroot.'/mod/opendsa_activity/continue.php', $customdata);
             $mform->set_data($data);
             ob_start();
             $mform->display();
-            $lessoncontent = ob_get_contents();
+            $opendsa_activitycontent = ob_get_contents();
             ob_end_clean();
         }
 
-        return array($page->id, $page, $lessoncontent);
+        return array($page->id, $page, $opendsa_activitycontent);
     }
 
     /**
-     * This returns a real page id to jump to (or LESSON_EOL) after processing page responses.
+     * This returns a real page id to jump to (or OPENDSA_ACTIVITY_EOL) after processing page responses.
      *
-     * @param  lesson_page $page      lesson page
+     * @param  opendsa_activity_page $page      opendsa_activity page
      * @param  int         $newpageid the new page id
-     * @return int the real page to jump to (or end of lesson)
+     * @return int the real page to jump to (or end of opendsa_activity)
      * @since  Moodle 3.3
      */
-    public function calculate_new_page_on_jump(lesson_page $page, $newpageid) {
+    public function calculate_new_page_on_jump(opendsa_activity_page $page, $newpageid) {
         global $USER, $DB;
 
         $canmanage = $this->can_manage();
@@ -3346,15 +3346,15 @@ class lesson extends lesson_base {
             // Make sure if the student is reviewing, that he/she sees the same pages/page path that he/she saw the first time.
             if ($USER->modattempts[$this->properties->id]->pageid == $page->id && $page->nextpageid == 0) {
                 // Remember, this session variable holds the pageid of the last page that the user saw.
-                $newpageid = LESSON_EOL;
+                $newpageid = OPENDSA_ACTIVITY_EOL;
             } else {
-                $nretakes = $DB->count_records("lesson_grades", array("opendsa_activity_id" => $this->properties->id, "userid" => $USER->id));
+                $nretakes = $DB->count_records("opendsa_activity_grades", array("opendsa_activity_id" => $this->properties->id, "userid" => $USER->id));
                 $nretakes--; // Make sure we are looking at the right try.
-                $attempts = $DB->get_records("lesson_attempts", array("opendsa_activity_id" => $this->properties->id, "userid" => $USER->id, "retry" => $nretakes), "timeseen", "id, pageid");
+                $attempts = $DB->get_records("opendsa_activity_attempts", array("opendsa_activity_id" => $this->properties->id, "userid" => $USER->id, "retry" => $nretakes), "timeseen", "id, pageid");
                 $found = false;
                 $temppageid = 0;
                 // Make sure that the newpageid always defaults to something valid.
-                $newpageid = LESSON_EOL;
+                $newpageid = OPENDSA_ACTIVITY_EOL;
                 foreach ($attempts as $attempt) {
                     if ($found && $temppageid != $attempt->pageid) {
                         // Now try to find the next page, make sure next few attempts do no belong to current page.
@@ -3367,7 +3367,7 @@ class lesson extends lesson_base {
                     }
                 }
             }
-        } else if ($newpageid != LESSON_CLUSTERJUMP && $page->id != 0 && $newpageid > 0) {
+        } else if ($newpageid != OPENDSA_ACTIVITY_CLUSTERJUMP && $page->id != 0 && $newpageid > 0) {
             // Going to check to see if the page that the user is going to view next, is a cluster page.
             // If so, dont display, go into the cluster.
             // The $newpageid > 0 is used to filter out all of the negative code jumps.
@@ -3375,24 +3375,24 @@ class lesson extends lesson_base {
             if ($overridenewpageid = $newpage->override_next_page($newpageid)) {
                 $newpageid = $overridenewpageid;
             }
-        } else if ($newpageid == LESSON_UNSEENBRANCHPAGE) {
+        } else if ($newpageid == OPENDSA_ACTIVITY_UNSEENBRANCHPAGE) {
             if ($canmanage) {
                 if ($page->nextpageid == 0) {
-                    $newpageid = LESSON_EOL;
+                    $newpageid = OPENDSA_ACTIVITY_EOL;
                 } else {
                     $newpageid = $page->nextpageid;
                 }
             } else {
-                $newpageid = lesson_unseen_question_jump($this, $USER->id, $page->id);
+                $newpageid = opendsa_activity_unseen_question_jump($this, $USER->id, $page->id);
             }
-        } else if ($newpageid == LESSON_PREVIOUSPAGE) {
+        } else if ($newpageid == OPENDSA_ACTIVITY_PREVIOUSPAGE) {
             $newpageid = $page->prevpageid;
-        } else if ($newpageid == LESSON_RANDOMPAGE) {
-            $newpageid = lesson_random_question_jump($this, $page->id);
-        } else if ($newpageid == LESSON_CLUSTERJUMP) {
+        } else if ($newpageid == OPENDSA_ACTIVITY_RANDOMPAGE) {
+            $newpageid = opendsa_activity_random_question_jump($this, $page->id);
+        } else if ($newpageid == OPENDSA_ACTIVITY_CLUSTERJUMP) {
             if ($canmanage) {
                 if ($page->nextpageid == 0) {  // If teacher, go to next page.
-                    $newpageid = LESSON_EOL;
+                    $newpageid = OPENDSA_ACTIVITY_EOL;
                 } else {
                     $newpageid = $page->nextpageid;
                 }
@@ -3401,7 +3401,7 @@ class lesson extends lesson_base {
             }
         } else if ($newpageid == 0) {
             $newpageid = $page->id;
-        } else if ($newpageid == LESSON_NEXTPAGE) {
+        } else if ($newpageid == OPENDSA_ACTIVITY_NEXTPAGE) {
             $newpageid = $this->get_next_page($page->nextpageid);
         }
 
@@ -3411,10 +3411,10 @@ class lesson extends lesson_base {
     /**
      * Process page responses.
      *
-     * @param lesson_page $page page object
+     * @param opendsa_activity_page $page page object
      * @since  Moodle 3.3
      */
-    public function process_page_responses(lesson_page $page) {
+    public function process_page_responses(opendsa_activity_page $page) {
         $context = $this->get_context();
 
         // Check the page has answers [MDL-25632].
@@ -3441,34 +3441,34 @@ class lesson extends lesson_base {
     /**
      * Add different informative messages to the given page.
      *
-     * @param lesson_page $page page object
+     * @param opendsa_activity_page $page page object
      * @param stdClass $result the page processing result object
      * @param bool $reviewmode whether we are in review mode or not
      * @since  Moodle 3.3
      */
-    public function add_messages_on_page_process(lesson_page $page, $result, $reviewmode) {
+    public function add_messages_on_page_process(opendsa_activity_page $page, $result, $reviewmode) {
 
         if ($this->can_manage()) {
             // This is the warning msg for teachers to inform them that cluster and unseen does not work while logged in as a teacher.
-            if (lesson_display_teacher_warning($this)) {
+            if (opendsa_activity_display_teacher_warning($this)) {
                 $warningvars = new stdClass();
-                $warningvars->cluster = get_string("clusterjump", "lesson");
-                $warningvars->unseen = get_string("unseenpageinbranch", "lesson");
-                $this->add_message(get_string("teacherjumpwarning", "lesson", $warningvars));
+                $warningvars->cluster = get_string("clusterjump", "opendsa_activity");
+                $warningvars->unseen = get_string("unseenpageinbranch", "opendsa_activity");
+                $this->add_message(get_string("teacherjumpwarning", "opendsa_activity", $warningvars));
             }
             // Inform teacher that s/he will not see the timer.
             if ($this->properties->timelimit) {
-                $this->add_message(get_string("teachertimerwarning", "lesson"));
+                $this->add_message(get_string("teachertimerwarning", "opendsa_activity"));
             }
         }
         // Report attempts remaining.
         if ($result->attemptsremaining != 0 && $this->properties->review && !$reviewmode) {
-            $this->add_message(get_string('attemptsremaining', 'lesson', $result->attemptsremaining));
+            $this->add_message(get_string('attemptsremaining', 'opendsa_activity', $result->attemptsremaining));
         }
     }
 
     /**
-     * Process and return all the information for the end of lesson page.
+     * Process and return all the information for the end of opendsa_activity page.
      *
      * @param string $outoftime used to check to see if the student ran out of time
      * @return stdclass an object with all the page data ready for rendering
@@ -3483,7 +3483,7 @@ class lesson extends lesson_base {
 
         // Init all the possible fields and values.
         $data = (object) array(
-            'gradelesson' => true,
+            'gradeopendsa_activity' => true,
             'notenoughtimespent' => false,
             'numberofpagesviewed' => false,
             'youshouldview' => false,
@@ -3495,18 +3495,18 @@ class lesson extends lesson_base {
             'welldone' => false,
             'progressbar' => false,
             'displayofgrade' => false,
-            'reviewlesson' => false,
+            'reviewopendsa_activity' => false,
             'modattemptsnoteacher' => false,
             'activitylink' => false,
             'progresscompleted' => false,
         );
 
-        $ntries = $DB->count_records("lesson_grades", array("opendsa_activity_id" => $this->properties->id, "userid" => $USER->id));
+        $ntries = $DB->count_records("opendsa_activity_grades", array("opendsa_activity_id" => $this->properties->id, "userid" => $USER->id));
         if (isset($USER->modattempts[$this->properties->id])) {
             $ntries--;  // Need to look at the old attempts :).
         }
 
-        $gradeinfo = lesson_grade($this, $ntries);
+        $gradeinfo = opendsa_activity_grade($this, $ntries);
         $data->gradeinfo = $gradeinfo;
         if ($this->properties->custom && !$canmanage) {
             // Before we calculate the custom score make sure they answered the minimum
@@ -3514,19 +3514,19 @@ class lesson extends lesson_base {
             // not get the miniumum score the user should achieve. If we are not using
             // custom scoring (so all questions are valued as 1) then we simply check if
             // they answered more than the minimum questions, if not, we mark it out of the
-            // number specified in the minimum questions setting - which is done in lesson_grade().
+            // number specified in the minimum questions setting - which is done in opendsa_activity_grade().
             // Get the number of answers given.
             if ($gradeinfo->nquestions < $this->properties->minquestions) {
-                $data->gradelesson = false;
+                $data->gradeopendsa_activity = false;
                 $a = new stdClass;
                 $a->nquestions = $gradeinfo->nquestions;
                 $a->minquestions = $this->properties->minquestions;
-                $this->add_message(get_string('numberofpagesviewednotice', 'lesson', $a));
+                $this->add_message(get_string('numberofpagesviewednotice', 'opendsa_activity', $a));
             }
         }
 
         if (!$canmanage) {
-            if ($data->gradelesson) {
+            if ($data->gradeopendsa_activity) {
                 // Store this now before any modifications to pages viewed.
                 $progresscompleted = $this->calculate_progress();
 
@@ -3541,8 +3541,8 @@ class lesson extends lesson_base {
 
                 if ($this->properties->completiontimespent > 0) {
                     $duration = $DB->get_field_sql(
-                        "SELECT SUM(lessontime - starttime)
-                                       FROM {lesson_timer}
+                        "SELECT SUM(opendsa_activitytime - starttime)
+                                       FROM {opendsa_activity_timer}
                                       WHERE opendsa_activity_id = :opendsa_activity_id
                                         AND userid = :userid",
                         array('userid' => $USER->id, 'opendsa_activity_id' => $this->properties->id));
@@ -3550,7 +3550,7 @@ class lesson extends lesson_base {
                         $duration = 0;
                     }
 
-                    // If student has not spend enough time in the lesson, display a message.
+                    // If student has not spend enough time in the opendsa_activity, display a message.
                     if ($duration < $this->properties->completiontimespent) {
                         $a = new stdClass;
                         $a->timespentraw = $duration;
@@ -3594,15 +3594,15 @@ class lesson extends lesson_base {
                     $grade->grade = $gradeinfo->grade;
                     $grade->completed = time();
                     if (isset($USER->modattempts[$this->properties->id])) { // If reviewing, make sure update old grade record.
-                        if (!$grades = $DB->get_records("lesson_grades",
+                        if (!$grades = $DB->get_records("opendsa_activity_grades",
                             array("opendsa_activity_id" => $this->properties->id, "userid" => $USER->id), "completed DESC", '*', 0, 1)) {
-                            throw new moodle_exception('cannotfindgrade', 'lesson');
+                            throw new moodle_exception('cannotfindgrade', 'opendsa_activity');
                         }
                         $oldgrade = array_shift($grades);
                         $grade->id = $oldgrade->id;
-                        $DB->update_record("lesson_grades", $grade);
+                        $DB->update_record("opendsa_activity_grades", $grade);
                     } else {
-                        $newgradeid = $DB->insert_record("lesson_grades", $grade);
+                        $newgradeid = $DB->insert_record("opendsa_activity_grades", $grade);
                     }
                 } else {
                     if ($this->properties->timelimit) {
@@ -3612,7 +3612,7 @@ class lesson extends lesson_base {
                             $grade->userid = $USER->id;
                             $grade->grade = 0;
                             $grade->completed = time();
-                            $newgradeid = $DB->insert_record("lesson_grades", $grade);
+                            $newgradeid = $DB->insert_record("opendsa_activity_grades", $grade);
                             $data->eolstudentoutoftimenoanswers = true;
                         }
                     } else {
@@ -3621,7 +3621,7 @@ class lesson extends lesson_base {
                 }
 
                 // Update central gradebook.
-                lesson_update_grades($this, $USER->id);
+                opendsa_activity_update_grades($this, $USER->id);
                 $data->progresscompleted = $progresscompleted;
             }
         } else {
@@ -3638,18 +3638,18 @@ class lesson extends lesson_base {
             // $ntries is decremented above.
             if (!$attempts = $this->get_attempts($ntries)) {
                 $attempts = array();
-                $url = new moodle_url('/mod/lesson/view.php', array('id' => $cm->id));
+                $url = new moodle_url('/mod/opendsa_activity/view.php', array('id' => $cm->id));
             } else {
                 $firstattempt = current($attempts);
                 $pageid = $firstattempt->pageid;
                 // If the student wishes to review, need to know the last question page that the student answered.
-                // This will help to make sure that the student can leave the lesson via pushing the continue button.
+                // This will help to make sure that the student can leave the opendsa_activity via pushing the continue button.
                 $lastattempt = end($attempts);
                 $USER->modattempts[$this->properties->id] = $lastattempt->pageid;
 
-                $url = new moodle_url('/mod/lesson/view.php', array('id' => $cm->id, 'pageid' => $pageid));
+                $url = new moodle_url('/mod/opendsa_activity/view.php', array('id' => $cm->id, 'pageid' => $pageid));
             }
-            $data->reviewlesson = $url->out(false);
+            $data->reviewopendsa_activity = $url->out(false);
         } else if ($this->properties->modattempts && $canmanage) {
             $data->modattemptsnoteacher = true;
         }
@@ -3663,9 +3663,9 @@ class lesson extends lesson_base {
 
 
 /**
- * Abstract class to provide a core functions to the all lesson classes
+ * Abstract class to provide a core functions to the all opendsa_activity classes
  *
- * This class should be abstracted by ALL classes with the lesson module to ensure
+ * This class should be abstracted by ALL classes with the opendsa_activity module to ensure
  * that all classes within this module can be interacted with in the same way.
  *
  * This class provides the user with a basic properties array that can be fetched
@@ -3675,7 +3675,7 @@ class lesson extends lesson_base {
  * @copyright  2009 Sam Hemelryk
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-abstract class lesson_base {
+abstract class opendsa_activity_base {
 
     /**
      * An object containing properties
@@ -3759,17 +3759,17 @@ abstract class lesson_base {
 
 
 /**
- * Abstract class representation of a page associated with a lesson.
+ * Abstract class representation of a page associated with a opendsa_activity.
  *
  * This class should MUST be extended by all specialised page types defined in
- * mod/lesson/pagetypes/.
+ * mod/opendsa_activity/pagetypes/.
  * There are a handful of abstract methods that need to be defined as well as
  * severl methods that can optionally be defined in order to make the page type
  * operate in the desired way
  *
  * Database properties
- * @property int $id The id of this lesson page
- * @property int $opendsa_activity_id The id of the lesson this page belongs to
+ * @property int $id The id of this opendsa_activity page
+ * @property int $opendsa_activity_id The id of the opendsa_activity this page belongs to
  * @property int $prevpageid The id of the page before this one
  * @property int $nextpageid The id of the next page in the page sequence
  * @property int $qtype Identifies the page type of this page
@@ -3786,7 +3786,7 @@ abstract class lesson_base {
  * @property-read array $answers An array of answers for this page
  * @property-read bool $displayinmenublock Toggles display in the left menu block
  * @property-read array $jumps An array containing all the jumps this page uses
- * @property-read lesson $lesson The lesson this page belongs to
+ * @property-read opendsa_activity $opendsa_activity The opendsa_activity this page belongs to
  * @property-read int $type The type of the page [question | structure]
  * @property-read typeid The unique identifier for the page type
  * @property-read typestring The string that describes this page type
@@ -3795,15 +3795,15 @@ abstract class lesson_base {
  * @copyright  2009 Sam Hemelryk
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-abstract class lesson_page extends lesson_base {
+abstract class opendsa_activity_page extends opendsa_activity_base {
 
     /**
-     * A reference to the lesson this page belongs to
-     * @var lesson
+     * A reference to the opendsa_activity this page belongs to
+     * @var opendsa_activity
      */
-    protected $lesson = null;
+    protected $opendsa_activity = null;
     /**
-     * Contains the answers to this lesson_page once loaded
+     * Contains the answers to this opendsa_activity_page once loaded
      * @var null|array
      */
     protected $answers = null;
@@ -3839,7 +3839,7 @@ abstract class lesson_page extends lesson_base {
     abstract protected function get_typestring();
 
     /**
-     * This method gets called to display the page to the user taking the lesson
+     * This method gets called to display the page to the user taking the opendsa_activity
      * @abstract
      * @param object $renderer
      * @param object $attempt
@@ -3848,22 +3848,22 @@ abstract class lesson_page extends lesson_base {
     abstract public function display($renderer, $attempt);
 
     /**
-     * Creates a new lesson_page within the database and returns the correct pagetype
-     * object to use to interact with the new lesson
+     * Creates a new opendsa_activity_page within the database and returns the correct pagetype
+     * object to use to interact with the new opendsa_activity
      *
      * @final
      * @static
      * @param object $properties
-     * @param lesson $lesson
-     * @return lesson_page Specialised object that extends lesson_page
+     * @param opendsa_activity $opendsa_activity
+     * @return opendsa_activity_page Specialised object that extends opendsa_activity_page
      */
-    final public static function create($properties, lesson $lesson, $context, $maxbytes) {
+    final public static function create($properties, opendsa_activity $opendsa_activity, $context, $maxbytes) {
         global $DB;
         $newpage = new stdClass;
         $newpage->title = $properties->title;
         $newpage->contents = $properties->contents_editor['text'];
         $newpage->contentsformat = $properties->contents_editor['format'];
-        $newpage->opendsa_activity_id = $lesson->id;
+        $newpage->opendsa_activity_id = $opendsa_activity->id;
         $newpage->timecreated = time();
         $newpage->qtype = $properties->qtype;
         $newpage->qoption = (isset($properties->qoption))?1:0;
@@ -3873,36 +3873,36 @@ abstract class lesson_page extends lesson_base {
         $newpage->nextpageid = 0; // this is the only page
 
         if ($properties->pageid) {
-            $prevpage = $DB->get_record("lesson_pages", array("id" => $properties->pageid), 'id, nextpageid');
+            $prevpage = $DB->get_record("opendsa_activity_pages", array("id" => $properties->pageid), 'id, nextpageid');
             if (!$prevpage) {
-                print_error('cannotfindpages', 'lesson');
+                print_error('cannotfindpages', 'opendsa_activity');
             }
             $newpage->prevpageid = $prevpage->id;
             $newpage->nextpageid = $prevpage->nextpageid;
         } else {
-            $nextpage = $DB->get_record('lesson_pages', array('opendsa_activity_id'=>$lesson->id, 'prevpageid'=>0), 'id');
+            $nextpage = $DB->get_record('opendsa_activity_pages', array('opendsa_activity_id'=>$opendsa_activity->id, 'prevpageid'=>0), 'id');
             if ($nextpage) {
                 // This is the first page, there are existing pages put this at the start
                 $newpage->nextpageid = $nextpage->id;
             }
         }
 
-        $newpage->id = $DB->insert_record("lesson_pages", $newpage);
+        $newpage->id = $DB->insert_record("opendsa_activity_pages", $newpage);
 
         $editor = new stdClass;
         $editor->id = $newpage->id;
         $editor->contents_editor = $properties->contents_editor;
-        $editor = file_postupdate_standard_editor($editor, 'contents', array('noclean'=>true, 'maxfiles'=>EDITOR_UNLIMITED_FILES, 'maxbytes'=>$maxbytes), $context, 'mod_lesson', 'page_contents', $editor->id);
-        $DB->update_record("lesson_pages", $editor);
+        $editor = file_postupdate_standard_editor($editor, 'contents', array('noclean'=>true, 'maxfiles'=>EDITOR_UNLIMITED_FILES, 'maxbytes'=>$maxbytes), $context, 'mod_opendsa_activity', 'page_contents', $editor->id);
+        $DB->update_record("opendsa_activity_pages", $editor);
 
         if ($newpage->prevpageid > 0) {
-            $DB->set_field("lesson_pages", "nextpageid", $newpage->id, array("id" => $newpage->prevpageid));
+            $DB->set_field("opendsa_activity_pages", "nextpageid", $newpage->id, array("id" => $newpage->prevpageid));
         }
         if ($newpage->nextpageid > 0) {
-            $DB->set_field("lesson_pages", "prevpageid", $newpage->id, array("id" => $newpage->nextpageid));
+            $DB->set_field("opendsa_activity_pages", "prevpageid", $newpage->id, array("id" => $newpage->nextpageid));
         }
 
-        $page = lesson_page::load($newpage, $lesson);
+        $page = opendsa_activity_page::load($newpage, $opendsa_activity);
         $page->create_answers($properties);
 
         // Trigger an event: page created.
@@ -3913,85 +3913,85 @@ abstract class lesson_page extends lesson_base {
                 'pagetype' => $page->get_typestring()
                 )
             );
-        $event = \mod_lesson\event\page_created::create($eventparams);
+        $event = \mod_opendsa_activity\event\page_created::create($eventparams);
         $snapshot = clone($newpage);
         $snapshot->timemodified = 0;
-        $event->add_record_snapshot('lesson_pages', $snapshot);
+        $event->add_record_snapshot('opendsa_activity_pages', $snapshot);
         $event->trigger();
 
-        $lesson->add_message(get_string('insertedpage', 'lesson').': '.format_string($newpage->title, true), 'notifysuccess');
+        $opendsa_activity->add_message(get_string('insertedpage', 'opendsa_activity').': '.format_string($newpage->title, true), 'notifysuccess');
 
         return $page;
     }
 
     /**
      * This method loads a page object from the database and returns it as a
-     * specialised object that extends lesson_page
+     * specialised object that extends opendsa_activity_page
      *
      * @final
      * @static
      * @param int $id
-     * @param lesson $lesson
-     * @return lesson_page Specialised lesson_page object
+     * @param opendsa_activity $opendsa_activity
+     * @return opendsa_activity_page Specialised opendsa_activity_page object
      */
-    final public static function load($id, lesson $lesson) {
+    final public static function load($id, opendsa_activity $opendsa_activity) {
         global $DB;
 
         if (is_object($id) && !empty($id->qtype)) {
             $page = $id;
         } else {
-            $page = $DB->get_record("lesson_pages", array("id" => $id));
+            $page = $DB->get_record("opendsa_activity_pages", array("id" => $id));
             if (!$page) {
-                print_error('cannotfindpages', 'lesson');
+                print_error('cannotfindpages', 'opendsa_activity');
             }
         }
-        $manager = lesson_page_type_manager::get($lesson);
+        $manager = opendsa_activity_page_type_manager::get($opendsa_activity);
 
-        $class = 'lesson_page_type_'.$manager->get_page_type_idstring($page->qtype);
+        $class = 'opendsa_activity_page_type_'.$manager->get_page_type_idstring($page->qtype);
         if (!class_exists($class)) {
-            $class = 'lesson_page';
+            $class = 'opendsa_activity_page';
         }
 
-        return new $class($page, $lesson);
+        return new $class($page, $opendsa_activity);
     }
 
     /**
-     * Deletes a lesson_page from the database as well as any associated records.
+     * Deletes a opendsa_activity_page from the database as well as any associated records.
      * @final
      * @return bool
      */
     final public function delete() {
         global $DB;
 
-        $cm = get_coursemodule_from_instance('lesson', $this->lesson->id, $this->lesson->course);
+        $cm = get_coursemodule_from_instance('opendsa_activity', $this->opendsa_activity->id, $this->opendsa_activity->course);
         $context = context_module::instance($cm->id);
 
         // Delete files associated with attempts.
         $fs = get_file_storage();
-        if ($attempts = $DB->get_records('lesson_attempts', array("pageid" => $this->properties->id))) {
+        if ($attempts = $DB->get_records('opendsa_activity_attempts', array("pageid" => $this->properties->id))) {
             foreach ($attempts as $attempt) {
-                $fs->delete_area_files($context->id, 'mod_lesson', 'essay_responses', $attempt->id);
-                $fs->delete_area_files($context->id, 'mod_lesson', 'essay_answers', $attempt->id);
+                $fs->delete_area_files($context->id, 'mod_opendsa_activity', 'essay_responses', $attempt->id);
+                $fs->delete_area_files($context->id, 'mod_opendsa_activity', 'essay_answers', $attempt->id);
             }
         }
 
         // Then delete all the associated records...
-        $DB->delete_records("lesson_attempts", array("pageid" => $this->properties->id));
+        $DB->delete_records("opendsa_activity_attempts", array("pageid" => $this->properties->id));
 
-        $DB->delete_records("lesson_branch", array("pageid" => $this->properties->id));
+        $DB->delete_records("opendsa_activity_branch", array("pageid" => $this->properties->id));
 
         // Delete files related to answers and responses.
-        if ($answers = $DB->get_records("lesson_answers", array("pageid" => $this->properties->id))) {
+        if ($answers = $DB->get_records("opendsa_activity_answers", array("pageid" => $this->properties->id))) {
             foreach ($answers as $answer) {
-                $fs->delete_area_files($context->id, 'mod_lesson', 'page_answers', $answer->id);
-                $fs->delete_area_files($context->id, 'mod_lesson', 'page_responses', $answer->id);
+                $fs->delete_area_files($context->id, 'mod_opendsa_activity', 'page_answers', $answer->id);
+                $fs->delete_area_files($context->id, 'mod_opendsa_activity', 'page_responses', $answer->id);
             }
         }
 
         // ...now delete the answers...
-        $DB->delete_records("lesson_answers", array("pageid" => $this->properties->id));
+        $DB->delete_records("opendsa_activity_answers", array("pageid" => $this->properties->id));
         // ..and the page itself
-        $DB->delete_records("lesson_pages", array("id" => $this->properties->id));
+        $DB->delete_records("opendsa_activity_pages", array("id" => $this->properties->id));
 
         // Trigger an event: page deleted.
         $eventparams = array(
@@ -4001,28 +4001,28 @@ abstract class lesson_page extends lesson_base {
                 'pagetype' => $this->get_typestring()
                 )
             );
-        $event = \mod_lesson\event\page_deleted::create($eventparams);
-        $event->add_record_snapshot('lesson_pages', $this->properties);
+        $event = \mod_opendsa_activity\event\page_deleted::create($eventparams);
+        $event->add_record_snapshot('opendsa_activity_pages', $this->properties);
         $event->trigger();
 
         // Delete files associated with this page.
-        $fs->delete_area_files($context->id, 'mod_lesson', 'page_contents', $this->properties->id);
+        $fs->delete_area_files($context->id, 'mod_opendsa_activity', 'page_contents', $this->properties->id);
 
         // repair the hole in the linkage
         if (!$this->properties->prevpageid && !$this->properties->nextpageid) {
             //This is the only page, no repair needed
         } elseif (!$this->properties->prevpageid) {
             // this is the first page...
-            $page = $this->lesson->load_page($this->properties->nextpageid);
+            $page = $this->opendsa_activity->load_page($this->properties->nextpageid);
             $page->move(null, 0);
         } elseif (!$this->properties->nextpageid) {
             // this is the last page...
-            $page = $this->lesson->load_page($this->properties->prevpageid);
+            $page = $this->opendsa_activity->load_page($this->properties->prevpageid);
             $page->move(0);
         } else {
             // page is in the middle...
-            $prevpage = $this->lesson->load_page($this->properties->prevpageid);
-            $nextpage = $this->lesson->load_page($this->properties->nextpageid);
+            $prevpage = $this->opendsa_activity->load_page($this->properties->prevpageid);
+            $nextpage = $this->opendsa_activity->load_page($this->properties->nextpageid);
 
             $prevpage->move($nextpage->id);
             $nextpage->move(null, $prevpage->id);
@@ -4050,7 +4050,7 @@ abstract class lesson_page extends lesson_base {
         $obj->id = $this->properties->id;
         $obj->prevpageid = $prevpageid;
         $obj->nextpageid = $nextpageid;
-        $DB->update_record('lesson_pages', $obj);
+        $DB->update_record('opendsa_activity_pages', $obj);
     }
 
     /**
@@ -4063,27 +4063,27 @@ abstract class lesson_page extends lesson_base {
         global $DB;
         if ($this->answers === null) {
             $this->answers = array();
-            $answers = $DB->get_records('lesson_answers', array('pageid'=>$this->properties->id, 'opendsa_activity_id'=>$this->lesson->id), 'id');
+            $answers = $DB->get_records('opendsa_activity_answers', array('pageid'=>$this->properties->id, 'opendsa_activity_id'=>$this->opendsa_activity->id), 'id');
             if (!$answers) {
-                // It is possible that a lesson upgraded from Moodle 1.9 still
+                // It is possible that a opendsa_activity upgraded from Moodle 1.9 still
                 // contains questions without any answers [MDL-25632].
-                // debugging(get_string('cannotfindanswer', 'lesson'));
+                // debugging(get_string('cannotfindanswer', 'opendsa_activity'));
                 return array();
             }
             foreach ($answers as $answer) {
-                $this->answers[count($this->answers)] = new lesson_page_answer($answer);
+                $this->answers[count($this->answers)] = new opendsa_activity_page_answer($answer);
             }
         }
         return $this->answers;
     }
 
     /**
-     * Returns the lesson this page is associated with
+     * Returns the opendsa_activity this page is associated with
      * @final
-     * @return lesson
+     * @return opendsa_activity
      */
-    final protected function get_lesson() {
-        return $this->lesson;
+    final protected function get_opendsa_activity() {
+        return $this->opendsa_activity;
     }
 
     /**
@@ -4122,26 +4122,26 @@ abstract class lesson_page extends lesson_base {
 
         if ($result->noanswer) {
             $result->newpageid = $this->properties->id; // display same page again
-            $result->feedback  = get_string('noanswer', 'lesson');
+            $result->feedback  = get_string('noanswer', 'opendsa_activity');
         } else {
-            if (!has_capability('mod/lesson:manage', $context)) {
-                $nretakes = $DB->count_records("lesson_grades", array("opendsa_activity_id"=>$this->lesson->id, "userid"=>$USER->id));
+            if (!has_capability('mod/opendsa_activity:manage', $context)) {
+                $nretakes = $DB->count_records("opendsa_activity_grades", array("opendsa_activity_id"=>$this->opendsa_activity->id, "userid"=>$USER->id));
 
                 // Get the number of attempts that have been made on this question for this student and retake,
-                $nattempts = $DB->count_records('lesson_attempts', array('opendsa_activity_id' => $this->lesson->id,
+                $nattempts = $DB->count_records('opendsa_activity_attempts', array('opendsa_activity_id' => $this->opendsa_activity->id,
                     'userid' => $USER->id, 'pageid' => $this->properties->id, 'retry' => $nretakes));
 
                 // Check if they have reached (or exceeded) the maximum number of attempts allowed.
-                if ($nattempts >= $this->lesson->maxattempts) {
+                if ($nattempts >= $this->opendsa_activity->maxattempts) {
                     $result->maxattemptsreached = true;
-                    $result->feedback = get_string('maximumnumberofattemptsreached', 'lesson');
-                    $result->newpageid = $this->lesson->get_next_page($this->properties->nextpageid);
+                    $result->feedback = get_string('maximumnumberofattemptsreached', 'opendsa_activity');
+                    $result->newpageid = $this->opendsa_activity->get_next_page($this->properties->nextpageid);
                     return $result;
                 }
 
                 // record student's attempt
                 $attempt = new stdClass;
-                $attempt->opendsa_activity_id = $this->lesson->id;
+                $attempt->opendsa_activity_id = $this->opendsa_activity->id;
                 $attempt->pageid = $this->properties->id;
                 $attempt->userid = $USER->id;
                 $attempt->answerid = $result->answerid;
@@ -4154,21 +4154,21 @@ abstract class lesson_page extends lesson_base {
                 $attempt->timeseen = time();
                 // if allow modattempts, then update the old attempt record, otherwise, insert new answer record
                 $userisreviewing = false;
-                if (isset($USER->modattempts[$this->lesson->id])) {
+                if (isset($USER->modattempts[$this->opendsa_activity->id])) {
                     $attempt->retry = $nretakes - 1; // they are going through on review, $nretakes will be too high
                     $userisreviewing = true;
                 }
 
-                // Only insert a record if we are not reviewing the lesson.
+                // Only insert a record if we are not reviewing the opendsa_activity.
                 if (!$userisreviewing) {
-                    if ($this->lesson->retake || (!$this->lesson->retake && $nretakes == 0)) {
-                        $attempt->id = $DB->insert_record("lesson_attempts", $attempt);
+                    if ($this->opendsa_activity->retake || (!$this->opendsa_activity->retake && $nretakes == 0)) {
+                        $attempt->id = $DB->insert_record("opendsa_activity_attempts", $attempt);
 
                         list($updatedattempt, $updatedresult) = $this->on_after_write_attempt($attempt, $result);
                         if ($updatedattempt) {
                             $attempt = $updatedattempt;
                             $result = $updatedresult;
-                            $DB->update_record("lesson_attempts", $attempt);
+                            $DB->update_record("opendsa_activity_attempts", $attempt);
                         }
 
                         // Trigger an event: question answered.
@@ -4179,15 +4179,15 @@ abstract class lesson_page extends lesson_base {
                                 'pagetype' => $this->get_typestring()
                                 )
                             );
-                        $event = \mod_lesson\event\question_answered::create($eventparams);
-                        $event->add_record_snapshot('lesson_attempts', $attempt);
+                        $event = \mod_opendsa_activity\event\question_answered::create($eventparams);
+                        $event->add_record_snapshot('opendsa_activity_attempts', $attempt);
                         $event->trigger();
 
                         // Increase the number of attempts made.
                         $nattempts++;
                     }
                 } else {
-                    // When reviewing the lesson, the existing attemptid is also needed for the filearea options.
+                    // When reviewing the opendsa_activity, the existing attemptid is also needed for the filearea options.
                     $params = [
                         'opendsa_activity_id' => $attempt->opendsa_activity_id,
                         'pageid' => $attempt->pageid,
@@ -4195,53 +4195,53 @@ abstract class lesson_page extends lesson_base {
                         'answerid' => $attempt->answerid,
                         'retry' => $attempt->retry
                     ];
-                    $attempt->id = $DB->get_field('lesson_attempts', 'id', $params);
+                    $attempt->id = $DB->get_field('opendsa_activity_attempts', 'id', $params);
                 }
-                // "number of attempts remaining" message if $this->lesson->maxattempts > 1
+                // "number of attempts remaining" message if $this->opendsa_activity->maxattempts > 1
                 // displaying of message(s) is at the end of page for more ergonomic display
                 if (!$result->correctanswer && ($result->newpageid == 0)) {
                     // retreive the number of attempts left counter for displaying at bottom of feedback page
-                    if ($nattempts >= $this->lesson->maxattempts) {
-                        if ($this->lesson->maxattempts > 1) { // don't bother with message if only one attempt
+                    if ($nattempts >= $this->opendsa_activity->maxattempts) {
+                        if ($this->opendsa_activity->maxattempts > 1) { // don't bother with message if only one attempt
                             $result->maxattemptsreached = true;
                         }
-                        $result->newpageid = LESSON_NEXTPAGE;
-                    } else if ($this->lesson->maxattempts > 1) { // don't bother with message if only one attempt
-                        $result->attemptsremaining = $this->lesson->maxattempts - $nattempts;
+                        $result->newpageid = OPENDSA_ACTIVITY_NEXTPAGE;
+                    } else if ($this->opendsa_activity->maxattempts > 1) { // don't bother with message if only one attempt
+                        $result->attemptsremaining = $this->opendsa_activity->maxattempts - $nattempts;
                     }
                 }
             }
 
             // Determine default feedback if necessary
             if (empty($result->response)) {
-                if (!$this->lesson->feedback && !$result->noanswer && !($this->lesson->review & !$result->correctanswer && !$result->isessayquestion)) {
+                if (!$this->opendsa_activity->feedback && !$result->noanswer && !($this->opendsa_activity->review & !$result->correctanswer && !$result->isessayquestion)) {
                     // These conditions have been met:
-                    //  1. The lesson manager has not supplied feedback to the student
+                    //  1. The opendsa_activity manager has not supplied feedback to the student
                     //  2. Not displaying default feedback
                     //  3. The user did provide an answer
                     //  4. We are not reviewing with an incorrect answer (and not reviewing an essay question)
 
                     $result->nodefaultresponse = true;  // This will cause a redirect below
                 } else if ($result->isessayquestion) {
-                    $result->response = get_string('defaultessayresponse', 'lesson');
+                    $result->response = get_string('defaultessayresponse', 'opendsa_activity');
                 } else if ($result->correctanswer) {
-                    $result->response = get_string('thatsthecorrectanswer', 'lesson');
+                    $result->response = get_string('thatsthecorrectanswer', 'opendsa_activity');
                 } else {
-                    $result->response = get_string('thatsthewronganswer', 'lesson');
+                    $result->response = get_string('thatsthewronganswer', 'opendsa_activity');
                 }
             }
 
             if ($result->response) {
-                if ($this->lesson->review && !$result->correctanswer && !$result->isessayquestion) {
-                    $nretakes = $DB->count_records("lesson_grades", array("opendsa_activity_id"=>$this->lesson->id, "userid"=>$USER->id));
-                    $qattempts = $DB->count_records("lesson_attempts", array("userid"=>$USER->id, "retry"=>$nretakes, "pageid"=>$this->properties->id));
+                if ($this->opendsa_activity->review && !$result->correctanswer && !$result->isessayquestion) {
+                    $nretakes = $DB->count_records("opendsa_activity_grades", array("opendsa_activity_id"=>$this->opendsa_activity->id, "userid"=>$USER->id));
+                    $qattempts = $DB->count_records("opendsa_activity_attempts", array("userid"=>$USER->id, "retry"=>$nretakes, "pageid"=>$this->properties->id));
                     if ($qattempts == 1) {
-                        $result->feedback = $OUTPUT->box(get_string("firstwrong", "lesson"), 'feedback');
+                        $result->feedback = $OUTPUT->box(get_string("firstwrong", "opendsa_activity"), 'feedback');
                     } else {
                         if (!$result->maxattemptsreached) {
-                            $result->feedback = $OUTPUT->box(get_string("secondpluswrong", "lesson"), 'feedback');
+                            $result->feedback = $OUTPUT->box(get_string("secondpluswrong", "opendsa_activity"), 'feedback');
                         } else {
-                            $result->feedback = $OUTPUT->box(get_string("finalwrong", "lesson"), 'feedback');
+                            $result->feedback = $OUTPUT->box(get_string("finalwrong", "opendsa_activity"), 'feedback');
                         }
                     }
                 } else {
@@ -4263,7 +4263,7 @@ abstract class lesson_page extends lesson_base {
                 $result->feedback .= $OUTPUT->box(format_text($this->get_contents(), $this->properties->contentsformat, $options),
                         'generalbox boxaligncenter p-y-1');
                 $result->feedback .= '<div class="correctanswer generalbox"><em>'
-                        . get_string("youranswer", "lesson").'</em> : <div class="studentanswer mt-2 mb-2">';
+                        . get_string("youranswer", "opendsa_activity").'</em> : <div class="studentanswer mt-2 mb-2">';
 
                 // Create a table containing the answers and responses.
                 $table = new html_table();
@@ -4281,7 +4281,7 @@ abstract class lesson_page extends lesson_base {
                         if (!empty(trim($response))) {
                             $studentresponse = isset($result->responseformat) ?
                                 $this->format_response($response, $context, $result->responseformat, $options) : $response;
-                            $studentresponsecontent = html_writer::div('<em>' . get_string("response", "lesson") .
+                            $studentresponsecontent = html_writer::div('<em>' . get_string("response", "opendsa_activity") .
                                 '</em>: <br/>' . $studentresponse, $class);
                             $table->data[] = array($studentresponsecontent);
                         } else {
@@ -4297,7 +4297,7 @@ abstract class lesson_page extends lesson_base {
                         $studentresponse = isset($result->responseformat) ?
                             $this->format_response($result->response, $context, $result->responseformat,
                                 $result->answerid, $options) : $result->response;
-                        $studentresponsecontent = html_writer::div('<em>' . get_string("response", "lesson") .
+                        $studentresponsecontent = html_writer::div('<em>' . get_string("response", "opendsa_activity") .
                             '</em>: <br/>' . $studentresponse, $class);
                         $table->data[] = array($studentresponsecontent);
                     } else {
@@ -4349,7 +4349,7 @@ abstract class lesson_page extends lesson_base {
     private function format_response($response, $context, $responseformat, $answerid, $options) {
 
         $convertstudentresponse = file_rewrite_pluginfile_urls($response, 'pluginfile.php',
-            $context->id, 'mod_lesson', 'page_responses', $answerid);
+            $context->id, 'mod_opendsa_activity', 'page_responses', $answerid);
 
         return format_text($convertstudentresponse, $responseformat, $options);
     }
@@ -4366,25 +4366,25 @@ abstract class lesson_page extends lesson_base {
         static $jumpnames = array();
 
         if (!array_key_exists($jumpto, $jumpnames)) {
-            if ($jumpto == LESSON_THISPAGE) {
-                $jumptitle = get_string('thispage', 'lesson');
-            } elseif ($jumpto == LESSON_NEXTPAGE) {
-                $jumptitle = get_string('nextpage', 'lesson');
-            } elseif ($jumpto == LESSON_EOL) {
-                $jumptitle = get_string('endoflesson', 'lesson');
-            } elseif ($jumpto == LESSON_UNSEENBRANCHPAGE) {
-                $jumptitle = get_string('unseenpageinbranch', 'lesson');
-            } elseif ($jumpto == LESSON_PREVIOUSPAGE) {
-                $jumptitle = get_string('previouspage', 'lesson');
-            } elseif ($jumpto == LESSON_RANDOMPAGE) {
-                $jumptitle = get_string('randompageinbranch', 'lesson');
-            } elseif ($jumpto == LESSON_RANDOMBRANCH) {
-                $jumptitle = get_string('randombranch', 'lesson');
-            } elseif ($jumpto == LESSON_CLUSTERJUMP) {
-                $jumptitle = get_string('clusterjump', 'lesson');
+            if ($jumpto == OPENDSA_ACTIVITY_THISPAGE) {
+                $jumptitle = get_string('thispage', 'opendsa_activity');
+            } elseif ($jumpto == OPENDSA_ACTIVITY_NEXTPAGE) {
+                $jumptitle = get_string('nextpage', 'opendsa_activity');
+            } elseif ($jumpto == OPENDSA_ACTIVITY_EOL) {
+                $jumptitle = get_string('endofopendsa_activity', 'opendsa_activity');
+            } elseif ($jumpto == OPENDSA_ACTIVITY_UNSEENBRANCHPAGE) {
+                $jumptitle = get_string('unseenpageinbranch', 'opendsa_activity');
+            } elseif ($jumpto == OPENDSA_ACTIVITY_PREVIOUSPAGE) {
+                $jumptitle = get_string('previouspage', 'opendsa_activity');
+            } elseif ($jumpto == OPENDSA_ACTIVITY_RANDOMPAGE) {
+                $jumptitle = get_string('randompageinbranch', 'opendsa_activity');
+            } elseif ($jumpto == OPENDSA_ACTIVITY_RANDOMBRANCH) {
+                $jumptitle = get_string('randombranch', 'opendsa_activity');
+            } elseif ($jumpto == OPENDSA_ACTIVITY_CLUSTERJUMP) {
+                $jumptitle = get_string('clusterjump', 'opendsa_activity');
             } else {
-                if (!$jumptitle = $DB->get_field('lesson_pages', 'title', array('id' => $jumpto))) {
-                    $jumptitle = '<strong>'.get_string('notdefined', 'lesson').'</strong>';
+                if (!$jumptitle = $DB->get_field('opendsa_activity_pages', 'title', array('id' => $jumpto))) {
+                    $jumptitle = '<strong>'.get_string('notdefined', 'opendsa_activity').'</strong>';
                 }
             }
             $jumpnames[$jumpto] = format_string($jumptitle,true);
@@ -4396,11 +4396,11 @@ abstract class lesson_page extends lesson_base {
     /**
      * Constructor method
      * @param object $properties
-     * @param lesson $lesson
+     * @param opendsa_activity $opendsa_activity
      */
-    public function __construct($properties, lesson $lesson) {
+    public function __construct($properties, opendsa_activity $opendsa_activity) {
         parent::__construct($properties);
-        $this->lesson = $lesson;
+        $this->opendsa_activity = $opendsa_activity;
     }
 
     /**
@@ -4439,17 +4439,17 @@ abstract class lesson_page extends lesson_base {
         global $DB;
         if (isset($answereditor['itemid'])) {
             $answer->answer = file_save_draft_area_files($answereditor['itemid'],
-                    $context->id, 'mod_lesson', 'page_answers', $answer->id,
+                    $context->id, 'mod_opendsa_activity', 'page_answers', $answer->id,
                     array('noclean' => true, 'maxfiles' => EDITOR_UNLIMITED_FILES, 'maxbytes' => $maxbytes),
                     $answer->answer, null);
-            $DB->set_field('lesson_answers', 'answer', $answer->answer, array('id' => $answer->id));
+            $DB->set_field('opendsa_activity_answers', 'answer', $answer->answer, array('id' => $answer->id));
         }
         if (isset($responseeditor['itemid'])) {
             $answer->response = file_save_draft_area_files($responseeditor['itemid'],
-                    $context->id, 'mod_lesson', 'page_responses', $answer->id,
+                    $context->id, 'mod_opendsa_activity', 'page_responses', $answer->id,
                     array('noclean' => true, 'maxfiles' => EDITOR_UNLIMITED_FILES, 'maxbytes' => $maxbytes),
                     $answer->response, null);
-            $DB->set_field('lesson_answers', 'response', $answer->response, array('id' => $answer->id));
+            $DB->set_field('opendsa_activity_answers', 'response', $answer->response, array('id' => $answer->id));
         }
     }
 
@@ -4466,16 +4466,16 @@ abstract class lesson_page extends lesson_base {
         $context = context_module::instance($PAGE->cm->id);
         if ($rewriteanswer) {
             $answer->answer = file_rewrite_pluginfile_urls($answer->answer, 'pluginfile.php', $context->id,
-                    'mod_lesson', 'page_answers', $answer->id);
+                    'mod_opendsa_activity', 'page_answers', $answer->id);
         }
         $answer->response = file_rewrite_pluginfile_urls($answer->response, 'pluginfile.php', $context->id,
-                'mod_lesson', 'page_responses', $answer->id);
+                'mod_opendsa_activity', 'page_responses', $answer->id);
 
         return $answer;
     }
 
     /**
-     * Updates a lesson page and its answers within the database
+     * Updates a opendsa_activity page and its answers within the database
      *
      * @param object $properties
      * @return bool
@@ -4484,7 +4484,7 @@ abstract class lesson_page extends lesson_base {
         global $DB, $PAGE;
         $answers  = $this->get_answers();
         $properties->id = $this->properties->id;
-        $properties->opendsa_activity_id = $this->lesson->id;
+        $properties->opendsa_activity_id = $this->opendsa_activity->id;
         if (empty($properties->qoption)) {
             $properties->qoption = '0';
         }
@@ -4495,18 +4495,18 @@ abstract class lesson_page extends lesson_base {
             $maxbytes = get_user_max_upload_file_size($context);
         }
         $properties->timemodified = time();
-        $properties = file_postupdate_standard_editor($properties, 'contents', array('noclean'=>true, 'maxfiles'=>EDITOR_UNLIMITED_FILES, 'maxbytes'=>$maxbytes), $context, 'mod_lesson', 'page_contents', $properties->id);
-        $DB->update_record("lesson_pages", $properties);
+        $properties = file_postupdate_standard_editor($properties, 'contents', array('noclean'=>true, 'maxfiles'=>EDITOR_UNLIMITED_FILES, 'maxbytes'=>$maxbytes), $context, 'mod_opendsa_activity', 'page_contents', $properties->id);
+        $DB->update_record("opendsa_activity_pages", $properties);
 
         // Trigger an event: page updated.
-        \mod_lesson\event\page_updated::create_from_lesson_page($this, $context)->trigger();
+        \mod_opendsa_activity\event\page_updated::create_from_opendsa_activity_page($this, $context)->trigger();
 
-        if ($this->type == self::TYPE_STRUCTURE && $this->get_typeid() != LESSON_PAGE_BRANCHTABLE) {
+        if ($this->type == self::TYPE_STRUCTURE && $this->get_typeid() != OPENDSA_ACTIVITY_PAGE_BRANCHTABLE) {
             // These page types have only one answer to save the jump and score.
             if (count($answers) > 1) {
                 $answer = array_shift($answers);
                 foreach ($answers as $a) {
-                    $DB->delete_records('lesson_answers', array('id' => $a->id));
+                    $DB->delete_records('opendsa_activity_answers', array('id' => $a->id));
                 }
             } else if (count($answers) == 1) {
                 $answer = array_shift($answers);
@@ -4525,15 +4525,15 @@ abstract class lesson_page extends lesson_base {
                 $answer->score = $properties->score[0];
             }
             if (!empty($answer->id)) {
-                $DB->update_record("lesson_answers", $answer->properties());
+                $DB->update_record("opendsa_activity_answers", $answer->properties());
             } else {
-                $DB->insert_record("lesson_answers", $answer);
+                $DB->insert_record("opendsa_activity_answers", $answer);
             }
         } else {
             for ($i = 0; $i < count($properties->answer_editor); $i++) {
                 if (!array_key_exists($i, $this->answers)) {
                     $this->answers[$i] = new stdClass;
-                    $this->answers[$i]->opendsa_activity_id = $this->lesson->id;
+                    $this->answers[$i]->opendsa_activity_id = $this->opendsa_activity->id;
                     $this->answers[$i]->pageid = $this->id;
                     $this->answers[$i]->timecreated = $this->timecreated;
                     $this->answers[$i]->answer = null;
@@ -4563,13 +4563,13 @@ abstract class lesson_page extends lesson_base {
                     if (isset($properties->jumpto[$i])) {
                         $this->answers[$i]->jumpto = $properties->jumpto[$i];
                     }
-                    if ($this->lesson->custom && isset($properties->score[$i])) {
+                    if ($this->opendsa_activity->custom && isset($properties->score[$i])) {
                         $this->answers[$i]->score = $properties->score[$i];
                     }
                     if (!isset($this->answers[$i]->id)) {
-                        $this->answers[$i]->id = $DB->insert_record("lesson_answers", $this->answers[$i]);
+                        $this->answers[$i]->id = $DB->insert_record("opendsa_activity_answers", $this->answers[$i]);
                     } else {
-                        $DB->update_record("lesson_answers", $this->answers[$i]->properties());
+                        $DB->update_record("opendsa_activity_answers", $this->answers[$i]->properties());
                     }
 
                     // Save files in answers and responses.
@@ -4582,7 +4582,7 @@ abstract class lesson_page extends lesson_base {
                     }
 
                 } else if (isset($this->answers[$i]->id)) {
-                    $DB->delete_records('lesson_answers', array('id' => $this->answers[$i]->id));
+                    $DB->delete_records('opendsa_activity_answers', array('id' => $this->answers[$i]->id));
                     unset($this->answers[$i]);
                 }
             }
@@ -4614,7 +4614,7 @@ abstract class lesson_page extends lesson_base {
             return (!array_key_exists($this->properties->id, $seenpages));
         } else {
             $nretakes = $param;
-            if (!$DB->count_records("lesson_attempts", array("pageid"=>$this->properties->id, "userid"=>$USER->id, "retry"=>$nretakes))) {
+            if (!$DB->count_records("opendsa_activity_attempts", array("pageid"=>$this->properties->id, "userid"=>$USER->id, "retry"=>$nretakes))) {
                 return true;
             }
         }
@@ -4628,14 +4628,14 @@ abstract class lesson_page extends lesson_base {
      */
     public function is_unanswered($nretakes) {
         global $DB, $USER;
-        if (!$DB->count_records("lesson_attempts", array('pageid'=>$this->properties->id, 'userid'=>$USER->id, 'correct'=>1, 'retry'=>$nretakes))) {
+        if (!$DB->count_records("opendsa_activity_attempts", array('pageid'=>$this->properties->id, 'userid'=>$USER->id, 'correct'=>1, 'retry'=>$nretakes))) {
             return true;
         }
         return false;
     }
 
     /**
-     * Creates answers within the database for this lesson_page. Usually only ever
+     * Creates answers within the database for this opendsa_activity_page. Usually only ever
      * called when creating a new page instance
      * @param object $properties
      * @return array
@@ -4644,16 +4644,16 @@ abstract class lesson_page extends lesson_base {
         global $DB, $PAGE;
         // now add the answers
         $newanswer = new stdClass;
-        $newanswer->opendsa_activity_id = $this->lesson->id;
+        $newanswer->opendsa_activity_id = $this->opendsa_activity->id;
         $newanswer->pageid = $this->properties->id;
         $newanswer->timecreated = $this->properties->timecreated;
 
-        $cm = get_coursemodule_from_instance('lesson', $this->lesson->id, $this->lesson->course);
+        $cm = get_coursemodule_from_instance('opendsa_activity', $this->opendsa_activity->id, $this->opendsa_activity->course);
         $context = context_module::instance($cm->id);
 
         $answers = array();
 
-        for ($i = 0; $i < ($this->lesson->maxanswers + 1); $i++) {
+        for ($i = 0; $i < ($this->opendsa_activity->maxanswers + 1); $i++) {
             $answer = clone($newanswer);
 
             if (isset($properties->answer_editor[$i])) {
@@ -4676,10 +4676,10 @@ abstract class lesson_page extends lesson_base {
                 if (isset($properties->jumpto[$i])) {
                     $answer->jumpto = $properties->jumpto[$i];
                 }
-                if ($this->lesson->custom && isset($properties->score[$i])) {
+                if ($this->opendsa_activity->custom && isset($properties->score[$i])) {
                     $answer->score = $properties->score[$i];
                 }
-                $answer->id = $DB->insert_record("lesson_answers", $answer);
+                $answer->id = $DB->insert_record("opendsa_activity_answers", $answer);
                 if (isset($properties->response_editor[$i])) {
                     $this->save_answers_files($context, $PAGE->course->maxbytes, $answer,
                             $properties->answer_editor[$i], $properties->response_editor[$i]);
@@ -4687,7 +4687,7 @@ abstract class lesson_page extends lesson_base {
                     $this->save_answers_files($context, $PAGE->course->maxbytes, $answer,
                             $properties->answer_editor[$i]);
                 }
-                $answers[$answer->id] = new lesson_page_answer($answer);
+                $answers[$answer->id] = new opendsa_activity_page_answer($answer);
             }
         }
 
@@ -4754,7 +4754,7 @@ abstract class lesson_page extends lesson_base {
 
     /**
      * Returns the maximum number of answers for this page given the maximum number
-     * of answers permitted by the lesson.
+     * of answers permitted by the opendsa_activity.
      *
      * @param int $default
      * @return int
@@ -4764,7 +4764,7 @@ abstract class lesson_page extends lesson_base {
     }
 
     /**
-     * Returns the properties of this lesson page as an object
+     * Returns the properties of this opendsa_activity page as an object
      * @return stdClass;
      */
     public function properties() {
@@ -4777,7 +4777,7 @@ abstract class lesson_page extends lesson_base {
             $qtype = $properties->qtype;
             foreach ($this->answers as $answer) {
                 $properties->{'answer_editor['.$count.']'} = array('text' => $answer->answer, 'format' => $answer->answerformat);
-                if ($qtype != LESSON_PAGE_MATCHING) {
+                if ($qtype != OPENDSA_ACTIVITY_PAGE_MATCHING) {
                     $properties->{'response_editor['.$count.']'} = array('text' => $answer->response, 'format' => $answer->responseformat);
                 } else {
                     $properties->{'response_editor['.$count.']'} = $answer->response;
@@ -4794,36 +4794,36 @@ abstract class lesson_page extends lesson_base {
      * Returns an array of options to display when choosing the jumpto for a page/answer
      * @static
      * @param int $pageid
-     * @param lesson $lesson
+     * @param opendsa_activity $opendsa_activity
      * @return array
      */
-    public static function get_jumptooptions($pageid, lesson $lesson) {
+    public static function get_jumptooptions($pageid, opendsa_activity $opendsa_activity) {
         global $DB;
         $jump = array();
-        $jump[0] = get_string("thispage", "lesson");
-        $jump[LESSON_NEXTPAGE] = get_string("nextpage", "lesson");
-        $jump[LESSON_PREVIOUSPAGE] = get_string("previouspage", "lesson");
-        $jump[LESSON_EOL] = get_string("endoflesson", "lesson");
+        $jump[0] = get_string("thispage", "opendsa_activity");
+        $jump[OPENDSA_ACTIVITY_NEXTPAGE] = get_string("nextpage", "opendsa_activity");
+        $jump[OPENDSA_ACTIVITY_PREVIOUSPAGE] = get_string("previouspage", "opendsa_activity");
+        $jump[OPENDSA_ACTIVITY_EOL] = get_string("endofopendsa_activity", "opendsa_activity");
 
         if ($pageid == 0) {
             return $jump;
         }
 
-        $pages = $lesson->load_all_pages();
-        if ($pages[$pageid]->qtype == LESSON_PAGE_BRANCHTABLE || $lesson->is_sub_page_of_type($pageid, array(LESSON_PAGE_BRANCHTABLE), array(LESSON_PAGE_ENDOFBRANCH, LESSON_PAGE_CLUSTER))) {
-            $jump[LESSON_UNSEENBRANCHPAGE] = get_string("unseenpageinbranch", "lesson");
-            $jump[LESSON_RANDOMPAGE] = get_string("randompageinbranch", "lesson");
+        $pages = $opendsa_activity->load_all_pages();
+        if ($pages[$pageid]->qtype == OPENDSA_ACTIVITY_PAGE_BRANCHTABLE || $opendsa_activity->is_sub_page_of_type($pageid, array(OPENDSA_ACTIVITY_PAGE_BRANCHTABLE), array(OPENDSA_ACTIVITY_PAGE_ENDOFBRANCH, OPENDSA_ACTIVITY_PAGE_CLUSTER))) {
+            $jump[OPENDSA_ACTIVITY_UNSEENBRANCHPAGE] = get_string("unseenpageinbranch", "opendsa_activity");
+            $jump[OPENDSA_ACTIVITY_RANDOMPAGE] = get_string("randompageinbranch", "opendsa_activity");
         }
-        if($pages[$pageid]->qtype == LESSON_PAGE_CLUSTER || $lesson->is_sub_page_of_type($pageid, array(LESSON_PAGE_CLUSTER), array(LESSON_PAGE_ENDOFCLUSTER))) {
-            $jump[LESSON_CLUSTERJUMP] = get_string("clusterjump", "lesson");
+        if($pages[$pageid]->qtype == OPENDSA_ACTIVITY_PAGE_CLUSTER || $opendsa_activity->is_sub_page_of_type($pageid, array(OPENDSA_ACTIVITY_PAGE_CLUSTER), array(OPENDSA_ACTIVITY_PAGE_ENDOFCLUSTER))) {
+            $jump[OPENDSA_ACTIVITY_CLUSTERJUMP] = get_string("clusterjump", "opendsa_activity");
         }
         if (!optional_param('firstpage', 0, PARAM_INT)) {
-            $apageid = $DB->get_field("lesson_pages", "id", array("opendsa_activity_id" => $lesson->id, "prevpageid" => 0));
+            $apageid = $DB->get_field("opendsa_activity_pages", "id", array("opendsa_activity_id" => $opendsa_activity->id, "prevpageid" => 0));
             while (true) {
                 if ($apageid) {
-                    $title = $DB->get_field("lesson_pages", "title", array("id" => $apageid));
+                    $title = $DB->get_field("opendsa_activity_pages", "title", array("id" => $apageid));
                     $jump[$apageid] = strip_tags(format_string($title,true));
-                    $apageid = $DB->get_field("lesson_pages", "nextpageid", array("id" => $apageid));
+                    $apageid = $DB->get_field("opendsa_activity_pages", "nextpageid", array("id" => $apageid));
                 } else {
                     // last page reached
                     break;
@@ -4844,7 +4844,7 @@ abstract class lesson_page extends lesson_base {
                 $this->properties->contentsformat = FORMAT_HTML;
             }
             $context = context_module::instance($PAGE->cm->id);
-            $contents = file_rewrite_pluginfile_urls($this->properties->contents, 'pluginfile.php', $context->id, 'mod_lesson',
+            $contents = file_rewrite_pluginfile_urls($this->properties->contents, 'pluginfile.php', $context->id, 'mod_opendsa_activity',
                                                      'page_contents', $this->properties->id);  // Must do this BEFORE format_text()!
             return format_text($contents, $this->properties->contentsformat,
                                array('context' => $context, 'noclean' => true,
@@ -4880,7 +4880,7 @@ abstract class lesson_page extends lesson_base {
         $i = 1;
         foreach ($answers as $answer) {
             $cells = array();
-            $cells[] = '<label>' . get_string('jump', 'lesson') . ' ' . $i . '</label>:';
+            $cells[] = '<label>' . get_string('jump', 'opendsa_activity') . ' ' . $i . '</label>:';
             $cells[] = $this->get_jump_name($answer->jumpto);
             $table->data[] = new html_table_row($cells);
             if ($i === 1){
@@ -4926,7 +4926,7 @@ abstract class lesson_page extends lesson_base {
         $formattextdefoptions = new stdClass;
         $formattextdefoptions->para = false;  //I'll use it widely in this page
         foreach ($answers as $answer) {
-            $data = get_string('jumpsto', 'lesson', $this->get_jump_name($answer->jumpto));
+            $data = get_string('jumpsto', 'opendsa_activity', $this->get_jump_name($answer->jumpto));
             $answerdata->answers[] = array($data, "");
             $answerpage->answerdata = $answerdata;
         }
@@ -4941,7 +4941,7 @@ abstract class lesson_page extends lesson_base {
     public function get_jumps() {
         global $DB;
         $jumps = array();
-        $params = array ("opendsa_activity_id" => $this->lesson->id, "pageid" => $this->properties->id);
+        $params = array ("opendsa_activity_id" => $this->opendsa_activity->id, "pageid" => $this->properties->id);
         if ($answers = $this->get_answers()) {
             foreach ($answers as $answer) {
                 $jumps[] = $this->get_jump_name($answer->jumpto);
@@ -4990,7 +4990,7 @@ abstract class lesson_page extends lesson_base {
      */
     public function get_files($includedirs = true, $updatedsince = 0) {
         $fs = get_file_storage();
-        return $fs->get_area_files($this->lesson->context->id, 'mod_lesson', 'page_contents', $this->properties->id,
+        return $fs->get_area_files($this->opendsa_activity->context->id, 'mod_opendsa_activity', 'page_contents', $this->properties->id,
                                     'itemid, filepath, filename', $includedirs, $updatedsince);
     }
 
@@ -5012,7 +5012,7 @@ abstract class lesson_page extends lesson_base {
  * Class used to represent an answer to a page
  *
  * @property int $id The ID of this answer in the database
- * @property int $opendsa_activity_id The ID of the lesson this answer belongs to
+ * @property int $opendsa_activity_id The ID of the opendsa_activity this answer belongs to
  * @property int $pageid The ID of the page this answer belongs to
  * @property int $jumpto Identifies where the user goes upon completing a page with this answer
  * @property int $grade The grade this answer is worth
@@ -5026,18 +5026,18 @@ abstract class lesson_page extends lesson_base {
  * @copyright  2009 Sam Hemelryk
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class lesson_page_answer extends lesson_base {
+class opendsa_activity_page_answer extends opendsa_activity_base {
 
     /**
      * Loads an page answer from the DB
      *
      * @param int $id
-     * @return lesson_page_answer
+     * @return opendsa_activity_page_answer
      */
     public static function load($id) {
         global $DB;
-        $answer = $DB->get_record("lesson_answers", array("id" => $id));
-        return new lesson_page_answer($answer);
+        $answer = $DB->get_record("opendsa_activity_answers", array("id" => $id));
+        return new opendsa_activity_page_answer($answer);
     }
 
     /**
@@ -5045,10 +5045,10 @@ class lesson_page_answer extends lesson_base {
      * in the database.
      *
      * @param stdClass $properties
-     * @param lesson_page $page
+     * @param opendsa_activity_page $page
      * @return array
      */
-    public static function create($properties, lesson_page $page) {
+    public static function create($properties, opendsa_activity_page $page) {
         return $page->create_answers($properties);
     }
 
@@ -5062,11 +5062,11 @@ class lesson_page_answer extends lesson_base {
      */
     public function get_files($includedirs = true, $updatedsince = 0) {
 
-        $lesson = lesson::load($this->properties->opendsa_activity_id);
+        $opendsa_activity = opendsa_activity::load($this->properties->opendsa_activity_id);
         $fs = get_file_storage();
-        $answerfiles = $fs->get_area_files($lesson->context->id, 'mod_lesson', 'page_answers', $this->properties->id,
+        $answerfiles = $fs->get_area_files($opendsa_activity->context->id, 'mod_opendsa_activity', 'page_answers', $this->properties->id,
                                             'itemid, filepath, filename', $includedirs, $updatedsince);
-        $responsefiles = $fs->get_area_files($lesson->context->id, 'mod_lesson', 'page_responses', $this->properties->id,
+        $responsefiles = $fs->get_area_files($opendsa_activity->context->id, 'mod_opendsa_activity', 'page_responses', $this->properties->id,
                                             'itemid, filepath, filename', $includedirs, $updatedsince);
         return array_merge($answerfiles, $responsefiles);
     }
@@ -5079,15 +5079,15 @@ class lesson_page_answer extends lesson_base {
  * This class is responsible for managing the different pages. A manager object can
  * be retrieved by calling the following line of code:
  * <code>
- * $manager  = lesson_page_type_manager::get($lesson);
+ * $manager  = opendsa_activity_page_type_manager::get($opendsa_activity);
  * </code>
  * The first time the page type manager is retrieved the it includes all of the
- * different page types located in mod/lesson/pagetypes.
+ * different page types located in mod/opendsa_activity/pagetypes.
  *
  * @copyright  2009 Sam Hemelryk
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class lesson_page_type_manager {
+class opendsa_activity_page_type_manager {
 
     /**
      * An array of different page type classes
@@ -5096,40 +5096,40 @@ class lesson_page_type_manager {
     protected $types = array();
 
     /**
-     * Retrieves the lesson page type manager object
+     * Retrieves the opendsa_activity page type manager object
      *
      * If the object hasn't yet been created it is created here.
      *
-     * @staticvar lesson_page_type_manager $pagetypemanager
-     * @param lesson $lesson
-     * @return lesson_page_type_manager
+     * @staticvar opendsa_activity_page_type_manager $pagetypemanager
+     * @param opendsa_activity $opendsa_activity
+     * @return opendsa_activity_page_type_manager
      */
-    public static function get(lesson $lesson) {
+    public static function get(opendsa_activity $opendsa_activity) {
         static $pagetypemanager;
-        if (!($pagetypemanager instanceof lesson_page_type_manager)) {
-            $pagetypemanager = new lesson_page_type_manager();
-            $pagetypemanager->load_lesson_types($lesson);
+        if (!($pagetypemanager instanceof opendsa_activity_page_type_manager)) {
+            $pagetypemanager = new opendsa_activity_page_type_manager();
+            $pagetypemanager->load_opendsa_activity_types($opendsa_activity);
         }
         return $pagetypemanager;
     }
 
     /**
-     * Finds and loads all lesson page types in mod/lesson/pagetypes
+     * Finds and loads all opendsa_activity page types in mod/opendsa_activity/pagetypes
      *
-     * @param lesson $lesson
+     * @param opendsa_activity $opendsa_activity
      */
-    public function load_lesson_types(lesson $lesson) {
+    public function load_opendsa_activity_types(opendsa_activity $opendsa_activity) {
         global $CFG;
-        $basedir = $CFG->dirroot.'/mod/lesson/pagetypes/';
+        $basedir = $CFG->dirroot.'/mod/opendsa_activity/pagetypes/';
         $dir = dir($basedir);
         while (false !== ($entry = $dir->read())) {
             if (strpos($entry, '.')===0 || !preg_match('#^[a-zA-Z]+\.php#i', $entry)) {
                 continue;
             }
             require_once($basedir.$entry);
-            $class = 'lesson_page_type_'.strtok($entry,'.');
+            $class = 'opendsa_activity_page_type_'.strtok($entry,'.');
             if (class_exists($class)) {
-                $pagetype = new $class(new stdClass, $lesson);
+                $pagetype = new $class(new stdClass, $opendsa_activity);
                 $this->types[$pagetype->typeid] = $pagetype;
             }
         }
@@ -5171,23 +5171,23 @@ class lesson_page_type_manager {
     }
 
     /**
-     * Loads a page for the provided lesson given it's id
+     * Loads a page for the provided opendsa_activity given it's id
      *
-     * This function loads a page from the lesson when given both the lesson it belongs
+     * This function loads a page from the opendsa_activity when given both the opendsa_activity it belongs
      * to as well as the page's id.
      * If the page doesn't exist an error is thrown
      *
      * @param int $pageid The id of the page to load
-     * @param lesson $lesson The lesson the page belongs to
-     * @return lesson_page A class that extends lesson_page
+     * @param opendsa_activity $opendsa_activity The opendsa_activity the page belongs to
+     * @return opendsa_activity_page A class that extends opendsa_activity_page
      */
-    public function load_page($pageid, lesson $lesson) {
+    public function load_page($pageid, opendsa_activity $opendsa_activity) {
         global $DB;
-        if (!($page =$DB->get_record('lesson_pages', array('id'=>$pageid, 'opendsa_activity_id'=>$lesson->id)))) {
-            print_error('cannotfindpages', 'lesson');
+        if (!($page =$DB->get_record('opendsa_activity_pages', array('id'=>$pageid, 'opendsa_activity_id'=>$opendsa_activity->id)))) {
+            print_error('cannotfindpages', 'opendsa_activity');
         }
         $pagetype = get_class($this->types[$page->qtype]);
-        $page = new $pagetype($page, $lesson);
+        $page = new $pagetype($page, $opendsa_activity);
         return $page;
     }
 
@@ -5203,42 +5203,42 @@ class lesson_page_type_manager {
             if ($page2->prevpageid != 0) {
                 debugging("***prevpageid of page " . $page2->id . " set to 0***");
                 $page2->prevpageid = 0;
-                $DB->set_field("lesson_pages", "prevpageid", 0, array("id" => $page2->id));
+                $DB->set_field("opendsa_activity_pages", "prevpageid", 0, array("id" => $page2->id));
             }
         } else if (empty($page2)) {
             if ($page1->nextpageid != 0) {
                 debugging("***nextpageid of page " . $page1->id . " set to 0***");
                 $page1->nextpageid = 0;
-                $DB->set_field("lesson_pages", "nextpageid", 0, array("id" => $page1->id));
+                $DB->set_field("opendsa_activity_pages", "nextpageid", 0, array("id" => $page1->id));
             }
         } else {
             if ($page1->nextpageid != $page2->id) {
                 debugging("***nextpageid of page " . $page1->id . " set to " . $page2->id . "***");
                 $page1->nextpageid = $page2->id;
-                $DB->set_field("lesson_pages", "nextpageid", $page2->id, array("id" => $page1->id));
+                $DB->set_field("opendsa_activity_pages", "nextpageid", $page2->id, array("id" => $page1->id));
             }
             if ($page2->prevpageid != $page1->id) {
                 debugging("***prevpageid of page " . $page2->id . " set to " . $page1->id . "***");
                 $page2->prevpageid = $page1->id;
-                $DB->set_field("lesson_pages", "prevpageid", $page1->id, array("id" => $page2->id));
+                $DB->set_field("opendsa_activity_pages", "prevpageid", $page1->id, array("id" => $page2->id));
             }
         }
     }
 
     /**
-     * This function loads ALL pages that belong to the lesson.
+     * This function loads ALL pages that belong to the opendsa_activity.
      *
-     * @param lesson $lesson
-     * @return array An array of lesson_page_type_*
+     * @param opendsa_activity $opendsa_activity
+     * @return array An array of opendsa_activity_page_type_*
      */
-    public function load_all_pages(lesson $lesson) {
+    public function load_all_pages(opendsa_activity $opendsa_activity) {
         global $DB;
-        if (!($pages =$DB->get_records('lesson_pages', array('opendsa_activity_id'=>$lesson->id)))) {
+        if (!($pages =$DB->get_records('opendsa_activity_pages', array('opendsa_activity_id'=>$opendsa_activity->id)))) {
             return array(); // Records returned empty.
         }
         foreach ($pages as $key=>$page) {
             $pagetype = get_class($this->types[$page->qtype]);
-            $pages[$key] = new $pagetype($page, $lesson);
+            $pages[$key] = new $pagetype($page, $opendsa_activity);
         }
 
         $orderedpages = array();
@@ -5292,15 +5292,15 @@ class lesson_page_type_manager {
      *
      * @param int $type The id for the page type
      * @param array $arguments Any arguments to pass to the mform
-     * @return lesson_add_page_form_base
+     * @return opendsa_activity_add_page_form_base
      */
     public function get_page_form($type, $arguments) {
-        $class = 'lesson_add_page_form_'.$this->get_page_type_idstring($type);
-        if (!class_exists($class) || get_parent_class($class)!=='lesson_add_page_form_base') {
+        $class = 'opendsa_activity_add_page_form_'.$this->get_page_type_idstring($type);
+        if (!class_exists($class) || get_parent_class($class)!=='opendsa_activity_add_page_form_base') {
             debugging('Lesson page type unknown class requested '.$class, DEBUG_DEVELOPER);
-            $class = 'lesson_add_page_form_selection';
-        } else if ($class === 'lesson_add_page_form_unknown') {
-            $class = 'lesson_add_page_form_selection';
+            $class = 'opendsa_activity_add_page_form_selection';
+        } else if ($class === 'opendsa_activity_add_page_form_unknown') {
+            $class = 'opendsa_activity_add_page_form_selection';
         }
         return new $class(null, $arguments);
     }

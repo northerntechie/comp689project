@@ -1,10 +1,10 @@
-@mod @mod_lesson
-Feature: A teacher can password protect a lesson
-  In order to avoid undesired accesses to lesson activities
+@mod @mod_opendsa_activity
+Feature: A teacher can password protect a opendsa_activity
+  In order to avoid undesired accesses to opendsa_activity activities
   As a teacher
-  I need to set a password to access the lesson
+  I need to set a password to access the opendsa_activity
 
-  Scenario: Accessing as student to a protected lesson
+  Scenario: Accessing as student to a protected opendsa_activity
     Given the following "users" exist:
       | username | firstname | lastname | email |
       | teacher1 | Teacher | 1 | teacher1@example.com |
@@ -19,11 +19,11 @@ Feature: A teacher can password protect a lesson
     And I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
     And I add a "Lesson" to section "1" and I fill the form with:
-      | Name | Test lesson |
-      | Description | Test lesson description |
-      | Password protected lesson | Yes |
+      | Name | Test opendsa_activity |
+      | Description | Test opendsa_activity description |
+      | Password protected opendsa_activity | Yes |
       | id_password | moodle_rules |
-    And I follow "Test lesson"
+    And I follow "Test opendsa_activity"
     And I follow "Add a content page"
     And I set the following fields to these values:
       | Page title | First page name |
@@ -33,13 +33,13 @@ Feature: A teacher can password protect a lesson
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    When I follow "Test lesson"
-    Then I should see "Test lesson is a password protected lesson"
+    When I follow "Test opendsa_activity"
+    Then I should see "Test opendsa_activity is a password protected opendsa_activity"
     And I should not see "First page contents"
     And I set the field "userpassword" to "moodle"
     And I press "Continue"
     And I should see "Login failed, please try again..."
-    And I should see "Test lesson is a password protected lesson"
+    And I should see "Test opendsa_activity is a password protected opendsa_activity"
     And I set the field "userpassword" to "moodle_rules"
     And I press "Continue"
     And I should see "First page contents"

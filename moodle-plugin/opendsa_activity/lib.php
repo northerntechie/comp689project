@@ -7,14 +7,14 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-// Modified for use in FALL2020 COMP689 Assigment 3 Project - 
-//   Todd Saharchuk, Jihan Chowdhury
+// Modified from opendsa_activity plugin for use in FALL2020 COMP689 Assigment 3 Project - 
+//   Todd Saharchuk, Chowdhury Sarker Jihan
 
 /**
- * Standard library of functions and constants for lesson
+ * Standard library of functions and constants for opendsa_activity
  *
  * @package mod_opendsa
- * @copyright  2020 onwards Todd Saharchuk
+ * @copyright  2020 onwards Public commons
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * 
  **/
@@ -22,8 +22,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 // Event types.
-define('LESSON_EVENT_TYPE_OPEN', 'open');
-define('LESSON_EVENT_TYPE_CLOSE', 'close');
+define('OPENDSA_ACTIVITY_EVENT_TYPE_OPEN', 'open');
+define('OPENDSA_ACTIVITY_EVENT_TYPE_CLOSE', 'close');
 
 /* Do not include any libraries here! */
 
@@ -35,27 +35,27 @@ define('LESSON_EVENT_TYPE_CLOSE', 'close');
  *
  * @global object
  * @global object
- * @param object $lesson Lesson post data from the form
+ * @param object $opendsa_activity opendsa_activity post data from the form
  * @return int
  **/
-function lesson_add_instance($data, $mform) {
+function opendsa_activity_add_instance($data, $mform) {
     global $DB;
 
     $cmid = $data->coursemodule;
     $draftitemid = $data->mediafile;
     $context = context_module::instance($cmid);
 
-    lesson_process_pre_save($data);
+    opendsa_activity_process_pre_save($data);
 
     unset($data->mediafile);
     $opendsa_activity_id = $DB->insert_record("opendsa_activity", $data);
     $data->id = $opendsa_activity_id;
 
-    lesson_update_media_file($opendsa_activity_id, $context, $draftitemid);
+    opendsa_activity_update_media_file($opendsa_activity_id, $context, $draftitemid);
 
-    lesson_process_post_save($data);
+    opendsa_activity_process_post_save($data);
 
-    lesson_grade_item_update($data);
+    opendsa_activity_grade_item_update($data);
 
     return $opendsa_activity_id;
 }
@@ -66,10 +66,10 @@ function lesson_add_instance($data, $mform) {
  * will update an existing instance with new data.
  *
  * @global object
- * @param object $lesson Lesson post data from the form
+ * @param object $opendsa_activity opendsa_activity post data from the form
  * @return boolean
  **/
-function lesson_update_instance($data, $mform) {
+function opendsa_activity_update_instance($data, $mform) {
     global $DB;
 
     $data->id = $data->instance;
@@ -77,42 +77,42 @@ function lesson_update_instance($data, $mform) {
     $draftitemid = $data->mediafile;
     $context = context_module::instance($cmid);
 
-    lesson_process_pre_save($data);
+    opendsa_activity_process_pre_save($data);
 
     unset($data->mediafile);
-    $DB->update_record("lesson", $data);
+    $DB->update_record("opendsa_activity", $data);
 
-    lesson_update_media_file($data->id, $context, $draftitemid);
+    opendsa_activity_update_media_file($data->id, $context, $draftitemid);
 
-    lesson_process_post_save($data);
+    opendsa_activity_process_post_save($data);
 
     // update grade item definition
-    lesson_grade_item_update($data);
+    opendsa_activity_grade_item_update($data);
 
     // update grades - TODO: do it only when grading style changes
-    lesson_update_grades($data, 0, false);
+    opendsa_activity_update_grades($data, 0, false);
 
     return true;
 }
 
 /**
- * This function updates the events associated to the lesson.
+ * This function updates the events associated to the opendsa_activity.
  * If $override is non-zero, then it updates only the events
  * associated with the specified override.
  *
- * @uses LESSON_MAX_EVENT_LENGTH
- * @param object $lesson the lesson object.
+ * @uses OPENDSA_ACTIVITY_MAX_EVENT_LENGTH
+ * @param object $opendsa_activity the opendsa_activity object.
  * @param object $override (optional) limit to a specific override
  */
-function lesson_update_events($lesson, $override = null) {
+function opendsa_activity_update_events($opendsa_activity, $override = null) {
     global $CFG, $DB;
 
-    require_once($CFG->dirroot . '/mod/lesson/locallib.php');
+    require_once($CFG->dirroot . '/mod/opendsa_activity/locallib.php');
     require_once($CFG->dirroot . '/calendar/lib.php');
 
-    // Load the old events relating to this lesson.
-    $conds = array('modulename' => 'lesson',
-                   'instance' => $lesson->id);
+    // Load the old events relating to this opendsa_activity.
+    $conds = array('modulename' => 'opendsa_activity',
+                   'instance' => $opendsa_activity->id);
     if (!empty($override)) {
         // Only load events for this override.
         if (isset($override->userid)) {
@@ -125,8 +125,8 @@ function lesson_update_events($lesson, $override = null) {
 
     // Now make a to-do list of all that needs to be updated.
     if (empty($override)) {
-        // We are updating the primary settings for the lesson, so we need to add all the overrides.
-        $overrides = $DB->get_records('lesson_overrides', array('opendsa_activity_id' => $lesson->id), 'id ASC');
+        // We are updating the primary settings for the opendsa_activity, so we need to add all the overrides.
+        $overrides = $DB->get_records('opendsa_activity_overrides', array('opendsa_activity_id' => $opendsa_activity->id), 'id ASC');
         // It is necessary to add an empty stdClass to the beginning of the array as the $oldevents
         // list contains the original (non-override) event for the module. If this is not included
         // the logic below will end up updating the wrong row when we try to reconcile this $overrides
@@ -138,52 +138,52 @@ function lesson_update_events($lesson, $override = null) {
     }
 
     // Get group override priorities.
-    $grouppriorities = lesson_get_group_override_priorities($lesson->id);
+    $grouppriorities = opendsa_activity_get_group_override_priorities($opendsa_activity->id);
 
     foreach ($overrides as $current) {
         $groupid   = isset($current->groupid) ? $current->groupid : 0;
         $userid    = isset($current->userid) ? $current->userid : 0;
-        $available  = isset($current->available) ? $current->available : $lesson->available;
-        $deadline = isset($current->deadline) ? $current->deadline : $lesson->deadline;
+        $available  = isset($current->available) ? $current->available : $opendsa_activity->available;
+        $deadline = isset($current->deadline) ? $current->deadline : $opendsa_activity->deadline;
 
-        // Only add open/close events for an override if they differ from the lesson default.
+        // Only add open/close events for an override if they differ from the opendsa_activity default.
         $addopen  = empty($current->id) || !empty($current->available);
         $addclose = empty($current->id) || !empty($current->deadline);
 
-        if (!empty($lesson->coursemodule)) {
-            $cmid = $lesson->coursemodule;
+        if (!empty($opendsa_activity->coursemodule)) {
+            $cmid = $opendsa_activity->coursemodule;
         } else {
-            $cmid = get_coursemodule_from_instance('lesson', $lesson->id, $lesson->course)->id;
+            $cmid = get_coursemodule_from_instance('opendsa_activity', $opendsa_activity->id, $opendsa_activity->course)->id;
         }
 
         $event = new stdClass();
         $event->type = !$deadline ? CALENDAR_EVENT_TYPE_ACTION : CALENDAR_EVENT_TYPE_STANDARD;
-        $event->description = format_module_intro('lesson', $lesson, $cmid, false);
+        $event->description = format_module_intro('opendsa_activity', $opendsa_activity, $cmid, false);
         $event->format = FORMAT_HTML;
         // Events module won't show user events when the courseid is nonzero.
-        $event->courseid    = ($userid) ? 0 : $lesson->course;
+        $event->courseid    = ($userid) ? 0 : $opendsa_activity->course;
         $event->groupid     = $groupid;
         $event->userid      = $userid;
-        $event->modulename  = 'lesson';
-        $event->instance    = $lesson->id;
+        $event->modulename  = 'opendsa_activity';
+        $event->instance    = $opendsa_activity->id;
         $event->timestart   = $available;
         $event->timeduration = max($deadline - $available, 0);
         $event->timesort    = $available;
-        $event->visible     = instance_is_visible('lesson', $lesson);
-        $event->eventtype   = LESSON_EVENT_TYPE_OPEN;
+        $event->visible     = instance_is_visible('opendsa_activity', $opendsa_activity);
+        $event->eventtype   = OPENDSA_ACTIVITY_EVENT_TYPE_OPEN;
         $event->priority    = null;
 
         // Determine the event name and priority.
         if ($groupid) {
             // Group override event.
             $params = new stdClass();
-            $params->lesson = $lesson->name;
+            $params->opendsa_activity = $opendsa_activity->name;
             $params->group = groups_get_group_name($groupid);
             if ($params->group === false) {
                 // Group doesn't exist, just skip it.
                 continue;
             }
-            $eventname = get_string('overridegroupeventname', 'lesson', $params);
+            $eventname = get_string('overridegroupeventname', 'opendsa_activity', $params);
             // Set group override priority.
             if ($grouppriorities !== null) {
                 $openpriorities = $grouppriorities['open'];
@@ -194,13 +194,13 @@ function lesson_update_events($lesson, $override = null) {
         } else if ($userid) {
             // User override event.
             $params = new stdClass();
-            $params->lesson = $lesson->name;
-            $eventname = get_string('overrideusereventname', 'lesson', $params);
+            $params->opendsa_activity = $opendsa_activity->name;
+            $eventname = get_string('overrideusereventname', 'opendsa_activity', $params);
             // Set user override priority.
             $event->priority = CALENDAR_EVENT_USER_OVERRIDE_PRIORITY;
         } else {
             // The parent event.
-            $eventname = $lesson->name;
+            $eventname = $opendsa_activity->name;
         }
 
         if ($addopen or $addclose) {
@@ -212,7 +212,7 @@ function lesson_update_events($lesson, $override = null) {
                 } else {
                     unset($event->id);
                 }
-                $event->name = get_string('lessoneventopens', 'lesson', $eventname);
+                $event->name = get_string('opendsa_activityeventopens', 'opendsa_activity', $eventname);
                 // The method calendar_event::create will reuse a db record if the id field is set.
                 calendar_event::create($event, false);
             }
@@ -223,10 +223,10 @@ function lesson_update_events($lesson, $override = null) {
                     unset($event->id);
                 }
                 $event->type      = CALENDAR_EVENT_TYPE_ACTION;
-                $event->name      = get_string('lessoneventcloses', 'lesson', $eventname);
+                $event->name      = get_string('opendsa_activityeventcloses', 'opendsa_activity', $eventname);
                 $event->timestart = $deadline;
                 $event->timesort  = $deadline;
-                $event->eventtype = LESSON_EVENT_TYPE_CLOSE;
+                $event->eventtype = OPENDSA_ACTIVITY_EVENT_TYPE_CLOSE;
                 if ($groupid && $grouppriorities !== null) {
                     $closepriorities = $grouppriorities['close'];
                     if (isset($closepriorities[$deadline])) {
@@ -246,18 +246,18 @@ function lesson_update_events($lesson, $override = null) {
 }
 
 /**
- * Calculates the priorities of timeopen and timeclose values for group overrides for a lesson.
+ * Calculates the priorities of timeopen and timeclose values for group overrides for a opendsa_activity.
  *
- * @param int $opendsa_activity_id The lesson ID.
+ * @param int $opendsa_activity_id The opendsa_activity ID.
  * @return array|null Array of group override priorities for open and close times. Null if there are no group overrides.
  */
-function lesson_get_group_override_priorities($opendsa_activity_id) {
+function opendsa_activity_get_group_override_priorities($opendsa_activity_id) {
     global $DB;
 
     // Fetch group overrides.
     $where = 'opendsa_activity_id = :opendsa_activity_id AND groupid IS NOT NULL';
     $params = ['opendsa_activity_id' => $opendsa_activity_id];
-    $overrides = $DB->get_records_select('lesson_overrides', $where, $params, '', 'id, groupid, available, deadline');
+    $overrides = $DB->get_records_select('opendsa_activity_overrides', $where, $params, '', 'id, groupid, available, deadline');
     if (!$overrides) {
         return null;
     }
@@ -300,39 +300,39 @@ function lesson_get_group_override_priorities($opendsa_activity_id) {
 /**
  * This standard function will check all instances of this module
  * and make sure there are up-to-date events created for each of them.
- * If courseid = 0, then every lesson event in the site is checked, else
- * only lesson events belonging to the course specified are checked.
+ * If courseid = 0, then every opendsa_activity event in the site is checked, else
+ * only opendsa_activity events belonging to the course specified are checked.
  * This function is used, in its new format, by restore_refresh_events()
  *
  * @param int $courseid
- * @param int|stdClass $instance Lesson module instance or ID.
+ * @param int|stdClass $instance opendsa_activity module instance or ID.
  * @param int|stdClass $cm Course module object or ID (not used in this module).
  * @return bool
  */
-function lesson_refresh_events($courseid = 0, $instance = null, $cm = null) {
+function opendsa_activity_refresh_events($courseid = 0, $instance = null, $cm = null) {
     global $DB;
 
     // If we have instance information then we can just update the one event instead of updating all events.
     if (isset($instance)) {
         if (!is_object($instance)) {
-            $instance = $DB->get_record('lesson', array('id' => $instance), '*', MUST_EXIST);
+            $instance = $DB->get_record('opendsa_activity', array('id' => $instance), '*', MUST_EXIST);
         }
-        lesson_update_events($instance);
+        opendsa_activity_update_events($instance);
         return true;
     }
 
     if ($courseid == 0) {
-        if (!$lessons = $DB->get_records('lesson')) {
+        if (!$opendsa_activitys = $DB->get_records('opendsa_activity')) {
             return true;
         }
     } else {
-        if (!$lessons = $DB->get_records('lesson', array('course' => $courseid))) {
+        if (!$opendsa_activitys = $DB->get_records('opendsa_activity', array('course' => $courseid))) {
             return true;
         }
     }
 
-    foreach ($lessons as $lesson) {
-        lesson_update_events($lesson);
+    foreach ($opendsa_activitys as $opendsa_activity) {
+        opendsa_activity_update_events($opendsa_activity);
     }
 
     return true;
@@ -347,13 +347,13 @@ function lesson_refresh_events($courseid = 0, $instance = null, $cm = null) {
  * @param int $id
  * @return bool
  */
-function lesson_delete_instance($id) {
+function opendsa_activity_delete_instance($id) {
     global $DB, $CFG;
-    require_once($CFG->dirroot . '/mod/lesson/locallib.php');
+    require_once($CFG->dirroot . '/mod/opendsa_activity/locallib.php');
 
-    $lesson = $DB->get_record("lesson", array("id"=>$id), '*', MUST_EXIST);
-    $lesson = new lesson($lesson);
-    return $lesson->delete();
+    $opendsa_activity = $DB->get_record("opendsa_activity", array("id"=>$id), '*', MUST_EXIST);
+    $opendsa_activity = new opendsa_activity($opendsa_activity);
+    return $opendsa_activity->delete();
 }
 
 /**
@@ -367,40 +367,40 @@ function lesson_delete_instance($id) {
  * @param object $course
  * @param object $user
  * @param object $mod
- * @param object $lesson
+ * @param object $opendsa_activity
  * @return object
  */
-function lesson_user_outline($course, $user, $mod, $lesson) {
+function opendsa_activity_user_outline($course, $user, $mod, $opendsa_activity) {
     global $CFG, $DB;
 
     require_once("$CFG->libdir/gradelib.php");
-    $grades = grade_get_grades($course->id, 'mod', 'lesson', $lesson->id, $user->id);
+    $grades = grade_get_grades($course->id, 'mod', 'opendsa_activity', $opendsa_activity->id, $user->id);
     $return = new stdClass();
 
     if (empty($grades->items[0]->grades)) {
-        $return->info = get_string("nolessonattempts", "lesson");
+        $return->info = get_string("noopendsa_activityattempts", "opendsa_activity");
     } else {
         $grade = reset($grades->items[0]->grades);
         if (empty($grade->grade)) {
 
             // Check to see if it an ungraded / incomplete attempt.
             $sql = "SELECT *
-                      FROM {lesson_timer}
+                      FROM {opendsa_activity_timer}
                      WHERE opendsa_activity_id = :opendsa_activity_id
                        AND userid = :userid
                   ORDER BY starttime DESC";
-            $params = array('opendsa_activity_id' => $lesson->id, 'userid' => $user->id);
+            $params = array('opendsa_activity_id' => $opendsa_activity->id, 'userid' => $user->id);
 
             if ($attempts = $DB->get_records_sql($sql, $params, 0, 1)) {
                 $attempt = reset($attempts);
                 if ($attempt->completed) {
-                    $return->info = get_string("completed", "lesson");
+                    $return->info = get_string("completed", "opendsa_activity");
                 } else {
-                    $return->info = get_string("notyetcompleted", "lesson");
+                    $return->info = get_string("notyetcompleted", "opendsa_activity");
                 }
-                $return->time = $attempt->lessontime;
+                $return->time = $attempt->opendsa_activitytime;
             } else {
-                $return->info = get_string("nolessonattempts", "lesson");
+                $return->info = get_string("noopendsa_activityattempts", "opendsa_activity");
             }
         } else {
             if (!$grade->hidden || has_capability('moodle/grade:viewhidden', context_course::instance($course->id))) {
@@ -423,38 +423,38 @@ function lesson_user_outline($course, $user, $mod, $lesson) {
  * @param object $course
  * @param object $user
  * @param object $mod
- * @param object $lesson
+ * @param object $opendsa_activity
  * @return bool
  */
-function lesson_user_complete($course, $user, $mod, $lesson) {
+function opendsa_activity_user_complete($course, $user, $mod, $opendsa_activity) {
     global $DB, $OUTPUT, $CFG;
 
     require_once("$CFG->libdir/gradelib.php");
 
-    $grades = grade_get_grades($course->id, 'mod', 'lesson', $lesson->id, $user->id);
+    $grades = grade_get_grades($course->id, 'mod', 'opendsa_activity', $opendsa_activity->id, $user->id);
 
     // Display the grade and feedback.
     if (empty($grades->items[0]->grades)) {
-        echo $OUTPUT->container(get_string("nolessonattempts", "lesson"));
+        echo $OUTPUT->container(get_string("noopendsa_activityattempts", "opendsa_activity"));
     } else {
         $grade = reset($grades->items[0]->grades);
         if (empty($grade->grade)) {
             // Check to see if it an ungraded / incomplete attempt.
             $sql = "SELECT *
-                      FROM {lesson_timer}
+                      FROM {opendsa_activity_timer}
                      WHERE opendsa_activity_id = :opendsa_activity_id
                        AND userid = :userid
                      ORDER by starttime desc";
-            $params = array('opendsa_activity_id' => $lesson->id, 'userid' => $user->id);
+            $params = array('opendsa_activity_id' => $opendsa_activity->id, 'userid' => $user->id);
 
             if ($attempt = $DB->get_record_sql($sql, $params, IGNORE_MULTIPLE)) {
                 if ($attempt->completed) {
-                    $status = get_string("completed", "lesson");
+                    $status = get_string("completed", "opendsa_activity");
                 } else {
-                    $status = get_string("notyetcompleted", "lesson");
+                    $status = get_string("notyetcompleted", "opendsa_activity");
                 }
             } else {
-                $status = get_string("nolessonattempts", "lesson");
+                $status = get_string("noopendsa_activityattempts", "opendsa_activity");
             }
         } else {
             if (!$grade->hidden || has_capability('moodle/grade:viewhidden', context_course::instance($course->id))) {
@@ -464,7 +464,7 @@ function lesson_user_complete($course, $user, $mod, $lesson) {
             }
         }
 
-        // Display the grade or lesson status if there isn't one.
+        // Display the grade or opendsa_activity status if there isn't one.
         echo $OUTPUT->container($status);
 
         if ($grade->str_feedback &&
@@ -473,19 +473,19 @@ function lesson_user_complete($course, $user, $mod, $lesson) {
         }
     }
 
-    // Display the lesson progress.
+    // Display the opendsa_activity progress.
     // Attempt, pages viewed, questions answered, correct answers, time.
-    $params = array ("opendsa_activity_id" => $lesson->id, "userid" => $user->id);
-    $attempts = $DB->get_records_select("lesson_attempts", "opendsa_activity_id = :opendsa_activity_id AND userid = :userid", $params, "retry, timeseen");
-    $branches = $DB->get_records_select("lesson_branch", "opendsa_activity_id = :opendsa_activity_id AND userid = :userid", $params, "retry, timeseen");
+    $params = array ("opendsa_activity_id" => $opendsa_activity->id, "userid" => $user->id);
+    $attempts = $DB->get_records_select("opendsa_activity_attempts", "opendsa_activity_id = :opendsa_activity_id AND userid = :userid", $params, "retry, timeseen");
+    $branches = $DB->get_records_select("opendsa_activity_branch", "opendsa_activity_id = :opendsa_activity_id AND userid = :userid", $params, "retry, timeseen");
     if (!empty($attempts) or !empty($branches)) {
         echo $OUTPUT->box_start();
         $table = new html_table();
         // Table Headings.
-        $table->head = array (get_string("attemptheader", "lesson"),
-            get_string("totalpagesviewedheader", "lesson"),
-            get_string("numberofpagesviewedheader", "lesson"),
-            get_string("numberofcorrectanswersheader", "lesson"),
+        $table->head = array (get_string("attemptheader", "opendsa_activity"),
+            get_string("totalpagesviewedheader", "opendsa_activity"),
+            get_string("numberofpagesviewedheader", "opendsa_activity"),
+            get_string("numberofcorrectanswersheader", "opendsa_activity"),
             get_string("time"));
         $table->width = "100%";
         $table->align = array ("center", "center", "center", "center", "center");
@@ -498,7 +498,7 @@ function lesson_user_complete($course, $user, $mod, $lesson) {
         $npages = 0;
         $ncorrect = 0;
 
-        // Filter question pages (from lesson_attempts).
+        // Filter question pages (from opendsa_activity_attempts).
         foreach ($attempts as $attempt) {
             if ($attempt->retry == $retry) {
                 $npages++;
@@ -520,7 +520,7 @@ function lesson_user_complete($course, $user, $mod, $lesson) {
             }
         }
 
-        // Filter content pages (from lesson_branch).
+        // Filter content pages (from opendsa_activity_branch).
         foreach ($branches as $branch) {
             if ($branch->retry == $retry) {
                 $npages++;
@@ -545,8 +545,8 @@ function lesson_user_complete($course, $user, $mod, $lesson) {
 /**
  * @deprecated since Moodle 3.3, when the block_course_overview block was removed.
  */
-function lesson_print_overview() {
-    throw new coding_exception('lesson_print_overview() can not be used any more and is obsolete.');
+function opendsa_activity_print_overview() {
+    throw new coding_exception('opendsa_activity_print_overview() can not be used any more and is obsolete.');
 }
 
 /**
@@ -556,7 +556,7 @@ function lesson_print_overview() {
  * @global stdClass
  * @return bool true
  */
-function lesson_cron () {
+function opendsa_activity_cron () {
     global $CFG;
 
     return true;
@@ -567,14 +567,14 @@ function lesson_cron () {
  *
  * @global stdClass
  * @global object
- * @param int $opendsa_activity_id id of lesson
+ * @param int $opendsa_activity_id id of opendsa_activity
  * @param int $userid optional user id, 0 means all users
  * @return array array of grades, false if none
  */
-function lesson_get_user_grades($lesson, $userid=0) {
+function opendsa_activity_get_user_grades($opendsa_activity, $userid=0) {
     global $CFG, $DB;
 
-    $params = array("opendsa_activity_id" => $lesson->id,"opendsa_activity_id2" => $lesson->id);
+    $params = array("opendsa_activity_id" => $opendsa_activity->id,"opendsa_activity_id2" => $opendsa_activity->id);
 
     if (!empty($userid)) {
         $params["userid"] = $userid;
@@ -587,16 +587,16 @@ function lesson_get_user_grades($lesson, $userid=0) {
         $fuser="";
     }
 
-    if ($lesson->retake) {
-        if ($lesson->usemaxgrade) {
+    if ($opendsa_activity->retake) {
+        if ($opendsa_activity->usemaxgrade) {
             $sql = "SELECT u.id, u.id AS userid, MAX(g.grade) AS rawgrade
-                      FROM {user} u, {lesson_grades} g
+                      FROM {user} u, {opendsa_activity_grades} g
                      WHERE u.id = g.userid AND g.opendsa_activity_id = :opendsa_activity_id
                            $user
                   GROUP BY u.id";
         } else {
             $sql = "SELECT u.id, u.id AS userid, AVG(g.grade) AS rawgrade
-                      FROM {user} u, {lesson_grades} g
+                      FROM {user} u, {opendsa_activity_grades} g
                      WHERE u.id = g.userid AND g.opendsa_activity_id = :opendsa_activity_id
                            $user
                   GROUP BY u.id";
@@ -604,15 +604,15 @@ function lesson_get_user_grades($lesson, $userid=0) {
         unset($params['opendsa_activity_id2']);
         unset($params['userid2']);
     } else {
-        // use only first attempts (with lowest id in lesson_grades table)
+        // use only first attempts (with lowest id in opendsa_activity_grades table)
         $firstonly = "SELECT uu.id AS userid, MIN(gg.id) AS firstcompleted
-                        FROM {user} uu, {lesson_grades} gg
+                        FROM {user} uu, {opendsa_activity_grades} gg
                        WHERE uu.id = gg.userid AND gg.opendsa_activity_id = :opendsa_activity_id2
                              $fuser
                        GROUP BY uu.id";
 
         $sql = "SELECT u.id, u.id AS userid, g.grade AS rawgrade
-                  FROM {user} u, {lesson_grades} g, ($firstonly) f
+                  FROM {user} u, {opendsa_activity_grades} g, ($firstonly) f
                  WHERE u.id = g.userid AND g.opendsa_activity_id = :opendsa_activity_id
                        AND g.id = f.firstcompleted AND g.userid=f.userid
                        $user";
@@ -625,60 +625,60 @@ function lesson_get_user_grades($lesson, $userid=0) {
  * Update grades in central gradebook
  *
  * @category grade
- * @param object $lesson
+ * @param object $opendsa_activity
  * @param int $userid specific user only, 0 means all
  * @param bool $nullifnone
  */
-function lesson_update_grades($lesson, $userid=0, $nullifnone=true) {
+function opendsa_activity_update_grades($opendsa_activity, $userid=0, $nullifnone=true) {
     global $CFG, $DB;
     require_once($CFG->libdir.'/gradelib.php');
 
-    if ($lesson->grade == 0 || $lesson->practice) {
-        lesson_grade_item_update($lesson);
+    if ($opendsa_activity->grade == 0 || $opendsa_activity->practice) {
+        opendsa_activity_grade_item_update($opendsa_activity);
 
-    } else if ($grades = lesson_get_user_grades($lesson, $userid)) {
-        lesson_grade_item_update($lesson, $grades);
+    } else if ($grades = opendsa_activity_get_user_grades($opendsa_activity, $userid)) {
+        opendsa_activity_grade_item_update($opendsa_activity, $grades);
 
     } else if ($userid and $nullifnone) {
         $grade = new stdClass();
         $grade->userid   = $userid;
         $grade->rawgrade = null;
-        lesson_grade_item_update($lesson, $grade);
+        opendsa_activity_grade_item_update($opendsa_activity, $grade);
 
     } else {
-        lesson_grade_item_update($lesson);
+        opendsa_activity_grade_item_update($opendsa_activity);
     }
 }
 
 /**
- * Create grade item for given lesson
+ * Create grade item for given opendsa_activity
  *
  * @category grade
  * @uses GRADE_TYPE_VALUE
  * @uses GRADE_TYPE_NONE
- * @param object $lesson object with extra cmidnumber
+ * @param object $opendsa_activity object with extra cmidnumber
  * @param array|object $grades optional array/object of grade(s); 'reset' means reset grades in gradebook
  * @return int 0 if ok, error code otherwise
  */
-function lesson_grade_item_update($lesson, $grades=null) {
+function opendsa_activity_grade_item_update($opendsa_activity, $grades=null) {
     global $CFG;
     if (!function_exists('grade_update')) { //workaround for buggy PHP versions
         require_once($CFG->libdir.'/gradelib.php');
     }
 
-    if (property_exists($lesson, 'cmidnumber')) { //it may not be always present
-        $params = array('itemname'=>$lesson->name, 'idnumber'=>$lesson->cmidnumber);
+    if (property_exists($opendsa_activity, 'cmidnumber')) { //it may not be always present
+        $params = array('itemname'=>$opendsa_activity->name, 'idnumber'=>$opendsa_activity->cmidnumber);
     } else {
-        $params = array('itemname'=>$lesson->name);
+        $params = array('itemname'=>$opendsa_activity->name);
     }
 
-    if (!$lesson->practice and $lesson->grade > 0) {
+    if (!$opendsa_activity->practice and $opendsa_activity->grade > 0) {
         $params['gradetype']  = GRADE_TYPE_VALUE;
-        $params['grademax']   = $lesson->grade;
+        $params['grademax']   = $opendsa_activity->grade;
         $params['grademin']   = 0;
-    } else if (!$lesson->practice and $lesson->grade < 0) {
+    } else if (!$opendsa_activity->practice and $opendsa_activity->grade < 0) {
         $params['gradetype']  = GRADE_TYPE_SCALE;
-        $params['scaleid']   = -$lesson->grade;
+        $params['scaleid']   = -$opendsa_activity->grade;
 
         // Make sure current grade fetched correctly from $grades
         $currentgrade = null;
@@ -692,7 +692,7 @@ function lesson_grade_item_update($lesson, $grades=null) {
 
         // When converting a score to a scale, use scale's grade maximum to calculate it.
         if (!empty($currentgrade) && $currentgrade->rawgrade !== null) {
-            $grade = grade_get_grades($lesson->course, 'mod', 'lesson', $lesson->id, $currentgrade->userid);
+            $grade = grade_get_grades($opendsa_activity->course, 'mod', 'opendsa_activity', $opendsa_activity->id, $currentgrade->userid);
             $params['grademax']   = reset($grade->items)->grademax;
         }
     } else {
@@ -723,7 +723,7 @@ function lesson_grade_item_update($lesson, $grades=null) {
         }
     }
 
-    return grade_update('mod/lesson', $lesson->course, 'mod', 'lesson', $lesson->id, 0, $grades, $params);
+    return grade_update('mod/opendsa_activity', $opendsa_activity->course, 'mod', 'opendsa_activity', $opendsa_activity->id, 0, $grades, $params);
 }
 
 /**
@@ -736,7 +736,7 @@ function lesson_grade_item_update($lesson, $grades=null) {
  *
  * @return array
  */
-function lesson_get_view_actions() {
+function opendsa_activity_get_view_actions() {
     return array('view','view all');
 }
 
@@ -750,92 +750,92 @@ function lesson_get_view_actions() {
  *
  * @return array
  */
-function lesson_get_post_actions() {
+function opendsa_activity_get_post_actions() {
     return array('end','start');
 }
 
 /**
  * Runs any processes that must run before
- * a lesson insert/update
+ * a opendsa_activity insert/update
  *
  * @global object
- * @param object $lesson Lesson form data
+ * @param object $opendsa_activity opendsa_activity form data
  * @return void
  **/
-function lesson_process_pre_save(&$lesson) {
+function opendsa_activity_process_pre_save(&$opendsa_activity) {
     global $DB;
 
-    $lesson->timemodified = time();
+    $opendsa_activity->timemodified = time();
 
-    if (empty($lesson->timelimit)) {
-        $lesson->timelimit = 0;
+    if (empty($opendsa_activity->timelimit)) {
+        $opendsa_activity->timelimit = 0;
     }
-    if (empty($lesson->timespent) or !is_numeric($lesson->timespent) or $lesson->timespent < 0) {
-        $lesson->timespent = 0;
+    if (empty($opendsa_activity->timespent) or !is_numeric($opendsa_activity->timespent) or $opendsa_activity->timespent < 0) {
+        $opendsa_activity->timespent = 0;
     }
-    if (!isset($lesson->completed)) {
-        $lesson->completed = 0;
+    if (!isset($opendsa_activity->completed)) {
+        $opendsa_activity->completed = 0;
     }
-    if (empty($lesson->gradebetterthan) or !is_numeric($lesson->gradebetterthan) or $lesson->gradebetterthan < 0) {
-        $lesson->gradebetterthan = 0;
-    } else if ($lesson->gradebetterthan > 100) {
-        $lesson->gradebetterthan = 100;
+    if (empty($opendsa_activity->gradebetterthan) or !is_numeric($opendsa_activity->gradebetterthan) or $opendsa_activity->gradebetterthan < 0) {
+        $opendsa_activity->gradebetterthan = 0;
+    } else if ($opendsa_activity->gradebetterthan > 100) {
+        $opendsa_activity->gradebetterthan = 100;
     }
 
-    if (empty($lesson->width)) {
-        $lesson->width = 640;
+    if (empty($opendsa_activity->width)) {
+        $opendsa_activity->width = 640;
     }
-    if (empty($lesson->height)) {
-        $lesson->height = 480;
+    if (empty($opendsa_activity->height)) {
+        $opendsa_activity->height = 480;
     }
-    if (empty($lesson->bgcolor)) {
-        $lesson->bgcolor = '#FFFFFF';
+    if (empty($opendsa_activity->bgcolor)) {
+        $opendsa_activity->bgcolor = '#FFFFFF';
     }
 
     // Conditions for dependency
     $conditions = new stdClass;
-    $conditions->timespent = $lesson->timespent;
-    $conditions->completed = $lesson->completed;
-    $conditions->gradebetterthan = $lesson->gradebetterthan;
-    $lesson->conditions = serialize($conditions);
-    unset($lesson->timespent);
-    unset($lesson->completed);
-    unset($lesson->gradebetterthan);
+    $conditions->timespent = $opendsa_activity->timespent;
+    $conditions->completed = $opendsa_activity->completed;
+    $conditions->gradebetterthan = $opendsa_activity->gradebetterthan;
+    $opendsa_activity->conditions = serialize($conditions);
+    unset($opendsa_activity->timespent);
+    unset($opendsa_activity->completed);
+    unset($opendsa_activity->gradebetterthan);
 
-    if (empty($lesson->password)) {
-        unset($lesson->password);
+    if (empty($opendsa_activity->password)) {
+        unset($opendsa_activity->password);
     }
 }
 
 /**
  * Runs any processes that must be run
- * after a lesson insert/update
+ * after a opendsa_activity insert/update
  *
  * @global object
- * @param object $lesson Lesson form data
+ * @param object $opendsa_activity opendsa_activity form data
  * @return void
  **/
-function lesson_process_post_save(&$lesson) {
-    // Update the events relating to this lesson.
-    lesson_update_events($lesson);
-    $completionexpected = (!empty($lesson->completionexpected)) ? $lesson->completionexpected : null;
-    \core_completion\api::update_completion_date_event($lesson->coursemodule, 'lesson', $lesson, $completionexpected);
+function opendsa_activity_process_post_save(&$opendsa_activity) {
+    // Update the events relating to this opendsa_activity.
+    opendsa_activity_update_events($opendsa_activity);
+    $completionexpected = (!empty($opendsa_activity->completionexpected)) ? $opendsa_activity->completionexpected : null;
+    \core_completion\api::update_completion_date_event($opendsa_activity->coursemodule, 'opendsa_activity', $opendsa_activity, $completionexpected);
 }
 
 
 /**
  * Implementation of the function for printing the form elements that control
- * whether the course reset functionality affects the lesson.
+ * whether the course reset functionality affects the opendsa_activity.
  *
  * @param $mform form passed by reference
  */
-function lesson_reset_course_form_definition(&$mform) {
-    $mform->addElement('header', 'lessonheader', get_string('modulenameplural', 'lesson'));
-    $mform->addElement('advcheckbox', 'reset_lesson', get_string('deleteallattempts','lesson'));
-    $mform->addElement('advcheckbox', 'reset_lesson_user_overrides',
-            get_string('removealluseroverrides', 'lesson'));
-    $mform->addElement('advcheckbox', 'reset_lesson_group_overrides',
-            get_string('removeallgroupoverrides', 'lesson'));
+function opendsa_activity_reset_course_form_definition(&$mform) {
+    $mform->addElement('header', 'opendsa_activityheader', get_string('modulenameplural', 'opendsa_activity'));
+    $mform->addElement('advcheckbox', 'reset_opendsa_activity', get_string('deleteallattempts','opendsa_activity'));
+    $mform->addElement('advcheckbox', 'reset_opendsa_activity_user_overrides',
+            get_string('removealluseroverrides', 'opendsa_activity'));
+    $mform->addElement('advcheckbox', 'reset_opendsa_activity_group_overrides',
+            get_string('removeallgroupoverrides', 'opendsa_activity'));
 }
 
 /**
@@ -843,10 +843,10 @@ function lesson_reset_course_form_definition(&$mform) {
  * @param object $course
  * @return array
  */
-function lesson_reset_course_form_defaults($course) {
-    return array('reset_lesson' => 1,
-            'reset_lesson_group_overrides' => 1,
-            'reset_lesson_user_overrides' => 1);
+function opendsa_activity_reset_course_form_defaults($course) {
+    return array('reset_opendsa_activity' => 1,
+            'reset_opendsa_activity_group_overrides' => 1,
+            'reset_opendsa_activity_user_overrides' => 1);
 }
 
 /**
@@ -857,101 +857,101 @@ function lesson_reset_course_form_defaults($course) {
  * @param int $courseid
  * @param string optional type
  */
-function lesson_reset_gradebook($courseid, $type='') {
+function opendsa_activity_reset_gradebook($courseid, $type='') {
     global $CFG, $DB;
 
     $sql = "SELECT l.*, cm.idnumber as cmidnumber, l.course as courseid
-              FROM {lesson} l, {course_modules} cm, {modules} m
-             WHERE m.name='lesson' AND m.id=cm.module AND cm.instance=l.id AND l.course=:course";
+              FROM {opendsa_activity} l, {course_modules} cm, {modules} m
+             WHERE m.name='opendsa_activity' AND m.id=cm.module AND cm.instance=l.id AND l.course=:course";
     $params = array ("course" => $courseid);
-    if ($lessons = $DB->get_records_sql($sql,$params)) {
-        foreach ($lessons as $lesson) {
-            lesson_grade_item_update($lesson, 'reset');
+    if ($opendsa_activitys = $DB->get_records_sql($sql,$params)) {
+        foreach ($opendsa_activitys as $opendsa_activity) {
+            opendsa_activity_grade_item_update($opendsa_activity, 'reset');
         }
     }
 }
 
 /**
  * Actual implementation of the reset course functionality, delete all the
- * lesson attempts for course $data->courseid.
+ * opendsa_activity attempts for course $data->courseid.
  *
  * @global stdClass
  * @global object
  * @param object $data the data submitted from the reset course.
  * @return array status array
  */
-function lesson_reset_userdata($data) {
+function opendsa_activity_reset_userdata($data) {
     global $CFG, $DB;
 
-    $componentstr = get_string('modulenameplural', 'lesson');
+    $componentstr = get_string('modulenameplural', 'opendsa_activity');
     $status = array();
 
-    if (!empty($data->reset_lesson)) {
-        $lessonssql = "SELECT l.id
-                         FROM {lesson} l
+    if (!empty($data->reset_opendsa_activity)) {
+        $opendsa_activityssql = "SELECT l.id
+                         FROM {opendsa_activity} l
                         WHERE l.course=:course";
 
         $params = array ("course" => $data->courseid);
-        $lessons = $DB->get_records_sql($lessonssql, $params);
+        $opendsa_activitys = $DB->get_records_sql($opendsa_activityssql, $params);
 
         // Get rid of attempts files.
         $fs = get_file_storage();
-        if ($lessons) {
-            foreach ($lessons as $opendsa_activity_id => $unused) {
-                if (!$cm = get_coursemodule_from_instance('lesson', $opendsa_activity_id)) {
+        if ($opendsa_activitys) {
+            foreach ($opendsa_activitys as $opendsa_activity_id => $unused) {
+                if (!$cm = get_coursemodule_from_instance('opendsa_activity', $opendsa_activity_id)) {
                     continue;
                 }
                 $context = context_module::instance($cm->id);
-                $fs->delete_area_files($context->id, 'mod_lesson', 'essay_responses');
-                $fs->delete_area_files($context->id, 'mod_lesson', 'essay_answers');
+                $fs->delete_area_files($context->id, 'mod_opendsa_activity', 'essay_responses');
+                $fs->delete_area_files($context->id, 'mod_opendsa_activity', 'essay_answers');
             }
         }
 
-        $DB->delete_records_select('lesson_timer', "opendsa_activity_id IN ($lessonssql)", $params);
-        $DB->delete_records_select('lesson_grades', "opendsa_activity_id IN ($lessonssql)", $params);
-        $DB->delete_records_select('lesson_attempts', "opendsa_activity_id IN ($lessonssql)", $params);
-        $DB->delete_records_select('lesson_branch', "opendsa_activity_id IN ($lessonssql)", $params);
+        $DB->delete_records_select('opendsa_activity_timer', "opendsa_activity_id IN ($opendsa_activityssql)", $params);
+        $DB->delete_records_select('opendsa_activity_grades', "opendsa_activity_id IN ($opendsa_activityssql)", $params);
+        $DB->delete_records_select('opendsa_activity_attempts', "opendsa_activity_id IN ($opendsa_activityssql)", $params);
+        $DB->delete_records_select('opendsa_activity_branch', "opendsa_activity_id IN ($opendsa_activityssql)", $params);
 
         // remove all grades from gradebook
         if (empty($data->reset_gradebook_grades)) {
-            lesson_reset_gradebook($data->courseid);
+            opendsa_activity_reset_gradebook($data->courseid);
         }
 
-        $status[] = array('component'=>$componentstr, 'item'=>get_string('deleteallattempts', 'lesson'), 'error'=>false);
+        $status[] = array('component'=>$componentstr, 'item'=>get_string('deleteallattempts', 'opendsa_activity'), 'error'=>false);
     }
 
     // Remove user overrides.
-    if (!empty($data->reset_lesson_user_overrides)) {
-        $DB->delete_records_select('lesson_overrides',
-                'opendsa_activity_id IN (SELECT id FROM {lesson} WHERE course = ?) AND userid IS NOT NULL', array($data->courseid));
+    if (!empty($data->reset_opendsa_activity_user_overrides)) {
+        $DB->delete_records_select('opendsa_activity_overrides',
+                'opendsa_activity_id IN (SELECT id FROM {opendsa_activity} WHERE course = ?) AND userid IS NOT NULL', array($data->courseid));
         $status[] = array(
         'component' => $componentstr,
-        'item' => get_string('useroverridesdeleted', 'lesson'),
+        'item' => get_string('useroverridesdeleted', 'opendsa_activity'),
         'error' => false);
     }
     // Remove group overrides.
-    if (!empty($data->reset_lesson_group_overrides)) {
-        $DB->delete_records_select('lesson_overrides',
-        'opendsa_activity_id IN (SELECT id FROM {lesson} WHERE course = ?) AND groupid IS NOT NULL', array($data->courseid));
+    if (!empty($data->reset_opendsa_activity_group_overrides)) {
+        $DB->delete_records_select('opendsa_activity_overrides',
+        'opendsa_activity_id IN (SELECT id FROM {opendsa_activity} WHERE course = ?) AND groupid IS NOT NULL', array($data->courseid));
         $status[] = array(
         'component' => $componentstr,
-        'item' => get_string('groupoverridesdeleted', 'lesson'),
+        'item' => get_string('groupoverridesdeleted', 'opendsa_activity'),
         'error' => false);
     }
     /// updating dates - shift may be negative too
     if ($data->timeshift) {
-        $DB->execute("UPDATE {lesson_overrides}
+        $DB->execute("UPDATE {opendsa_activity_overrides}
                          SET available = available + ?
-                       WHERE opendsa_activity_id IN (SELECT id FROM {lesson} WHERE course = ?)
+                       WHERE opendsa_activity_id IN (SELECT id FROM {opendsa_activity} WHERE course = ?)
                          AND available <> 0", array($data->timeshift, $data->courseid));
-        $DB->execute("UPDATE {lesson_overrides}
+        $DB->execute("UPDATE {opendsa_activity_overrides}
                          SET deadline = deadline + ?
-                       WHERE opendsa_activity_id IN (SELECT id FROM {lesson} WHERE course = ?)
+                       WHERE opendsa_activity_id IN (SELECT id FROM {opendsa_activity} WHERE course = ?)
                          AND deadline <> 0", array($data->timeshift, $data->courseid));
 
         // Any changes to the list of dates that needs to be rolled should be same during course restore and course reset.
         // See MDL-9367.
-        shift_course_mod_dates('lesson', array('available', 'deadline'), $data->timeshift, $data->courseid);
+        shift_course_mod_dates('opendsa_activity', array('available', 'deadline'), $data->timeshift, $data->courseid);
         $status[] = array('component'=>$componentstr, 'item'=>get_string('datechanged'), 'error'=>false);
     }
 
@@ -968,7 +968,7 @@ function lesson_reset_userdata($data) {
  * @param string $feature FEATURE_xx constant for requested feature
  * @return mixed True if module supports feature, false if not, null if doesn't know
  */
-function lesson_supports($feature) {
+function opendsa_activity_supports($feature) {
     switch($feature) {
         case FEATURE_GROUPS:
             return true;
@@ -994,8 +994,8 @@ function lesson_supports($feature) {
 }
 
 /**
- * Obtains the automatic completion state for this lesson based on any conditions
- * in lesson settings.
+ * Obtains the automatic completion state for this opendsa_activity based on any conditions
+ * in opendsa_activity settings.
  *
  * @param object $course Course
  * @param object $cm course-module
@@ -1003,38 +1003,38 @@ function lesson_supports($feature) {
  * @param bool $type Type of comparison (or/and; can be used as return value if no conditions)
  * @return bool True if completed, false if not, $type if conditions not set.
  */
-function lesson_get_completion_state($course, $cm, $userid, $type) {
+function opendsa_activity_get_completion_state($course, $cm, $userid, $type) {
     global $CFG, $DB;
 
-    // Get lesson details.
-    $lesson = $DB->get_record('lesson', array('id' => $cm->instance), '*',
+    // Get opendsa_activity details.
+    $opendsa_activity = $DB->get_record('opendsa_activity', array('id' => $cm->instance), '*',
             MUST_EXIST);
 
     $result = $type; // Default return value.
     // If completion option is enabled, evaluate it and return true/false.
-    if ($lesson->completionendreached) {
-        $value = $DB->record_exists('lesson_timer', array(
-                'opendsa_activity_id' => $lesson->id, 'userid' => $userid, 'completed' => 1));
+    if ($opendsa_activity->completionendreached) {
+        $value = $DB->record_exists('opendsa_activity_timer', array(
+                'opendsa_activity_id' => $opendsa_activity->id, 'userid' => $userid, 'completed' => 1));
         if ($type == COMPLETION_AND) {
             $result = $result && $value;
         } else {
             $result = $result || $value;
         }
     }
-    if ($lesson->completiontimespent != 0) {
+    if ($opendsa_activity->completiontimespent != 0) {
         $duration = $DB->get_field_sql(
-                        "SELECT SUM(lessontime - starttime)
-                               FROM {lesson_timer}
+                        "SELECT SUM(opendsa_activitytime - starttime)
+                               FROM {opendsa_activity_timer}
                               WHERE opendsa_activity_id = :opendsa_activity_id
                                 AND userid = :userid",
-                        array('userid' => $userid, 'opendsa_activity_id' => $lesson->id));
+                        array('userid' => $userid, 'opendsa_activity_id' => $opendsa_activity->id));
         if (!$duration) {
             $duration = 0;
         }
         if ($type == COMPLETION_AND) {
-            $result = $result && ($lesson->completiontimespent < $duration);
+            $result = $result && ($opendsa_activity->completiontimespent < $duration);
         } else {
-            $result = $result || ($lesson->completiontimespent < $duration);
+            $result = $result || ($opendsa_activity->completiontimespent < $duration);
         }
     }
     return $result;
@@ -1046,14 +1046,14 @@ function lesson_get_completion_state($course, $cm, $userid, $type) {
  * context when this is called
  *
  * @param settings_navigation $settings
- * @param navigation_node $lessonnode
+ * @param navigation_node $opendsa_activitynode
  */
-function lesson_extend_settings_navigation($settings, $lessonnode) {
+function opendsa_activity_extend_settings_navigation($settings, $opendsa_activitynode) {
     global $PAGE, $DB;
 
     // We want to add these new nodes after the Edit settings node, and before the
     // Locally assigned roles node. Of course, both of those are controlled by capabilities.
-    $keys = $lessonnode->get_children_key_list();
+    $keys = $opendsa_activitynode->get_children_key_list();
     $beforekey = null;
     $i = array_search('modedit', $keys);
     if ($i === false and array_key_exists(0, $keys)) {
@@ -1062,40 +1062,40 @@ function lesson_extend_settings_navigation($settings, $lessonnode) {
         $beforekey = $keys[$i + 1];
     }
 
-    if (has_capability('mod/lesson:manageoverrides', $PAGE->cm->context)) {
-        $url = new moodle_url('/mod/lesson/overrides.php', array('cmid' => $PAGE->cm->id));
-        $node = navigation_node::create(get_string('groupoverrides', 'lesson'),
+    if (has_capability('mod/opendsa_activity:manageoverrides', $PAGE->cm->context)) {
+        $url = new moodle_url('/mod/opendsa_activity/overrides.php', array('cmid' => $PAGE->cm->id));
+        $node = navigation_node::create(get_string('groupoverrides', 'opendsa_activity'),
                 new moodle_url($url, array('mode' => 'group')),
-                navigation_node::TYPE_SETTING, null, 'mod_lesson_groupoverrides');
-        $lessonnode->add_node($node, $beforekey);
+                navigation_node::TYPE_SETTING, null, 'mod_opendsa_activity_groupoverrides');
+        $opendsa_activitynode->add_node($node, $beforekey);
 
-        $node = navigation_node::create(get_string('useroverrides', 'lesson'),
+        $node = navigation_node::create(get_string('useroverrides', 'opendsa_activity'),
                 new moodle_url($url, array('mode' => 'user')),
-                navigation_node::TYPE_SETTING, null, 'mod_lesson_useroverrides');
-        $lessonnode->add_node($node, $beforekey);
+                navigation_node::TYPE_SETTING, null, 'mod_opendsa_activity_useroverrides');
+        $opendsa_activitynode->add_node($node, $beforekey);
     }
 
-    if (has_capability('mod/lesson:edit', $PAGE->cm->context)) {
-        $url = new moodle_url('/mod/lesson/view.php', array('id' => $PAGE->cm->id));
-        $lessonnode->add(get_string('preview', 'lesson'), $url);
-        $editnode = $lessonnode->add(get_string('edit', 'lesson'));
-        $url = new moodle_url('/mod/lesson/edit.php', array('id' => $PAGE->cm->id, 'mode' => 'collapsed'));
-        $editnode->add(get_string('collapsed', 'lesson'), $url);
-        $url = new moodle_url('/mod/lesson/edit.php', array('id' => $PAGE->cm->id, 'mode' => 'full'));
-        $editnode->add(get_string('full', 'lesson'), $url);
+    if (has_capability('mod/opendsa_activity:edit', $PAGE->cm->context)) {
+        $url = new moodle_url('/mod/opendsa_activity/view.php', array('id' => $PAGE->cm->id));
+        $opendsa_activitynode->add(get_string('preview', 'opendsa_activity'), $url);
+        $editnode = $opendsa_activitynode->add(get_string('edit', 'opendsa_activity'));
+        $url = new moodle_url('/mod/opendsa_activity/edit.php', array('id' => $PAGE->cm->id, 'mode' => 'collapsed'));
+        $editnode->add(get_string('collapsed', 'opendsa_activity'), $url);
+        $url = new moodle_url('/mod/opendsa_activity/edit.php', array('id' => $PAGE->cm->id, 'mode' => 'full'));
+        $editnode->add(get_string('full', 'opendsa_activity'), $url);
     }
 
-    if (has_capability('mod/lesson:viewreports', $PAGE->cm->context)) {
-        $reportsnode = $lessonnode->add(get_string('reports', 'lesson'));
-        $url = new moodle_url('/mod/lesson/report.php', array('id'=>$PAGE->cm->id, 'action'=>'reportoverview'));
-        $reportsnode->add(get_string('overview', 'lesson'), $url);
-        $url = new moodle_url('/mod/lesson/report.php', array('id'=>$PAGE->cm->id, 'action'=>'reportdetail'));
-        $reportsnode->add(get_string('detailedstats', 'lesson'), $url);
+    if (has_capability('mod/opendsa_activity:viewreports', $PAGE->cm->context)) {
+        $reportsnode = $opendsa_activitynode->add(get_string('reports', 'opendsa_activity'));
+        $url = new moodle_url('/mod/opendsa_activity/report.php', array('id'=>$PAGE->cm->id, 'action'=>'reportoverview'));
+        $reportsnode->add(get_string('overview', 'opendsa_activity'), $url);
+        $url = new moodle_url('/mod/opendsa_activity/report.php', array('id'=>$PAGE->cm->id, 'action'=>'reportdetail'));
+        $reportsnode->add(get_string('detailedstats', 'opendsa_activity'), $url);
     }
 
-    if (has_capability('mod/lesson:grade', $PAGE->cm->context)) {
-        $url = new moodle_url('/mod/lesson/essay.php', array('id'=>$PAGE->cm->id));
-        $lessonnode->add(get_string('manualgrading', 'lesson'), $url);
+    if (has_capability('mod/opendsa_activity:grade', $PAGE->cm->context)) {
+        $url = new moodle_url('/mod/opendsa_activity/essay.php', array('id'=>$PAGE->cm->id));
+        $opendsa_activitynode->add(get_string('manualgrading', 'opendsa_activity'), $url);
     }
 
 }
@@ -1108,7 +1108,7 @@ function lesson_extend_settings_navigation($settings, $lessonnode) {
  * @param string $type 'import' if import list, otherwise export list assumed
  * @return array sorted list of import/export formats available
  */
-function lesson_get_import_export_formats($type) {
+function opendsa_activity_get_import_export_formats($type) {
     global $CFG;
     $fileformats = core_component::get_plugin_list("qformat");
 
@@ -1137,9 +1137,9 @@ function lesson_get_import_export_formats($type) {
 }
 
 /**
- * Serves the lesson attachments. Implements needed access control ;-)
+ * Serves the opendsa_activity attachments. Implements needed access control ;-)
  *
- * @package mod_lesson
+ * @package mod_opendsa_activity
  * @category files
  * @param stdClass $course course object
  * @param stdClass $cm course module object
@@ -1150,19 +1150,19 @@ function lesson_get_import_export_formats($type) {
  * @param array $options additional options affecting the file serving
  * @return bool false if file not found, does not return if found - justsend the file
  */
-function lesson_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options=array()) {
+function opendsa_activity_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options=array()) {
     global $CFG, $DB;
 
     if ($context->contextlevel != CONTEXT_MODULE) {
         return false;
     }
 
-    $fileareas = lesson_get_file_areas();
+    $fileareas = opendsa_activity_get_file_areas();
     if (!array_key_exists($filearea, $fileareas)) {
         return false;
     }
 
-    if (!$lesson = $DB->get_record('lesson', array('id'=>$cm->instance))) {
+    if (!$opendsa_activity = $DB->get_record('opendsa_activity', array('id'=>$cm->instance))) {
         return false;
     }
 
@@ -1170,24 +1170,24 @@ function lesson_pluginfile($course, $cm, $context, $filearea, $args, $forcedownl
 
     if ($filearea === 'page_contents') {
         $pageid = (int)array_shift($args);
-        if (!$page = $DB->get_record('lesson_pages', array('id'=>$pageid))) {
+        if (!$page = $DB->get_record('opendsa_activity_pages', array('id'=>$pageid))) {
             return false;
         }
-        $fullpath = "/$context->id/mod_lesson/$filearea/$pageid/".implode('/', $args);
+        $fullpath = "/$context->id/mod_opendsa_activity/$filearea/$pageid/".implode('/', $args);
 
     } else if ($filearea === 'page_answers' || $filearea === 'page_responses') {
         $itemid = (int)array_shift($args);
-        if (!$pageanswers = $DB->get_record('lesson_answers', array('id' => $itemid))) {
+        if (!$pageanswers = $DB->get_record('opendsa_activity_answers', array('id' => $itemid))) {
             return false;
         }
-        $fullpath = "/$context->id/mod_lesson/$filearea/$itemid/".implode('/', $args);
+        $fullpath = "/$context->id/mod_opendsa_activity/$filearea/$itemid/".implode('/', $args);
 
     } else if ($filearea === 'essay_responses' || $filearea === 'essay_answers') {
         $itemid = (int)array_shift($args);
-        if (!$attempt = $DB->get_record('lesson_attempts', array('id' => $itemid))) {
+        if (!$attempt = $DB->get_record('opendsa_activity_attempts', array('id' => $itemid))) {
             return false;
         }
-        $fullpath = "/$context->id/mod_lesson/$filearea/$itemid/".implode('/', $args);
+        $fullpath = "/$context->id/mod_opendsa_activity/$filearea/$itemid/".implode('/', $args);
 
     } else if ($filearea === 'mediafile') {
         if (count($args) > 1) {
@@ -1195,7 +1195,7 @@ function lesson_pluginfile($course, $cm, $context, $filearea, $args, $forcedownl
             // then it is surely the file name. The itemid is sometimes used to prevent browser caching.
             array_shift($args);
         }
-        $fullpath = "/$context->id/mod_lesson/$filearea/0/".implode('/', $args);
+        $fullpath = "/$context->id/mod_opendsa_activity/$filearea/0/".implode('/', $args);
 
     } else {
         return false;
@@ -1213,25 +1213,25 @@ function lesson_pluginfile($course, $cm, $context, $filearea, $args, $forcedownl
 /**
  * Returns an array of file areas
  *
- * @package  mod_lesson
+ * @package  mod_opendsa_activity
  * @category files
  * @return array a list of available file areas
  */
-function lesson_get_file_areas() {
+function opendsa_activity_get_file_areas() {
     $areas = array();
-    $areas['page_contents'] = get_string('pagecontents', 'mod_lesson');
-    $areas['mediafile'] = get_string('mediafile', 'mod_lesson');
-    $areas['page_answers'] = get_string('pageanswers', 'mod_lesson');
-    $areas['page_responses'] = get_string('pageresponses', 'mod_lesson');
-    $areas['essay_responses'] = get_string('essayresponses', 'mod_lesson');
-    $areas['essay_answers'] = get_string('essayresponses', 'mod_lesson');
+    $areas['page_contents'] = get_string('pagecontents', 'mod_opendsa_activity');
+    $areas['mediafile'] = get_string('mediafile', 'mod_opendsa_activity');
+    $areas['page_answers'] = get_string('pageanswers', 'mod_opendsa_activity');
+    $areas['page_responses'] = get_string('pageresponses', 'mod_opendsa_activity');
+    $areas['essay_responses'] = get_string('essayresponses', 'mod_opendsa_activity');
+    $areas['essay_answers'] = get_string('essayresponses', 'mod_opendsa_activity');
     return $areas;
 }
 
 /**
  * Returns a file_info_stored object for the file being requested here
  *
- * @package  mod_lesson
+ * @package  mod_opendsa_activity
  * @category files
  * @global stdClass $CFG
  * @param file_browse $browser file browser instance
@@ -1245,7 +1245,7 @@ function lesson_get_file_areas() {
  * @param string $filename file name
  * @return file_info_stored
  */
-function lesson_get_file_info($browser, $areas, $course, $cm, $context, $filearea, $itemid, $filepath, $filename) {
+function opendsa_activity_get_file_info($browser, $areas, $course, $cm, $context, $filearea, $itemid, $filepath, $filename) {
     global $CFG, $DB;
 
     if (!has_capability('moodle/course:managefiles', $context)) {
@@ -1260,22 +1260,22 @@ function lesson_get_file_info($browser, $areas, $course, $cm, $context, $fileare
     }
 
     if (is_null($itemid)) {
-        return new mod_lesson_file_info($browser, $course, $cm, $context, $areas, $filearea);
+        return new mod_opendsa_activity_file_info($browser, $course, $cm, $context, $areas, $filearea);
     }
 
     $fs = get_file_storage();
     $filepath = is_null($filepath) ? '/' : $filepath;
     $filename = is_null($filename) ? '.' : $filename;
-    if (!$storedfile = $fs->get_file($context->id, 'mod_lesson', $filearea, $itemid, $filepath, $filename)) {
+    if (!$storedfile = $fs->get_file($context->id, 'mod_opendsa_activity', $filearea, $itemid, $filepath, $filename)) {
         return null;
     }
 
     $itemname = $filearea;
     if ($filearea == 'page_contents') {
-        $itemname = $DB->get_field('lesson_pages', 'title', array('opendsa_activity_id' => $cm->instance, 'id' => $itemid));
+        $itemname = $DB->get_field('opendsa_activity_pages', 'title', array('opendsa_activity_id' => $cm->instance, 'id' => $itemid));
         $itemname = format_string($itemname, true, array('context' => $context));
     } else {
-        $areas = lesson_get_file_areas();
+        $areas = opendsa_activity_get_file_areas();
         if (isset($areas[$filearea])) {
             $itemname = $areas[$filearea];
         }
@@ -1292,50 +1292,50 @@ function lesson_get_file_info($browser, $areas, $course, $cm, $context, $fileare
  * @param stdClass $parentcontext Block's parent context
  * @param stdClass $currentcontext Current context of block
  */
-function lesson_page_type_list($pagetype, $parentcontext, $currentcontext) {
+function opendsa_activity_page_type_list($pagetype, $parentcontext, $currentcontext) {
     $module_pagetype = array(
-        'mod-lesson-*'=>get_string('page-mod-lesson-x', 'lesson'),
-        'mod-lesson-view'=>get_string('page-mod-lesson-view', 'lesson'),
-        'mod-lesson-edit'=>get_string('page-mod-lesson-edit', 'lesson'));
+        'mod-opendsa_activity-*'=>get_string('page-mod-opendsa_activity-x', 'opendsa_activity'),
+        'mod-opendsa_activity-view'=>get_string('page-mod-opendsa_activity-view', 'opendsa_activity'),
+        'mod-opendsa_activity-edit'=>get_string('page-mod-opendsa_activity-edit', 'opendsa_activity'));
     return $module_pagetype;
 }
 
 /**
- * Update the lesson activity to include any file
+ * Update the opendsa_activity activity to include any file
  * that was uploaded, or if there is none, set the
  * mediafile field to blank.
  *
- * @param int $opendsa_activity_id the lesson id
+ * @param int $opendsa_activity_id the opendsa_activity id
  * @param stdClass $context the context
  * @param int $draftitemid the draft item
  */
-function lesson_update_media_file($opendsa_activity_id, $context, $draftitemid) {
+function opendsa_activity_update_media_file($opendsa_activity_id, $context, $draftitemid) {
     global $DB;
 
     // Set the filestorage object.
     $fs = get_file_storage();
     // Save the file if it exists that is currently in the draft area.
-    file_save_draft_area_files($draftitemid, $context->id, 'mod_lesson', 'mediafile', 0);
+    file_save_draft_area_files($draftitemid, $context->id, 'mod_opendsa_activity', 'mediafile', 0);
     // Get the file if it exists.
-    $files = $fs->get_area_files($context->id, 'mod_lesson', 'mediafile', 0, 'itemid, filepath, filename', false);
+    $files = $fs->get_area_files($context->id, 'mod_opendsa_activity', 'mediafile', 0, 'itemid, filepath, filename', false);
     // Check that there is a file to process.
     if (count($files) == 1) {
         // Get the first (and only) file.
         $file = reset($files);
-        // Set the mediafile column in the lessons table.
-        $DB->set_field('lesson', 'mediafile', '/' . $file->get_filename(), array('id' => $opendsa_activity_id));
+        // Set the mediafile column in the opendsa_activitys table.
+        $DB->set_field('opendsa_activity', 'mediafile', '/' . $file->get_filename(), array('id' => $opendsa_activity_id));
     } else {
-        // Set the mediafile column in the lessons table.
-        $DB->set_field('lesson', 'mediafile', '', array('id' => $opendsa_activity_id));
+        // Set the mediafile column in the opendsa_activitys table.
+        $DB->set_field('opendsa_activity', 'mediafile', '', array('id' => $opendsa_activity_id));
     }
 }
 
 /**
  * Get icon mapping for font-awesome.
  */
-function mod_lesson_get_fontawesome_icon_map() {
+function mod_opendsa_activity_get_fontawesome_icon_map() {
     return [
-        'mod_lesson:e/copy' => 'fa-clone',
+        'mod_opendsa_activity:e/copy' => 'fa-clone',
     ];
 }
 
@@ -1348,23 +1348,23 @@ function mod_lesson_get_fontawesome_icon_map() {
  * @return stdClass an object with the different type of areas indicating if they were updated or not
  * @since Moodle 3.3
  */
-function lesson_check_updates_since(cm_info $cm, $from, $filter = array()) {
+function opendsa_activity_check_updates_since(cm_info $cm, $from, $filter = array()) {
     global $DB, $USER;
 
     $updates = course_check_module_updates_since($cm, $from, array(), $filter);
 
-    // Check if there are new pages or answers in the lesson.
+    // Check if there are new pages or answers in the opendsa_activity.
     $updates->pages = (object) array('updated' => false);
     $updates->answers = (object) array('updated' => false);
     $select = 'opendsa_activity_id = ? AND (timecreated > ? OR timemodified > ?)';
     $params = array($cm->instance, $from, $from);
 
-    $pages = $DB->get_records_select('lesson_pages', $select, $params, '', 'id');
+    $pages = $DB->get_records_select('opendsa_activity_pages', $select, $params, '', 'id');
     if (!empty($pages)) {
         $updates->pages->updated = true;
         $updates->pages->itemids = array_keys($pages);
     }
-    $answers = $DB->get_records_select('lesson_answers', $select, $params, '', 'id');
+    $answers = $DB->get_records_select('opendsa_activity_answers', $select, $params, '', 'id');
     if (!empty($answers)) {
         $updates->answers->updated = true;
         $updates->answers->itemids = array_keys($answers);
@@ -1379,34 +1379,34 @@ function lesson_check_updates_since(cm_info $cm, $from, $filter = array()) {
     $select = 'opendsa_activity_id = ? AND userid = ? AND timeseen > ?';
     $params = array($cm->instance, $USER->id, $from);
 
-    $questionattempts = $DB->get_records_select('lesson_attempts', $select, $params, '', 'id');
+    $questionattempts = $DB->get_records_select('opendsa_activity_attempts', $select, $params, '', 'id');
     if (!empty($questionattempts)) {
         $updates->questionattempts->updated = true;
         $updates->questionattempts->itemids = array_keys($questionattempts);
     }
-    $pagesviewed = $DB->get_records_select('lesson_branch', $select, $params, '', 'id');
+    $pagesviewed = $DB->get_records_select('opendsa_activity_branch', $select, $params, '', 'id');
     if (!empty($pagesviewed)) {
         $updates->pagesviewed->updated = true;
         $updates->pagesviewed->itemids = array_keys($pagesviewed);
     }
 
     $select = 'opendsa_activity_id = ? AND userid = ? AND completed > ?';
-    $grades = $DB->get_records_select('lesson_grades', $select, $params, '', 'id');
+    $grades = $DB->get_records_select('opendsa_activity_grades', $select, $params, '', 'id');
     if (!empty($grades)) {
         $updates->grades->updated = true;
         $updates->grades->itemids = array_keys($grades);
     }
 
-    $select = 'opendsa_activity_id = ? AND userid = ? AND (starttime > ? OR lessontime > ? OR timemodifiedoffline > ?)';
+    $select = 'opendsa_activity_id = ? AND userid = ? AND (starttime > ? OR opendsa_activitytime > ? OR timemodifiedoffline > ?)';
     $params = array($cm->instance, $USER->id, $from, $from, $from);
-    $timers = $DB->get_records_select('lesson_timer', $select, $params, '', 'id');
+    $timers = $DB->get_records_select('opendsa_activity_timer', $select, $params, '', 'id');
     if (!empty($timers)) {
         $updates->timers->updated = true;
         $updates->timers->itemids = array_keys($timers);
     }
 
     // Now, teachers should see other students updates.
-    if (has_capability('mod/lesson:viewreports', $cm->context)) {
+    if (has_capability('mod/opendsa_activity:viewreports', $cm->context)) {
         $select = 'opendsa_activity_id = ? AND timeseen > ?';
         $params = array($cm->instance, $from);
 
@@ -1427,12 +1427,12 @@ function lesson_check_updates_since(cm_info $cm, $from, $filter = array()) {
         $updates->userpagesviewed = (object) array('updated' => false);
         $updates->usertimers = (object) array('updated' => false);
 
-        $questionattempts = $DB->get_records_select('lesson_attempts', $select, $params, '', 'id');
+        $questionattempts = $DB->get_records_select('opendsa_activity_attempts', $select, $params, '', 'id');
         if (!empty($questionattempts)) {
             $updates->userquestionattempts->updated = true;
             $updates->userquestionattempts->itemids = array_keys($questionattempts);
         }
-        $pagesviewed = $DB->get_records_select('lesson_branch', $select, $params, '', 'id');
+        $pagesviewed = $DB->get_records_select('opendsa_activity_branch', $select, $params, '', 'id');
         if (!empty($pagesviewed)) {
             $updates->userpagesviewed->updated = true;
             $updates->userpagesviewed->itemids = array_keys($pagesviewed);
@@ -1442,19 +1442,19 @@ function lesson_check_updates_since(cm_info $cm, $from, $filter = array()) {
         if (!empty($insql)) {
             $select .= ' AND userid ' . $insql;
         }
-        $grades = $DB->get_records_select('lesson_grades', $select, $params, '', 'id');
+        $grades = $DB->get_records_select('opendsa_activity_grades', $select, $params, '', 'id');
         if (!empty($grades)) {
             $updates->usergrades->updated = true;
             $updates->usergrades->itemids = array_keys($grades);
         }
 
-        $select = 'opendsa_activity_id = ? AND (starttime > ? OR lessontime > ? OR timemodifiedoffline > ?)';
+        $select = 'opendsa_activity_id = ? AND (starttime > ? OR opendsa_activitytime > ? OR timemodifiedoffline > ?)';
         $params = array($cm->instance, $from, $from, $from);
         if (!empty($insql)) {
             $select .= ' AND userid ' . $insql;
             $params = array_merge($params, $inparams);
         }
-        $timers = $DB->get_records_select('lesson_timer', $select, $params, '', 'id');
+        $timers = $DB->get_records_select('opendsa_activity_timer', $select, $params, '', 'id');
         if (!empty($timers)) {
             $updates->usertimers->updated = true;
             $updates->usertimers->itemids = array_keys($timers);
@@ -1474,17 +1474,17 @@ function lesson_check_updates_since(cm_info $cm, $from, $filter = array()) {
  * @param int $userid User id to use for all capability checks, etc. Set to 0 for current user (default).
  * @return \core_calendar\local\event\entities\action_interface|null
  */
-function mod_lesson_core_calendar_provide_event_action(calendar_event $event,
+function mod_opendsa_activity_core_calendar_provide_event_action(calendar_event $event,
                                                        \core_calendar\action_factory $factory,
                                                        int $userid = 0) {
     global $DB, $CFG, $USER;
-    require_once($CFG->dirroot . '/mod/lesson/locallib.php');
+    require_once($CFG->dirroot . '/mod/opendsa_activity/locallib.php');
 
     if (!$userid) {
         $userid = $USER->id;
     }
 
-    $cm = get_fast_modinfo($event->courseid, $userid)->instances['lesson'][$event->instance];
+    $cm = get_fast_modinfo($event->courseid, $userid)->instances['opendsa_activity'][$event->instance];
 
     if (!$cm->uservisible) {
         // The module is not visible to the user for any reason.
@@ -1499,32 +1499,32 @@ function mod_lesson_core_calendar_provide_event_action(calendar_event $event,
         return null;
     }
 
-    $lesson = new lesson($DB->get_record('lesson', array('id' => $cm->instance), '*', MUST_EXIST));
+    $opendsa_activity = new opendsa_activity($DB->get_record('opendsa_activity', array('id' => $cm->instance), '*', MUST_EXIST));
 
-    if ($lesson->count_user_retries($userid)) {
-        // If the user has attempted the lesson then there is no further action for the user.
+    if ($opendsa_activity->count_user_retries($userid)) {
+        // If the user has attempted the opendsa_activity then there is no further action for the user.
         return null;
     }
 
     // Apply overrides.
-    $lesson->update_effective_access($userid);
+    $opendsa_activity->update_effective_access($userid);
 
-    if (!$lesson->is_participant($userid)) {
+    if (!$opendsa_activity->is_participant($userid)) {
         // If the user is not a participant then they have
         // no action to take. This will filter out the events for teachers.
         return null;
     }
 
     return $factory->create_instance(
-        get_string('startlesson', 'lesson'),
-        new \moodle_url('/mod/lesson/view.php', ['id' => $cm->id]),
+        get_string('startopendsa_activity', 'opendsa_activity'),
+        new \moodle_url('/mod/opendsa_activity/view.php', ['id' => $cm->id]),
         1,
-        $lesson->is_accessible()
+        $opendsa_activity->is_accessible()
     );
 }
 
 /**
- * Add a get_coursemodule_info function in case any lesson type wants to add 'extra' information
+ * Add a get_coursemodule_info function in case any opendsa_activity type wants to add 'extra' information
  * for the course (see resource).
  *
  * Given a course_module object, this function returns any "extra" information that may be needed
@@ -1534,27 +1534,27 @@ function mod_lesson_core_calendar_provide_event_action(calendar_event $event,
  * @return cached_cm_info An object on information that the courses
  *                        will know about (most noticeably, an icon).
  */
-function lesson_get_coursemodule_info($coursemodule) {
+function opendsa_activity_get_coursemodule_info($coursemodule) {
     global $DB;
 
     $dbparams = ['id' => $coursemodule->instance];
     $fields = 'id, name, intro, introformat, completionendreached, completiontimespent';
-    if (!$lesson = $DB->get_record('lesson', $dbparams, $fields)) {
+    if (!$opendsa_activity = $DB->get_record('opendsa_activity', $dbparams, $fields)) {
         return false;
     }
 
     $result = new cached_cm_info();
-    $result->name = $lesson->name;
+    $result->name = $opendsa_activity->name;
 
     if ($coursemodule->showdescription) {
         // Convert intro to html. Do not filter cached version, filters run at display time.
-        $result->content = format_module_intro('lesson', $lesson, $coursemodule->id, false);
+        $result->content = format_module_intro('opendsa_activity', $opendsa_activity, $coursemodule->id, false);
     }
 
     // Populate the custom completion rules as key => value pairs, but only if the completion mode is 'automatic'.
     if ($coursemodule->completion == COMPLETION_TRACKING_AUTOMATIC) {
-        $result->customdata['customcompletionrules']['completionendreached'] = $lesson->completionendreached;
-        $result->customdata['customcompletionrules']['completiontimespent'] = $lesson->completiontimespent;
+        $result->customdata['customcompletionrules']['completionendreached'] = $opendsa_activity->completionendreached;
+        $result->customdata['customcompletionrules']['completiontimespent'] = $opendsa_activity->completiontimespent;
     }
 
     return $result;
@@ -1566,7 +1566,7 @@ function lesson_get_coursemodule_info($coursemodule) {
  * @param cm_info|stdClass $cm object with fields ->completion and ->customdata['customcompletionrules']
  * @return array $descriptions the array of descriptions for the custom rules.
  */
-function mod_lesson_get_completion_active_rule_descriptions($cm) {
+function mod_opendsa_activity_get_completion_active_rule_descriptions($cm) {
     // Values will be present in cm_info, and we assume these are up to date.
     if (empty($cm->customdata['customcompletionrules'])
         || $cm->completion != COMPLETION_TRACKING_AUTOMATIC) {
@@ -1578,12 +1578,12 @@ function mod_lesson_get_completion_active_rule_descriptions($cm) {
         switch ($key) {
             case 'completionendreached':
                 if (!empty($val)) {
-                    $descriptions[] = get_string('completionendreached_desc', 'lesson', $val);
+                    $descriptions[] = get_string('completionendreached_desc', 'opendsa_activity', $val);
                 }
                 break;
             case 'completiontimespent':
                 if (!empty($val)) {
-                    $descriptions[] = get_string('completiontimespentdesc', 'lesson', format_time($val));
+                    $descriptions[] = get_string('completiontimespentdesc', 'opendsa_activity', format_time($val));
                 }
                 break;
             default:
@@ -1614,26 +1614,26 @@ function mod_lesson_get_completion_active_rule_descriptions($cm) {
  * @param stdClass $instance The module instance to get the range from
  * @return array
  */
-function mod_lesson_core_calendar_get_valid_event_timestart_range(\calendar_event $event, \stdClass $instance) {
+function mod_opendsa_activity_core_calendar_get_valid_event_timestart_range(\calendar_event $event, \stdClass $instance) {
     $mindate = null;
     $maxdate = null;
 
-    if ($event->eventtype == LESSON_EVENT_TYPE_OPEN) {
+    if ($event->eventtype == OPENDSA_ACTIVITY_EVENT_TYPE_OPEN) {
         // The start time of the open event can't be equal to or after the
-        // close time of the lesson activity.
+        // close time of the opendsa_activity activity.
         if (!empty($instance->deadline)) {
             $maxdate = [
                 $instance->deadline,
-                get_string('openafterclose', 'lesson')
+                get_string('openafterclose', 'opendsa_activity')
             ];
         }
-    } else if ($event->eventtype == LESSON_EVENT_TYPE_CLOSE) {
+    } else if ($event->eventtype == OPENDSA_ACTIVITY_EVENT_TYPE_CLOSE) {
         // The start time of the close event can't be equal to or earlier than the
-        // open time of the lesson activity.
+        // open time of the opendsa_activity activity.
         if (!empty($instance->available)) {
             $mindate = [
                 $instance->available,
-                get_string('closebeforeopen', 'lesson')
+                get_string('closebeforeopen', 'opendsa_activity')
             ];
         }
     }
@@ -1642,28 +1642,28 @@ function mod_lesson_core_calendar_get_valid_event_timestart_range(\calendar_even
 }
 
 /**
- * This function will update the lesson module according to the
+ * This function will update the opendsa_activity module according to the
  * event that has been modified.
  *
- * It will set the available or deadline value of the lesson instance
+ * It will set the available or deadline value of the opendsa_activity instance
  * according to the type of event provided.
  *
  * @throws \moodle_exception
  * @param \calendar_event $event
- * @param stdClass $lesson The module instance to get the range from
+ * @param stdClass $opendsa_activity The module instance to get the range from
  */
-function mod_lesson_core_calendar_event_timestart_updated(\calendar_event $event, \stdClass $lesson) {
+function mod_opendsa_activity_core_calendar_event_timestart_updated(\calendar_event $event, \stdClass $opendsa_activity) {
     global $DB;
 
-    if (empty($event->instance) || $event->modulename != 'lesson') {
+    if (empty($event->instance) || $event->modulename != 'opendsa_activity') {
         return;
     }
 
-    if ($event->instance != $lesson->id) {
+    if ($event->instance != $opendsa_activity->id) {
         return;
     }
 
-    if (!in_array($event->eventtype, [LESSON_EVENT_TYPE_OPEN, LESSON_EVENT_TYPE_CLOSE])) {
+    if (!in_array($event->eventtype, [OPENDSA_ACTIVITY_EVENT_TYPE_OPEN, OPENDSA_ACTIVITY_EVENT_TYPE_CLOSE])) {
         return;
     }
 
@@ -1680,28 +1680,28 @@ function mod_lesson_core_calendar_event_timestart_updated(\calendar_event $event
         return;
     }
 
-    if ($event->eventtype == LESSON_EVENT_TYPE_OPEN) {
-        // If the event is for the lesson activity opening then we should
-        // set the start time of the lesson activity to be the new start
+    if ($event->eventtype == OPENDSA_ACTIVITY_EVENT_TYPE_OPEN) {
+        // If the event is for the opendsa_activity activity opening then we should
+        // set the start time of the opendsa_activity activity to be the new start
         // time of the event.
-        if ($lesson->available != $event->timestart) {
-            $lesson->available = $event->timestart;
-            $lesson->timemodified = time();
+        if ($opendsa_activity->available != $event->timestart) {
+            $opendsa_activity->available = $event->timestart;
+            $opendsa_activity->timemodified = time();
             $modified = true;
         }
-    } else if ($event->eventtype == LESSON_EVENT_TYPE_CLOSE) {
-        // If the event is for the lesson activity closing then we should
-        // set the end time of the lesson activity to be the new start
+    } else if ($event->eventtype == OPENDSA_ACTIVITY_EVENT_TYPE_CLOSE) {
+        // If the event is for the opendsa_activity activity closing then we should
+        // set the end time of the opendsa_activity activity to be the new start
         // time of the event.
-        if ($lesson->deadline != $event->timestart) {
-            $lesson->deadline = $event->timestart;
+        if ($opendsa_activity->deadline != $event->timestart) {
+            $opendsa_activity->deadline = $event->timestart;
             $modified = true;
         }
     }
 
     if ($modified) {
-        $lesson->timemodified = time();
-        $DB->update_record('lesson', $lesson);
+        $opendsa_activity->timemodified = time();
+        $DB->update_record('opendsa_activity', $opendsa_activity);
         $event = \core\event\course_module_updated::create_from_cm($coursemodule, $context);
         $event->trigger();
     }

@@ -1,5 +1,5 @@
-@mod @mod_lesson
-Feature: In a lesson activity, I need to edit pages in the lesson taking into account locale settings
+@mod @mod_opendsa_activity
+Feature: In a opendsa_activity activity, I need to edit pages in the opendsa_activity taking into account locale settings
 
   Background:
     Given the following "users" exist:
@@ -19,10 +19,10 @@ Feature: In a lesson activity, I need to edit pages in the lesson taking into ac
     And I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
     And I add a "Lesson" to section "1" and I fill the form with:
-      | Name | Test lesson name |
-      | Description | Test lesson description |
+      | Name | Test opendsa_activity name |
+      | Description | Test opendsa_activity description |
       | Allow student review | Yes |
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
     And I follow "Add a question page"
     And I set the field "Select a question type" to "Numerical"
     And I press "Add a question page"
@@ -31,7 +31,7 @@ Feature: In a lesson activity, I need to edit pages in the lesson taking into ac
       | Page contents | 1 + 1? |
       | id_answer_editor_0 | 2#87 |
       | id_response_editor_0 | Correct answer |
-      | id_jumpto_0 | End of lesson |
+      | id_jumpto_0 | End of opendsa_activity |
       | id_score_0 | 1 |
       | id_answer_editor_1 | 2#1:2#8 |
       | id_response_editor_1 | Incorrect answer |
@@ -43,27 +43,27 @@ Feature: In a lesson activity, I need to edit pages in the lesson taking into ac
   Scenario: Edit a numerical question with the locale specific variables
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
     And I click on "Edit" "link" in the "region-main" "region"
     And I follow "Hardest question ever"
     Then I should see "2#87"
     And I should see "2#1:2#8"
     And I log out
 
-  Scenario: View the detailed page of lesson
+  Scenario: View the detailed page of opendsa_activity
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
     And I click on "Edit" "link" in the "region-main" "region"
     And I click on "Expanded" "link" in the "region-main" "region"
     Then I should see "2#87"
     And I should see "2#1:2#8"
     And I log out
 
-  Scenario: Attempt the lesson successfully as a student
+  Scenario: Attempt the opendsa_activity successfully as a student
     Given I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
     And I should see "1 + 1?"
     And I set the following fields to these values:
       | Your answer | 2#87 |
@@ -71,14 +71,14 @@ Feature: In a lesson activity, I need to edit pages in the lesson taking into ac
     Then I should see "Correct answer"
     And I should not see "Incorrect answer"
     And I press "Continue"
-    And I should see "Congratulations - end of lesson reached"
+    And I should see "Congratulations - end of opendsa_activity reached"
     And I should see "Your score is 1 (out of 1)."
     And I log out
 
-  Scenario: Attempt the lesson unsuccessfully as a student
+  Scenario: Attempt the opendsa_activity unsuccessfully as a student
     Given I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
     And I should see "1 + 1?"
     And I set the following fields to these values:
       | Your answer | 2#7 |
@@ -86,14 +86,14 @@ Feature: In a lesson activity, I need to edit pages in the lesson taking into ac
     Then I should not see "Correct answer"
     And I should see "Incorrect answer"
     And I press "Continue"
-    And I should see "Congratulations - end of lesson reached"
+    And I should see "Congratulations - end of opendsa_activity reached"
     And I should see "Your score is 0 (out of 1)."
     And I log out
 
-  Scenario: Attempt the lesson successfully as a student and review
+  Scenario: Attempt the opendsa_activity successfully as a student and review
     Given I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
     And I should see "1 + 1?"
     And I set the following fields to these values:
       | Your answer | 2#87 |
@@ -101,21 +101,21 @@ Feature: In a lesson activity, I need to edit pages in the lesson taking into ac
     Then I should see "Correct answer"
     And I should not see "Incorrect answer"
     And I press "Continue"
-    And I should see "Congratulations - end of lesson reached"
+    And I should see "Congratulations - end of opendsa_activity reached"
     And I should see "Your score is 1 (out of 1)."
-    And I follow "Review lesson"
+    And I follow "Review opendsa_activity"
     Then I should see "1 + 1?"
     And the following fields match these values:
       | Your answer | 2#87 |
     And I log out
 
-  Scenario: Edit lesson question page with updated locale setting and wrong answer
+  Scenario: Edit opendsa_activity question page with updated locale setting and wrong answer
     Given I log in as "teacher1"
     And the following "language customisations" exist:
       | component       | stringid | value |
       | core_langconfig | decsep   | ,     |
     And I am on "Course 1" course homepage with editing mode on
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
     Then I click on "Edit" "link" in the "region-main" "region"
     And I follow "Hardest question ever"
     Then I should see "2,87"
@@ -123,7 +123,7 @@ Feature: In a lesson activity, I need to edit pages in the lesson taking into ac
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
     And I should see "1 + 1?"
     And I set the following fields to these values:
       | Your answer | 2,7 |
@@ -131,5 +131,5 @@ Feature: In a lesson activity, I need to edit pages in the lesson taking into ac
     And I should see "Incorrect answer"
     And I should not see "Correct answer"
     And I press "Continue"
-    And I should see "Congratulations - end of lesson reached"
+    And I should see "Congratulations - end of opendsa_activity reached"
     And I should see "Your score is 0 (out of 1)."

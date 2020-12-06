@@ -18,7 +18,7 @@
 /**
  * Form used to select a file and file format for the import
  *
- * @package mod_lesson
+ * @package mod_opendsa_activity
  * @copyright  2009 Sam Hemelryk
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  **/
@@ -30,7 +30,7 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright  2009 Sam Hemelryk
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class lesson_import_form extends moodleform {
+class opendsa_activity_import_form extends moodleform {
 
     public function definition() {
 
@@ -42,7 +42,7 @@ class lesson_import_form extends moodleform {
         $mform->addElement('hidden', 'pageid');
         $mform->setType('pageid', PARAM_INT);
 
-        $mform->addElement('select', 'format', get_string('fileformat', 'lesson'), $this->_customdata['formats']);
+        $mform->addElement('select', 'format', get_string('fileformat', 'opendsa_activity'), $this->_customdata['formats']);
         $mform->setDefault('format', 'gift');
         $mform->setType('format', 'text');
         $mform->addRule('format', null, 'required');
@@ -77,7 +77,7 @@ class lesson_import_form extends moodleform {
 
         $formatfile = $CFG->dirroot.'/question/format/'.$data['format'].'/format.php';
         if (!is_readable($formatfile)) {
-            throw new moodle_exception('formatnotfound', 'lesson', '', $data['format']);
+            throw new moodle_exception('formatnotfound', 'opendsa_activity', '', $data['format']);
         }
 
         require_once($formatfile);

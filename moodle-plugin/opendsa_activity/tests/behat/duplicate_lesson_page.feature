@@ -1,8 +1,8 @@
-@mod @mod_lesson
-Feature: In a lesson activity, a teacher can duplicate a lesson page
-  In order to duplicate a lesson page
+@mod @mod_opendsa_activity
+Feature: In a opendsa_activity activity, a teacher can duplicate a opendsa_activity page
+  In order to duplicate a opendsa_activity page
   As a teacher
-  I need to add content to a lesson
+  I need to add content to a opendsa_activity
 
   Background:
     Given the following "users" exist:
@@ -18,16 +18,16 @@ Feature: In a lesson activity, a teacher can duplicate a lesson page
       | student1 | C1 | student |
     And I log in as "teacher1"
     And I follow "Manage private files"
-    And I upload "mod/lesson/tests/fixtures/moodle_logo.jpg" file to "Files" filemanager
+    And I upload "mod/opendsa_activity/tests/fixtures/moodle_logo.jpg" file to "Files" filemanager
     And I click on "Save changes" "button"
     When I am on "Course 1" course homepage with editing mode on
     And I add a "Lesson" to section "1" and I fill the form with:
-      | Name | Test lesson name |
-      | Description | Test lesson description |
+      | Name | Test opendsa_activity name |
+      | Description | Test opendsa_activity description |
 
   @javascript @_file_upload
   Scenario: Duplicate content page with an image.
-    Given I follow "Test lesson name"
+    Given I follow "Test opendsa_activity name"
     And I follow "Add a content page"
     And I set the following fields to these values:
       | Page title | First page name |
@@ -57,7 +57,7 @@ Feature: In a lesson activity, a teacher can duplicate a lesson page
 
   @javascript @_file_upload
   Scenario: Duplicate question page with image in answer.
-    Given I follow "Test lesson name"
+    Given I follow "Test opendsa_activity name"
     And I follow "Add a question page"
     And I set the field "Select a question type" to "True/false"
     And I press "Add a question page"
@@ -66,7 +66,7 @@ Feature: In a lesson activity, a teacher can duplicate a lesson page
       | Page contents | Select the picture |
       | id_answer_editor_0 | To be replaced |
       | id_response_editor_0 | Correct answer |
-      | id_jumpto_0 | End of lesson |
+      | id_jumpto_0 | End of opendsa_activity |
       | id_score_0 | 1 |
       | id_answer_editor_1 | 1 |
       | id_response_editor_1 | Incorrect answer |
@@ -94,7 +94,7 @@ Feature: In a lesson activity, a teacher can duplicate a lesson page
 
   @javascript @_file_upload
   Scenario: Duplicate question page with image in feedback.
-    Given I follow "Test lesson name"
+    Given I follow "Test opendsa_activity name"
     And I follow "Add a question page"
     And I set the field "Select a question type" to "True/false"
     And I press "Add a question page"
@@ -103,7 +103,7 @@ Feature: In a lesson activity, a teacher can duplicate a lesson page
       | Page contents | Select the picture |
       | id_answer_editor_0 | To be replaced |
       | id_response_editor_0 | Correct answer |
-      | id_jumpto_0 | End of lesson |
+      | id_jumpto_0 | End of opendsa_activity |
       | id_score_0 | 1 |
       | id_answer_editor_1 | 1 |
       | id_response_editor_1 | Incorrect answer |

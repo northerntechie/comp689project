@@ -44,10 +44,10 @@ app.get('/catalog', (req,res) => {
     res.send(fullCatalog);
 });
 
-//! Lesson request by id
-app.get('/lesson/:id', (req,res) => {
-    console.log(`Processing request for lesson: {req.params.id}`)
-    res.send(`Lesson ${req.params.id} requested.`);
+//! OpenDSA exercise request by id
+app.get('/opendsa-exercise/:id', (req,res) => {
+    console.log(`Processing request for opendsa-exercise: {req.params.id}`)
+    res.send(`Exercise ${req.params.id} requested.`);
 });
 
 //! Default handler for all other requests

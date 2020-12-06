@@ -1,6 +1,6 @@
-@mod @mod_lesson
-Feature: In a lesson activity, students can see questions in random order
-  In order to create a lesson with clusters
+@mod @mod_opendsa_activity
+Feature: In a opendsa_activity activity, students can see questions in random order
+  In order to create a opendsa_activity with clusters
   As a teacher
   I need to add content pages and questions with clusters and end of clusters pages
 
@@ -22,7 +22,7 @@ Feature: In a lesson activity, students can see questions in random order
   Scenario: Lesson with two clusters
     Given I add a "Lesson" to section "1" and I fill the form with:
       | Name | Lesson with clusters |
-      | Description | Test lesson description |
+      | Description | Test opendsa_activity description |
     And I follow "Lesson with clusters"
     And I follow "Add a content page"
     And I set the following fields to these values:
@@ -155,5 +155,5 @@ Feature: In a lesson activity, students can see questions in random order
     And I press "Continue"
     And I should see "Content page after cluster 2"
     And I press "Next page"
-    And I should see "Congratulations - end of lesson reached"
+    And I should see "Congratulations - end of opendsa_activity reached"
     And I should see "Your score is 4 (out of 4)."

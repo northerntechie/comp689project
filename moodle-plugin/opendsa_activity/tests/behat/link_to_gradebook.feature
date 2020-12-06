@@ -1,8 +1,8 @@
-@mod @mod_lesson
-Feature: link to gradebook on the end of lesson page
-  In order to allow students to see their lesson grades
+@mod @mod_opendsa_activity
+Feature: link to gradebook on the end of opendsa_activity page
+  In order to allow students to see their opendsa_activity grades
   As a teacher
-  I need to provide a link to gradebook on the end of lesson page
+  I need to provide a link to gradebook on the end of opendsa_activity page
 
   Background:
     Given the following "users" exist:
@@ -19,9 +19,9 @@ Feature: link to gradebook on the end of lesson page
     And I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
     And I add a "Lesson" to section "1" and I fill the form with:
-      | Name | Test lesson |
-      | Description | Test lesson description |
-    And I follow "Test lesson"
+      | Name | Test opendsa_activity |
+      | Description | Test opendsa_activity description |
+    And I follow "Test opendsa_activity"
     And I follow "Add a content page"
     And I set the following fields to these values:
       | Page title | First page name |
@@ -39,21 +39,21 @@ Feature: link to gradebook on the end of lesson page
       | id_jumpto_1 | Next page |
     And I press "Save page"
 
-  Scenario: Link to gradebook for non practice lesson
+  Scenario: Link to gradebook for non practice opendsa_activity
     Given I log out
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson"
+    And I follow "Test opendsa_activity"
     And I press "Next page"
     And I press "Next page"
-    Then I should see "Congratulations - end of lesson reached"
+    Then I should see "Congratulations - end of opendsa_activity reached"
     And I should see "View grades"
     And I follow "View grades"
     And I should see "User report - Student 1"
-    And I should see "Test lesson"
+    And I should see "Test opendsa_activity"
 
-  Scenario: No link to gradebook for non graded lesson
-    Given I follow "Test lesson"
+  Scenario: No link to gradebook for non graded opendsa_activity
+    Given I follow "Test opendsa_activity"
     And I navigate to "Edit settings" in current page administration
     And I set the following fields to these values:
         | Type | None |
@@ -61,25 +61,25 @@ Feature: link to gradebook on the end of lesson page
     And I log out
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson"
+    And I follow "Test opendsa_activity"
     And I press "Next page"
     And I press "Next page"
-    Then I should see "Congratulations - end of lesson reached"
+    Then I should see "Congratulations - end of opendsa_activity reached"
     And I should not see "View grades"
 
-  Scenario: No link to gradebook for practice lesson
-    Given I follow "Test lesson"
+  Scenario: No link to gradebook for practice opendsa_activity
+    Given I follow "Test opendsa_activity"
     And I navigate to "Edit settings" in current page administration
     And I set the following fields to these values:
-        | Practice lesson | Yes |
+        | Practice opendsa_activity | Yes |
     And I press "Save and display"
     And I log out
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson"
+    And I follow "Test opendsa_activity"
     And I press "Next page"
     And I press "Next page"
-    Then I should see "Congratulations - end of lesson reached"
+    Then I should see "Congratulations - end of opendsa_activity reached"
     And I should not see "View grades"
 
   Scenario: No link if Show gradebook to student disabled
@@ -91,10 +91,10 @@ Feature: link to gradebook on the end of lesson page
     And I log out
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson"
+    And I follow "Test opendsa_activity"
     And I press "Next page"
     And I press "Next page"
-    Then I should see "Congratulations - end of lesson reached"
+    Then I should see "Congratulations - end of opendsa_activity reached"
     And I should not see "View grades"
 
   Scenario: No link to gradebook if no gradereport/user:view capability
@@ -106,8 +106,8 @@ Feature: link to gradebook on the end of lesson page
     And I log out
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson"
+    And I follow "Test opendsa_activity"
     And I press "Next page"
     And I press "Next page"
-    Then I should see "Congratulations - end of lesson reached"
+    Then I should see "Congratulations - end of opendsa_activity reached"
     And I should not see "View grades"

@@ -18,7 +18,7 @@
 /**
  * Lesson page without answers
  *
- * @package mod_lesson
+ * @package mod_opendsa_activity
  * @copyright  2009 Sam Hemelryk
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  **/
@@ -37,7 +37,7 @@ require_once($CFG->libdir.'/formslib.php');
  * @copyright  2009 Sam Hemelryk
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  **/
-class lesson_page_without_answers extends moodleform {
+class opendsa_activity_page_without_answers extends moodleform {
 
     public function definition() {
         global $OUTPUT;
@@ -64,7 +64,7 @@ class lesson_page_without_answers extends moodleform {
         $mform->addElement('hidden', 'newpageid');
         $mform->setType('newpageid', PARAM_INT);
 
-        $this->add_action_buttons(null, get_string("continue", "lesson"));
+        $this->add_action_buttons(null, get_string("continue", "opendsa_activity"));
 
     }
 

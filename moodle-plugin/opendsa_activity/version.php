@@ -17,7 +17,7 @@
 /**
  * Version information
  *
- * @package mod_lesson
+ * @package mod_opendsa_activity
  * @copyright  1999 onwards Martin Dougiamas  {@link http://moodle.com}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -26,5 +26,5 @@ defined('MOODLE_INTERNAL') || die();
 
 $plugin->version   = 2020061500;     // The current module version (Date: YYYYMMDDXX)
 $plugin->requires  = 2020060900;    // Requires this Moodle version
-$plugin->component = 'mod_lesson'; // Full name of the plugin (used for diagnostics)
+$plugin->component = 'mod_opendsa_activity'; // Full name of the plugin (used for diagnostics)
 $plugin->cron      = 0;

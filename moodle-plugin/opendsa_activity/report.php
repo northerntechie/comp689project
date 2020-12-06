@@ -16,48 +16,48 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Displays the lesson statistics.
+ * Displays the opendsa_activity statistics.
  *
- * @package mod_lesson
+ * @package mod_opendsa_activity
  * @copyright  1999 onwards Martin Dougiamas  {@link http://moodle.com}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or late
  **/
 
 require_once('../../config.php');
-require_once($CFG->dirroot.'/mod/lesson/locallib.php');
+require_once($CFG->dirroot.'/mod/opendsa_activity/locallib.php');
 
 $id     = required_param('id', PARAM_INT);    // Course Module ID
 $pageid = optional_param('pageid', null, PARAM_INT);    // Lesson Page ID
 $action = optional_param('action', 'reportoverview', PARAM_ALPHA);  // action to take
 $nothingtodisplay = false;
 
-$cm = get_coursemodule_from_id('lesson', $id, 0, false, MUST_EXIST);
+$cm = get_coursemodule_from_id('opendsa_activity', $id, 0, false, MUST_EXIST);
 $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
-$lesson = new lesson($DB->get_record('lesson', array('id' => $cm->instance), '*', MUST_EXIST));
+$opendsa_activity = new opendsa_activity($DB->get_record('opendsa_activity', array('id' => $cm->instance), '*', MUST_EXIST));
 
 require_login($course, false, $cm);
 
 $currentgroup = groups_get_activity_group($cm, true);
 
 $context = context_module::instance($cm->id);
-require_capability('mod/lesson:viewreports', $context);
+require_capability('mod/opendsa_activity:viewreports', $context);
 
-$url = new moodle_url('/mod/lesson/report.php', array('id'=>$id));
+$url = new moodle_url('/mod/opendsa_activity/report.php', array('id'=>$id));
 $url->param('action', $action);
 if ($pageid !== null) {
     $url->param('pageid', $pageid);
 }
 $PAGE->set_url($url);
 if ($action == 'reportoverview') {
-    $PAGE->navbar->add(get_string('reports', 'lesson'));
-    $PAGE->navbar->add(get_string('overview', 'lesson'));
+    $PAGE->navbar->add(get_string('reports', 'opendsa_activity'));
+    $PAGE->navbar->add(get_string('overview', 'opendsa_activity'));
 }
 
-$lessonoutput = $PAGE->get_renderer('mod_lesson');
+$opendsa_activityoutput = $PAGE->get_renderer('mod_opendsa_activity');
 
 if ($action === 'delete') {
     /// Process any form data before fetching attempts, grades and times
-    if (has_capability('mod/lesson:edit', $context) and $form = data_submitted() and confirm_sesskey()) {
+    if (has_capability('mod/opendsa_activity:edit', $context) and $form = data_submitted() and confirm_sesskey()) {
     /// Cycle through array of userids with nested arrays of tries
         if (!empty($form->attempts)) {
             foreach ($form->attempts as $userid => $tries) {
@@ -73,33 +73,33 @@ if ($action === 'delete') {
                     $try -= $modifier;
 
                 /// Clean up the timer table by removing using the order - this is silly, it should be linked to specific attempt (skodak)
-                    $timers = $lesson->get_user_timers($userid, 'starttime', 'id', $try, 1);
+                    $timers = $opendsa_activity->get_user_timers($userid, 'starttime', 'id', $try, 1);
                     if ($timers) {
                         $timer = reset($timers);
-                        $DB->delete_records('lesson_timer', array('id' => $timer->id));
+                        $DB->delete_records('opendsa_activity_timer', array('id' => $timer->id));
                     }
 
-                    $params = array ("userid" => $userid, "opendsa_activity_id" => $lesson->id);
+                    $params = array ("userid" => $userid, "opendsa_activity_id" => $opendsa_activity->id);
                     // Remove the grade from the grades tables - this is silly, it should be linked to specific attempt (skodak).
-                    $grades = $DB->get_records_sql("SELECT id FROM {lesson_grades}
+                    $grades = $DB->get_records_sql("SELECT id FROM {opendsa_activity_grades}
                                                      WHERE userid = :userid AND opendsa_activity_id = :opendsa_activity_id
                                                   ORDER BY completed", $params, $try, 1);
 
                     if ($grades) {
                         $grade = reset($grades);
-                        $DB->delete_records('lesson_grades', array('id' => $grade->id));
+                        $DB->delete_records('opendsa_activity_grades', array('id' => $grade->id));
                     }
 
                 /// Remove attempts and update the retry number
-                    $DB->delete_records('lesson_attempts', array('userid' => $userid, 'opendsa_activity_id' => $lesson->id, 'retry' => $try));
-                    $DB->execute("UPDATE {lesson_attempts} SET retry = retry - 1 WHERE userid = ? AND opendsa_activity_id = ? AND retry > ?", array($userid, $lesson->id, $try));
+                    $DB->delete_records('opendsa_activity_attempts', array('userid' => $userid, 'opendsa_activity_id' => $opendsa_activity->id, 'retry' => $try));
+                    $DB->execute("UPDATE {opendsa_activity_attempts} SET retry = retry - 1 WHERE userid = ? AND opendsa_activity_id = ? AND retry > ?", array($userid, $opendsa_activity->id, $try));
 
                 /// Remove seen branches and update the retry number
-                    $DB->delete_records('lesson_branch', array('userid' => $userid, 'opendsa_activity_id' => $lesson->id, 'retry' => $try));
-                    $DB->execute("UPDATE {lesson_branch} SET retry = retry - 1 WHERE userid = ? AND opendsa_activity_id = ? AND retry > ?", array($userid, $lesson->id, $try));
+                    $DB->delete_records('opendsa_activity_branch', array('userid' => $userid, 'opendsa_activity_id' => $opendsa_activity->id, 'retry' => $try));
+                    $DB->execute("UPDATE {opendsa_activity_branch} SET retry = retry - 1 WHERE userid = ? AND opendsa_activity_id = ? AND retry > ?", array($userid, $opendsa_activity->id, $try));
 
                 /// update central gradebook
-                    lesson_update_grades($lesson, $userid);
+                    opendsa_activity_update_grades($opendsa_activity, $userid);
 
                     $modifier++;
                 }
@@ -114,22 +114,22 @@ if ($action === 'delete') {
     **************************************************************************/
 
     // Get the table and data for build statistics.
-    list($table, $data) = lesson_get_overview_report_table_and_data($lesson, $currentgroup);
+    list($table, $data) = opendsa_activity_get_overview_report_table_and_data($opendsa_activity, $currentgroup);
 
     if ($table === false) {
-        echo $lessonoutput->header($lesson, $cm, $action, false, null, get_string('nolessonattempts', 'lesson'));
+        echo $opendsa_activityoutput->header($opendsa_activity, $cm, $action, false, null, get_string('noopendsa_activityattempts', 'opendsa_activity'));
         if (!empty($currentgroup)) {
             $groupname = groups_get_group_name($currentgroup);
-            echo $OUTPUT->notification(get_string('nolessonattemptsgroup', 'lesson', $groupname));
+            echo $OUTPUT->notification(get_string('noopendsa_activityattemptsgroup', 'opendsa_activity', $groupname));
         } else {
-            echo $OUTPUT->notification(get_string('nolessonattempts', 'lesson'));
+            echo $OUTPUT->notification(get_string('noopendsa_activityattempts', 'opendsa_activity'));
         }
         groups_print_activity_menu($cm, $url);
         echo $OUTPUT->footer();
         exit();
     }
 
-    echo $lessonoutput->header($lesson, $cm, $action, false, null, get_string('overview', 'lesson'));
+    echo $opendsa_activityoutput->header($opendsa_activity, $cm, $action, false, null, get_string('overview', 'opendsa_activity'));
     groups_print_activity_menu($cm, $url);
 
     $course_context = context_course::instance($course->id);
@@ -145,10 +145,10 @@ if ($action === 'delete') {
     // The HTML that we will be displaying which includes the attempts table and bulk actions menu, if necessary.
     $attemptshtml = $attemptstable;
 
-    // Show bulk actions when user has capability to edit the lesson.
-    if (has_capability('mod/lesson:edit', $context)) {
-        $reporturl = new moodle_url('/mod/lesson/report.php');
-        $formid  = 'mod-lesson-report-form';
+    // Show bulk actions when user has capability to edit the opendsa_activity.
+    if (has_capability('mod/opendsa_activity:edit', $context)) {
+        $reporturl = new moodle_url('/mod/opendsa_activity/report.php');
+        $formid  = 'mod-opendsa_activity-report-form';
 
         // Sesskey hidden input.
         $formcontents = html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'sesskey', 'value' => sesskey()]);
@@ -164,11 +164,11 @@ if ($action === 'delete') {
             'delete' => get_string('deleteselected')
         ];
         $bulkactions = new single_select($reporturl, 'action', $attemptsactions, '', ['' => 'choosedots'], $formid);
-        $bulkactions->set_label(get_string('withselectedattempts', 'lesson'));
+        $bulkactions->set_label(get_string('withselectedattempts', 'opendsa_activity'));
         $bulkactions->disabled = true;
         $bulkactions->attributes = [
             'data-action' => 'toggle',
-            'data-togglegroup' => 'lesson-attempts',
+            'data-togglegroup' => 'opendsa_activity-attempts',
             'data-toggle' => 'action',
         ];
         $bulkactionshtml = $OUTPUT->render($bulkactions);
@@ -187,56 +187,56 @@ if ($action === 'delete') {
 
     // Calculate the Statistics.
     if ($data->avetime == null) {
-        $data->avetime = get_string("notcompleted", "lesson");
+        $data->avetime = get_string("notcompleted", "opendsa_activity");
     } else {
         $data->avetime = format_float($data->avetime / $data->numofattempts, 0);
         $data->avetime = format_time($data->avetime);
     }
     if ($data->hightime == null) {
-        $data->hightime = get_string("notcompleted", "lesson");
+        $data->hightime = get_string("notcompleted", "opendsa_activity");
     } else {
         $data->hightime = format_time($data->hightime);
     }
     if ($data->lowtime == null) {
-        $data->lowtime = get_string("notcompleted", "lesson");
+        $data->lowtime = get_string("notcompleted", "opendsa_activity");
     } else {
         $data->lowtime = format_time($data->lowtime);
     }
 
-    if ($data->lessonscored) {
+    if ($data->opendsa_activityscored) {
         if ($data->numofattempts == 0) {
-            $data->avescore = get_string("notcompleted", "lesson");
+            $data->avescore = get_string("notcompleted", "opendsa_activity");
         } else {
             $data->avescore = format_float($data->avescore, 2) . '%';
         }
         if ($data->highscore === null) {
-            $data->highscore = get_string("notcompleted", "lesson");
+            $data->highscore = get_string("notcompleted", "opendsa_activity");
         } else {
             $data->highscore .= '%';
         }
         if ($data->lowscore === null) {
-            $data->lowscore = get_string("notcompleted", "lesson");
+            $data->lowscore = get_string("notcompleted", "opendsa_activity");
         } else {
             $data->lowscore .= '%';
         }
 
-        // Display the full stats for the lesson.
-        echo $OUTPUT->heading(get_string('lessonstats', 'lesson'), 3);
+        // Display the full stats for the opendsa_activity.
+        echo $OUTPUT->heading(get_string('opendsa_activitystats', 'opendsa_activity'), 3);
         $stattable = new html_table();
-        $stattable->head = array(get_string('averagescore', 'lesson'), get_string('averagetime', 'lesson'),
-                                get_string('highscore', 'lesson'), get_string('lowscore', 'lesson'),
-                                get_string('hightime', 'lesson'), get_string('lowtime', 'lesson'));
+        $stattable->head = array(get_string('averagescore', 'opendsa_activity'), get_string('averagetime', 'opendsa_activity'),
+                                get_string('highscore', 'opendsa_activity'), get_string('lowscore', 'opendsa_activity'),
+                                get_string('hightime', 'opendsa_activity'), get_string('lowtime', 'opendsa_activity'));
         $stattable->align = array('center', 'center', 'center', 'center', 'center', 'center');
         $stattable->wrap = array('nowrap', 'nowrap', 'nowrap', 'nowrap', 'nowrap', 'nowrap');
         $stattable->attributes['class'] = 'standardtable generaltable';
         $stattable->data[] = array($data->avescore, $data->avetime, $data->highscore, $data->lowscore, $data->hightime, $data->lowtime);
 
     } else {
-        // Display simple stats for the lesson.
-        echo $OUTPUT->heading(get_string('lessonstats', 'lesson'), 3);
+        // Display simple stats for the opendsa_activity.
+        echo $OUTPUT->heading(get_string('opendsa_activitystats', 'opendsa_activity'), 3);
         $stattable = new html_table();
-        $stattable->head = array(get_string('averagetime', 'lesson'), get_string('hightime', 'lesson'),
-                                get_string('lowtime', 'lesson'));
+        $stattable->head = array(get_string('averagetime', 'opendsa_activity'), get_string('hightime', 'opendsa_activity'),
+                                get_string('lowtime', 'opendsa_activity'));
         $stattable->align = array('center', 'center', 'center');
         $stattable->wrap = array('nowrap', 'nowrap', 'nowrap');
         $stattable->attributes['class'] = 'standardtable generaltable';
@@ -258,7 +258,7 @@ if ($action === 'delete') {
     4.  Print out the object which contains all the try info
 
 **************************************************************************/
-    echo $lessonoutput->header($lesson, $cm, $action, false, null, get_string('detailedstats', 'lesson'));
+    echo $opendsa_activityoutput->header($opendsa_activity, $cm, $action, false, null, get_string('detailedstats', 'opendsa_activity'));
     groups_print_activity_menu($cm, $url);
 
     $course_context = context_course::instance($course->id);
@@ -275,7 +275,7 @@ if ($action === 'delete') {
     $userid = optional_param('userid', null, PARAM_INT); // if empty, then will display the general detailed view
     $try    = optional_param('try', null, PARAM_INT);
 
-    list($answerpages, $userstats) = lesson_get_user_detailed_report_data($lesson, $userid, $try);
+    list($answerpages, $userstats) = opendsa_activity_get_user_detailed_report_data($opendsa_activity, $userid, $try);
 
     /// actually start printing something
     $table = new html_table();
@@ -288,8 +288,8 @@ if ($action === 'delete') {
             //$headingobject->lastname = $students[$userid]->lastname;
             //$headingobject->firstname = $students[$userid]->firstname;
             //$headingobject->attempt = $try + 1;
-            //print_heading(get_string("studentattemptlesson", "lesson", $headingobject));
-        echo $OUTPUT->heading(get_string('attempt', 'lesson', $try+1), 3);
+            //print_heading(get_string("studentattemptopendsa_activity", "opendsa_activity", $headingobject));
+        echo $OUTPUT->heading(get_string('attempt', 'opendsa_activity', $try+1), 3);
 
         $table->head = array();
         $table->align = array('right', 'left');
@@ -298,17 +298,17 @@ if ($action === 'delete') {
         if (empty($userstats->gradeinfo)) {
             $table->align = array("center");
 
-            $table->data[] = array(get_string("notcompleted", "lesson"));
+            $table->data[] = array(get_string("notcompleted", "opendsa_activity"));
         } else {
             $user = $DB->get_record('user', array('id' => $userid));
 
-            $gradeinfo = lesson_grade($lesson, $try, $user->id);
+            $gradeinfo = opendsa_activity_grade($opendsa_activity, $try, $user->id);
 
             $table->data[] = array(get_string('name').':', $OUTPUT->user_picture($user, array('courseid'=>$course->id)).fullname($user, true));
-            $table->data[] = array(get_string("timetaken", "lesson").":", format_time($userstats->timetotake));
-            $table->data[] = array(get_string("completed", "lesson").":", userdate($userstats->completed));
-            $table->data[] = array(get_string('rawgrade', 'lesson').':', $userstats->gradeinfo->earned.'/'.$userstats->gradeinfo->total);
-            $table->data[] = array(get_string("grade", "lesson").":", $userstats->grade."%");
+            $table->data[] = array(get_string("timetaken", "opendsa_activity").":", format_time($userstats->timetotake));
+            $table->data[] = array(get_string("completed", "opendsa_activity").":", userdate($userstats->completed));
+            $table->data[] = array(get_string('rawgrade', 'opendsa_activity').':', $userstats->gradeinfo->earned.'/'.$userstats->gradeinfo->total);
+            $table->data[] = array(get_string("grade", "opendsa_activity").":", $userstats->grade."%");
         }
         echo html_writer::table($table);
 
@@ -333,9 +333,9 @@ if ($action === 'delete') {
             $fontend2 = '';
         }
 
-        $table->head = array($fontstart2.$page->qtype.": ".format_string($page->title).$fontend2, $fontstart2.get_string("classstats", "lesson").$fontend2);
-        $table->data[] = array($fontstart.get_string("question", "lesson").": <br />".$fontend.$fontstart2.$page->contents.$fontend2, " ");
-        $table->data[] = array($fontstart.get_string("answer", "lesson").":".$fontend, ' ');
+        $table->head = array($fontstart2.$page->qtype.": ".format_string($page->title).$fontend2, $fontstart2.get_string("classstats", "opendsa_activity").$fontend2);
+        $table->data[] = array($fontstart.get_string("question", "opendsa_activity").": <br />".$fontend.$fontstart2.$page->contents.$fontend2, " ");
+        $table->data[] = array($fontstart.get_string("answer", "opendsa_activity").":".$fontend, ' ');
         // apply the font to each answer
         if (!empty($page->answerdata) && !empty($page->answerdata->answers)) {
             foreach ($page->answerdata->answers as $answer){
@@ -347,12 +347,12 @@ if ($action === 'delete') {
                 $table->data[] = $modified;
             }
             if (isset($page->answerdata->response)) {
-                $table->data[] = array($fontstart.get_string("response", "lesson").": <br />".$fontend
+                $table->data[] = array($fontstart.get_string("response", "opendsa_activity").": <br />".$fontend
                         .$fontstart2.$page->answerdata->response.$fontend2, " ");
             }
             $table->data[] = array($page->answerdata->score, " ");
         } else {
-            $table->data[] = array(get_string('didnotanswerquestion', 'lesson'), " ");
+            $table->data[] = array(get_string('didnotanswerquestion', 'opendsa_activity'), " ");
         }
         echo html_writer::start_tag('div', array('class' => 'no-overflow'));
         echo html_writer::table($table);

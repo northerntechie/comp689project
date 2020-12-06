@@ -1,6 +1,6 @@
-@mod @mod_lesson
-Feature: In a lesson activity a student should
-  be able to close the lesson and then later resume.
+@mod @mod_opendsa_activity
+Feature: In a opendsa_activity activity a student should
+  be able to close the opendsa_activity and then later resume.
 
   Background:
     Given the following "users" exist:
@@ -18,13 +18,13 @@ Feature: In a lesson activity a student should
     And I am on "Course 1" course homepage with editing mode on
     And I add a "Lesson" to section "1"
     And I set the following fields to these values:
-      | Name | Test lesson name |
-      | Description | Test lesson description |
+      | Name | Test opendsa_activity name |
+      | Description | Test opendsa_activity description |
       | Re-takes allowed | Yes |
     And I press "Save and return to course"
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
 
-  Scenario: resume a lesson with both content then question pages
+  Scenario: resume a opendsa_activity with both content then question pages
     Given I follow "Add a content page"
     And I set the following fields to these values:
       | Page title | First page name |
@@ -79,25 +79,25 @@ Feature: In a lesson activity a student should
     And I log out
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
     And I should see "First page contents"
     And I press "Next page"
-    # Add 1 sec delay so lesson knows a valid attempt has been made in past.
+    # Add 1 sec delay so opendsa_activity knows a valid attempt has been made in past.
     And I wait "1" seconds
     And I should see "Second page contents"
     And I press "Next page"
     And I should see "Third page contents"
-    And I follow "Test lesson name"
-    And I should see "You have seen more than one page of this lesson already."
+    And I follow "Test opendsa_activity name"
+    And I should see "You have seen more than one page of this opendsa_activity already."
     And I should see "Do you want to start at the last page you saw?"
     And I follow "Yes"
     Then I should see "Third page contents"
-    # Add 1 sec delay so lesson knows differentiate 3rd and paper attempts.
+    # Add 1 sec delay so opendsa_activity knows differentiate 3rd and paper attempts.
     And I wait "1" seconds
     And I press "Next page"
     And I should see "Paper is made from trees."
-    And I follow "Test lesson name"
-    And I should see "You have seen more than one page of this lesson already."
+    And I follow "Test opendsa_activity name"
+    And I should see "You have seen more than one page of this opendsa_activity already."
     And I should see "Do you want to start at the last page you saw?"
     And I follow "Yes"
     And I should see "Paper is made from trees."
@@ -106,8 +106,8 @@ Feature: In a lesson activity a student should
     And I press "Submit"
     And I press "Continue"
     And I should see "Kermit is a frog"
-    And I follow "Test lesson name"
-    And I should see "You have seen more than one page of this lesson already."
+    And I follow "Test opendsa_activity name"
+    And I should see "You have seen more than one page of this opendsa_activity already."
     And I should see "Do you want to start at the last page you saw?"
     And I follow "Yes"
     And I should see "Kermit is a frog"
@@ -115,9 +115,9 @@ Feature: In a lesson activity a student should
       | True | 1 |
     And I press "Submit"
     And I press "Continue"
-    And I should see "Congratulations - end of lesson reached"
+    And I should see "Congratulations - end of opendsa_activity reached"
 
-  Scenario: resume a lesson with only content pages
+  Scenario: resume a opendsa_activity with only content pages
     Given I follow "Add a content page"
     And I set the following fields to these values:
       | Page title | First page name |
@@ -131,8 +131,8 @@ Feature: In a lesson activity a student should
       | Page contents | Fourth page contents |
       | id_answer_editor_0 | Previous page |
       | id_jumpto_0 | Previous page |
-      | id_answer_editor_1 | End of lesson |
-      | id_jumpto_1 | End of lesson |
+      | id_answer_editor_1 | End of opendsa_activity |
+      | id_jumpto_1 | End of opendsa_activity |
     And I press "Save page"
     And I select "Add a content page" from the "qtype" singleselect
     And I set the following fields to these values:
@@ -155,32 +155,32 @@ Feature: In a lesson activity a student should
     And I log out
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
     And I should see "First page contents"
     And I press "Next page"
     And I should see "Second page contents"
-    # Add 1 sec delay so lesson knows a valid attempt has been made in past.
+    # Add 1 sec delay so opendsa_activity knows a valid attempt has been made in past.
     And I wait "1" seconds
     And I press "Next page"
     And I should see "Third page contents"
-    And I follow "Test lesson name"
-    Then I should see "You have seen more than one page of this lesson already."
+    And I follow "Test opendsa_activity name"
+    Then I should see "You have seen more than one page of this opendsa_activity already."
     And I should see "Do you want to start at the last page you saw?"
     And I follow "Yes"
     And I should see "Third page contents"
     And I press "Next page"
     And I should see "Fourth page contents"
-    # Add 1 sec delay so lesson knows a valid attempt has been made in past.
+    # Add 1 sec delay so opendsa_activity knows a valid attempt has been made in past.
     And I wait "1" seconds
-    And I press "End of lesson"
+    And I press "End of opendsa_activity"
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
     And I should see "First page contents"
     And I log out
 
-  Scenario: resume a lesson with both question then content pages
+  Scenario: resume a opendsa_activity with both question then content pages
     Given I follow "Add a question page"
     And I set the field "Select a question type" to "True/false"
     And I press "Add a question page"
@@ -263,7 +263,7 @@ Feature: In a lesson activity a student should
     And I log out
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
     And I should see "Cat is an amphibian"
     And I set the following fields to these values:
       | False | 1 |
@@ -279,25 +279,25 @@ Feature: In a lesson activity a student should
     And I should see "1+1=2"
     And I set the following fields to these values:
       | True | 1 |
-    # Add 1 sec delay so lesson knows a valid attempt has been made in past.
+    # Add 1 sec delay so opendsa_activity knows a valid attempt has been made in past.
     And I wait "1" seconds
     And I press "Submit"
     And I press "Continue"
     And I should see "2+2=4"
-    And I follow "Test lesson name"
-    And I should see "You have seen more than one page of this lesson already."
+    And I follow "Test opendsa_activity name"
+    And I should see "You have seen more than one page of this opendsa_activity already."
     Then I should see "Do you want to start at the last page you saw?"
     And I follow "Yes"
     And I should see "2+2=4"
     And I set the following fields to these values:
       | True | 1 |
-    # Add 1 sec delay so lesson knows a valid attempt has been made in past.
+    # Add 1 sec delay so opendsa_activity knows a valid attempt has been made in past.
     And I wait "1" seconds
     And I press "Submit"
     And I press "Continue"
     And I should see "Second content page"
-    And I follow "Test lesson name"
-    And I should see "You have seen more than one page of this lesson already."
+    And I follow "Test opendsa_activity name"
+    And I should see "You have seen more than one page of this opendsa_activity already."
     And I should see "Do you want to start at the last page you saw?"
     And I follow "Yes"
     And I should see "Second content page"
@@ -307,9 +307,9 @@ Feature: In a lesson activity a student should
       | True | 1 |
     And I press "Submit"
     And I press "Continue"
-    And I should see "Congratulations - end of lesson reached"
+    And I should see "Congratulations - end of opendsa_activity reached"
 
-  Scenario: resume a lesson with only question pages
+  Scenario: resume a opendsa_activity with only question pages
     Given I follow "Add a question page"
     And I set the field "Select a question type" to "True/false"
     And I press "Add a question page"
@@ -378,7 +378,7 @@ Feature: In a lesson activity a student should
     And I log out
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
     And I should see "Cat is an amphibian"
     And I set the following fields to these values:
       | False | 1 |
@@ -392,19 +392,19 @@ Feature: In a lesson activity a student should
     And I should see "1+1=2"
     And I set the following fields to these values:
       | True | 1 |
-    # Add 1 sec delay so lesson knows a valid attempt has been made in past.
+    # Add 1 sec delay so opendsa_activity knows a valid attempt has been made in past.
     And I wait "1" seconds
     And I press "Submit"
     And I press "Continue"
     And I should see "2+2=4"
-    And I follow "Test lesson name"
-    Then I should see "You have seen more than one page of this lesson already."
+    And I follow "Test opendsa_activity name"
+    Then I should see "You have seen more than one page of this opendsa_activity already."
     And I should see "Do you want to start at the last page you saw?"
     And I follow "Yes"
     And I should see "2+2=4"
     And I set the following fields to these values:
       | True | 1 |
-    # Add 1 sec delay so lesson knows a valid attempt has been made in past.
+    # Add 1 sec delay so opendsa_activity knows a valid attempt has been made in past.
     And I wait "1" seconds
     And I press "Submit"
     And I press "Continue"
@@ -413,4 +413,4 @@ Feature: In a lesson activity a student should
       | True | 1 |
     And I press "Submit"
     And I press "Continue"
-    And I should see "Congratulations - end of lesson reached"
+    And I should see "Congratulations - end of opendsa_activity reached"

@@ -16,30 +16,30 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This file contains the backup structure for the lesson module
+ * This file contains the backup structure for the opendsa_activity module
  *
- * This is the "graphical" structure of the lesson module:
+ * This is the "graphical" structure of the opendsa_activity module:
  *
- *         lesson ---------->-------------|------------>---------|----------->----------|
+ *         opendsa_activity ---------->-------------|------------>---------|----------->----------|
  *      (CL,pk->id)                       |                      |                      |
  *            |                           |                      |                      |
- *            |                     lesson_grades           lesson_timer           lesson_overrides
+ *            |                     opendsa_activity_grades           opendsa_activity_timer           opendsa_activity_overrides
  *            |            (UL, pk->id,fk->opendsa_activity_id)  (UL, pk->id,fk->opendsa_activity_id) (UL, pk->id,fk->opendsa_activity_id)
  *            |                           |
  *            |                           |
  *            |                           |
  *            |                           |
- *      lesson_pages-------->-------lesson_branch
+ *      opendsa_activity_pages-------->-------opendsa_activity_branch
  *   (CL,pk->id,fk->opendsa_activity_id)     (UL, pk->id,fk->pageid)
  *            |
  *            |
  *            |
- *      lesson_answers
+ *      opendsa_activity_answers
  *   (CL,pk->id,fk->pageid)
  *            |
  *            |
  *            |
- *      lesson_attempts
+ *      opendsa_activity_attempts
  *  (UL,pk->id,fk->answerid)
  *
  * Meaning: pk->primary key field of the table
@@ -49,26 +49,26 @@
  *          UL->user level info
  *          files->table may have files)
  *
- * @package mod_lesson
+ * @package mod_opendsa_activity
  * @copyright  2010 Sam Hemelryk
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 /**
- * Structure step class that informs a backup task how to backup the lesson module.
+ * Structure step class that informs a backup task how to backup the opendsa_activity module.
  *
  * @copyright  2010 Sam Hemelryk
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class backup_lesson_activity_structure_step extends backup_activity_structure_step {
+class backup_opendsa_activity_activity_structure_step extends backup_activity_structure_step {
 
     protected function define_structure() {
 
-        // The lesson table
-        // This table contains all of the goodness for the lesson module, quite
+        // The opendsa_activity table
+        // This table contains all of the goodness for the opendsa_activity module, quite
         // alot goes into it but nothing relational other than course when will
         // need to be corrected upon restore.
-        $lesson = new backup_nested_element('lesson', array('id'), array(
+        $opendsa_activity = new backup_nested_element('opendsa_activity', array('id'), array(
             'course', 'name', 'intro', 'introformat', 'practice', 'modattempts',
             'usepassword', 'password',
             'dependency', 'conditions', 'grade', 'custom', 'ongoing', 'usemaxgrade',
@@ -80,9 +80,9 @@ class backup_lesson_activity_structure_step extends backup_activity_structure_st
             'completionendreached', 'completiontimespent', 'allowofflineattempts'
         ));
 
-        // The lesson_pages table
+        // The opendsa_activity_pages table
         // Grouped within a `pages` element, important to note that page is relational
-        // to the lesson, and also to the previous/next page in the series.
+        // to the opendsa_activity, and also to the previous/next page in the series.
         // Upon restore prevpageid and nextpageid will need to be corrected.
         $pages = new backup_nested_element('pages');
         $page = new backup_nested_element('page', array('id'), array(
@@ -91,9 +91,9 @@ class backup_lesson_activity_structure_step extends backup_activity_structure_st
             'contentsformat'
         ));
 
-        // The lesson_answers table
-        // Grouped within an answers `element`, the lesson_answers table relates
-        // to the page and lesson with `pageid` and `opendsa_activity_id` that will both need
+        // The opendsa_activity_answers table
+        // Grouped within an answers `element`, the opendsa_activity_answers table relates
+        // to the page and opendsa_activity with `pageid` and `opendsa_activity_id` that will both need
         // to be corrected during restore.
         $answers = new backup_nested_element('answers');
         $answer = new backup_nested_element('answer', array('id'), array(
@@ -104,34 +104,34 @@ class backup_lesson_activity_structure_step extends backup_activity_structure_st
         // database field.
         $answer->set_source_alias('answer', 'answer_text');
 
-        // The lesson_attempts table
-        // Grouped by an `attempts` element this is relational to the page, lesson,
+        // The opendsa_activity_attempts table
+        // Grouped by an `attempts` element this is relational to the page, opendsa_activity,
         // and user.
         $attempts = new backup_nested_element('attempts');
         $attempt = new backup_nested_element('attempt', array('id'), array(
             'userid','retry','correct','useranswer','timeseen'
         ));
 
-        // The lesson_branch table
-        // Grouped by a `branch` element this is relational to the page, lesson,
+        // The opendsa_activity_branch table
+        // Grouped by a `branch` element this is relational to the page, opendsa_activity,
         // and user.
         $branches = new backup_nested_element('branches');
         $branch = new backup_nested_element('branch', array('id'), array(
              'userid', 'retry', 'flag', 'timeseen', 'nextpageid'
         ));
 
-        // The lesson_grades table
-        // Grouped by a grades element this is relational to the lesson and user.
+        // The opendsa_activity_grades table
+        // Grouped by a grades element this is relational to the opendsa_activity and user.
         $grades = new backup_nested_element('grades');
         $grade = new backup_nested_element('grade', array('id'), array(
             'userid','grade','late','completed'
         ));
 
-        // The lesson_timer table
-        // Grouped by a `timers` element this is relational to the lesson and user.
+        // The opendsa_activity_timer table
+        // Grouped by a `timers` element this is relational to the opendsa_activity and user.
         $timers = new backup_nested_element('timers');
         $timer = new backup_nested_element('timer', array('id'), array(
-            'userid', 'starttime', 'lessontime', 'completed', 'timemodifiedoffline'
+            'userid', 'starttime', 'opendsa_activitytime', 'completed', 'timemodifiedoffline'
         ));
 
         $overrides = new backup_nested_element('overrides');
@@ -141,7 +141,7 @@ class backup_lesson_activity_structure_step extends backup_activity_structure_st
 
         // Now that we have all of the elements created we've got to put them
         // together correctly.
-        $lesson->add_child($pages);
+        $opendsa_activity->add_child($pages);
         $pages->add_child($page);
         $page->add_child($answers);
         $answers->add_child($answer);
@@ -149,21 +149,21 @@ class backup_lesson_activity_structure_step extends backup_activity_structure_st
         $attempts->add_child($attempt);
         $page->add_child($branches);
         $branches->add_child($branch);
-        $lesson->add_child($grades);
+        $opendsa_activity->add_child($grades);
         $grades->add_child($grade);
-        $lesson->add_child($timers);
+        $opendsa_activity->add_child($timers);
         $timers->add_child($timer);
-        $lesson->add_child($overrides);
+        $opendsa_activity->add_child($overrides);
         $overrides->add_child($override);
 
         // Set the source table for the elements that aren't reliant on the user
-        // at this point (lesson, lesson_pages, lesson_answers)
-        $lesson->set_source_table('lesson', array('id' => backup::VAR_ACTIVITYID));
+        // at this point (opendsa_activity, opendsa_activity_pages, opendsa_activity_answers)
+        $opendsa_activity->set_source_table('opendsa_activity', array('id' => backup::VAR_ACTIVITYID));
         //we use SQL here as it must be ordered by prevpageid so that restore gets the pages in the right order.
-        $page->set_source_table('lesson_pages', array('opendsa_activity_id' => backup::VAR_PARENTID), 'prevpageid ASC');
+        $page->set_source_table('opendsa_activity_pages', array('opendsa_activity_id' => backup::VAR_PARENTID), 'prevpageid ASC');
 
         // We use SQL here as answers must be ordered by id so that the restore gets them in the right order
-        $answer->set_source_table('lesson_answers', array('pageid' => backup::VAR_PARENTID), 'id ASC');
+        $answer->set_source_table('opendsa_activity_answers', array('pageid' => backup::VAR_PARENTID), 'id ASC');
 
         // Lesson overrides to backup are different depending of user info.
         $overrideparams = array('opendsa_activity_id' => backup::VAR_PARENTID);
@@ -171,11 +171,11 @@ class backup_lesson_activity_structure_step extends backup_activity_structure_st
         // Check if we are also backing up user information
         if ($this->get_setting_value('userinfo')) {
             // Set the source table for elements that are reliant on the user
-            // lesson_attempts, lesson_branch, lesson_grades, lesson_timer.
-            $attempt->set_source_table('lesson_attempts', array('answerid' => backup::VAR_PARENTID));
-            $branch->set_source_table('lesson_branch', array('pageid' => backup::VAR_PARENTID));
-            $grade->set_source_table('lesson_grades', array('opendsa_activity_id'=>backup::VAR_PARENTID));
-            $timer->set_source_table('lesson_timer', array('opendsa_activity_id' => backup::VAR_PARENTID));
+            // opendsa_activity_attempts, opendsa_activity_branch, opendsa_activity_grades, opendsa_activity_timer.
+            $attempt->set_source_table('opendsa_activity_attempts', array('answerid' => backup::VAR_PARENTID));
+            $branch->set_source_table('opendsa_activity_branch', array('pageid' => backup::VAR_PARENTID));
+            $grade->set_source_table('opendsa_activity_grades', array('opendsa_activity_id'=>backup::VAR_PARENTID));
+            $timer->set_source_table('opendsa_activity_timer', array('opendsa_activity_id' => backup::VAR_PARENTID));
         } else {
             $overrideparams['userid'] = backup_helper::is_sqlparam(null); //  Without userinfo, skip user overrides.
         }
@@ -186,7 +186,7 @@ class backup_lesson_activity_structure_step extends backup_activity_structure_st
             $overrideparams['groupid'] = backup_helper::is_sqlparam(null);
         }
 
-        $override->set_source_table('lesson_overrides', $overrideparams);
+        $override->set_source_table('opendsa_activity_overrides', $overrideparams);
 
         // Annotate the user id's where required.
         $attempt->annotate_ids('user', 'userid');
@@ -196,16 +196,16 @@ class backup_lesson_activity_structure_step extends backup_activity_structure_st
         $override->annotate_ids('user', 'userid');
         $override->annotate_ids('group', 'groupid');
 
-        // Annotate the file areas in user by the lesson module.
-        $lesson->annotate_files('mod_lesson', 'intro', null);
-        $lesson->annotate_files('mod_lesson', 'mediafile', null);
-        $page->annotate_files('mod_lesson', 'page_contents', 'id');
-        $answer->annotate_files('mod_lesson', 'page_answers', 'id');
-        $answer->annotate_files('mod_lesson', 'page_responses', 'id');
-        $attempt->annotate_files('mod_lesson', 'essay_responses', 'id');
-        $attempt->annotate_files('mod_lesson', 'essay_answers', 'id');
+        // Annotate the file areas in user by the opendsa_activity module.
+        $opendsa_activity->annotate_files('mod_opendsa_activity', 'intro', null);
+        $opendsa_activity->annotate_files('mod_opendsa_activity', 'mediafile', null);
+        $page->annotate_files('mod_opendsa_activity', 'page_contents', 'id');
+        $answer->annotate_files('mod_opendsa_activity', 'page_answers', 'id');
+        $answer->annotate_files('mod_opendsa_activity', 'page_responses', 'id');
+        $attempt->annotate_files('mod_opendsa_activity', 'essay_responses', 'id');
+        $attempt->annotate_files('mod_opendsa_activity', 'essay_answers', 'id');
 
-        // Prepare and return the structure we have just created for the lesson module.
-        return $this->prepare_activity_structure($lesson);
+        // Prepare and return the structure we have just created for the opendsa_activity module.
+        return $this->prepare_activity_structure($opendsa_activity);
     }
 }

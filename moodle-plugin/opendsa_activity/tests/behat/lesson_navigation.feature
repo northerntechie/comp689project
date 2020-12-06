@@ -1,6 +1,6 @@
-@mod @mod_lesson
-Feature: In a lesson activity, students can navigate through a series of pages in various ways depending upon their answers to questions
-  In order to create a lesson with conditional paths
+@mod @mod_opendsa_activity
+Feature: In a opendsa_activity activity, students can navigate through a series of pages in various ways depending upon their answers to questions
+  In order to create a opendsa_activity with conditional paths
   As a teacher
   I need to add pages and questions with links between them
 
@@ -21,9 +21,9 @@ Feature: In a lesson activity, students can navigate through a series of pages i
 
   Scenario: Student navigation with pages and questions
     Given I add a "Lesson" to section "1" and I fill the form with:
-      | Name | Test lesson name |
-      | Description | Test lesson description |
-    And I follow "Test lesson name"
+      | Name | Test opendsa_activity name |
+      | Description | Test opendsa_activity description |
+    And I follow "Test opendsa_activity name"
     And I follow "Add a content page"
     And I set the following fields to these values:
       | Page title | First page name |
@@ -49,7 +49,7 @@ Feature: In a lesson activity, students can navigate through a series of pages i
       | Page contents | 1 + 1? |
       | id_answer_editor_0 | 2 |
       | id_response_editor_0 | Correct answer |
-      | id_jumpto_0 | End of lesson |
+      | id_jumpto_0 | End of opendsa_activity |
       | id_score_0 | 1 |
       | id_answer_editor_1 | 1 |
       | id_response_editor_1 | Incorrect answer |
@@ -59,7 +59,7 @@ Feature: In a lesson activity, students can navigate through a series of pages i
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    When I follow "Test lesson name"
+    When I follow "Test opendsa_activity name"
     Then I should see "First page contents"
     And I press "Next page"
     And I should see "Second page contents"
@@ -84,16 +84,16 @@ Feature: In a lesson activity, students can navigate through a series of pages i
     And I press "Submit"
     And I should see "Maximum number of attempts reached - Moving to next page"
     And I press "Continue"
-    And I should see "Congratulations - end of lesson reached"
+    And I should see "Congratulations - end of opendsa_activity reached"
     And I should see "Your score is 0 (out of 1)."
 
   Scenario: Student reattempts a question until out of attempts
     Given I add a "Lesson" to section "1" and I fill the form with:
-      | Name | Test lesson name |
-      | Description | Test lesson description |
+      | Name | Test opendsa_activity name |
+      | Description | Test opendsa_activity description |
       | id_review | Yes |
       | id_maxattempts | 3 |
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
     And I follow "Add a question page"
     And I set the following fields to these values:
       | id_qtype | True/false |
@@ -107,7 +107,7 @@ Feature: In a lesson activity, students can navigate through a series of pages i
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    When I follow "Test lesson name"
+    When I follow "Test opendsa_activity name"
     Then I should see "Test content"
     And I set the following fields to these values:
       | wrong | 1 |
@@ -126,4 +126,4 @@ Feature: In a lesson activity, students can navigate through a series of pages i
     And I press "Submit"
     And I should not see "Yes, I'd like to try again"
     And I press "Continue"
-    And I should see "Congratulations - end of lesson reached"
+    And I should see "Congratulations - end of opendsa_activity reached"

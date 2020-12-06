@@ -15,11 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Capability definitions for the lesson module.
+ * Capability definitions for the opendsa_activity module.
  *
  * For naming conventions, see lib/db/access.php.
  *
- * @package    mod_lesson
+ * @package    mod_opendsa_activity
  * @copyright  1999 onwards Martin Dougiamas  {@link http://moodle.com}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or late
  */
@@ -28,7 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 
 $capabilities = array(
 
-    'mod/lesson:addinstance' => array(
+    'mod/opendsa_activity:addinstance' => array(
         'riskbitmask' => RISK_XSS,
 
         'captype' => 'write',
@@ -40,7 +40,7 @@ $capabilities = array(
         'clonepermissionsfrom' => 'moodle/course:manageactivities'
     ),
 
-    'mod/lesson:edit' => array(
+    'mod/opendsa_activity:edit' => array(
 
         'riskbitmask' => RISK_XSS, // we want flash and JS in question pages
 
@@ -53,7 +53,7 @@ $capabilities = array(
     ),
 
     // Grade essay questions.
-    'mod/lesson:grade' => array(
+    'mod/opendsa_activity:grade' => array(
         'riskbitmask' => RISK_SPAM | RISK_XSS,
         'captype' => 'write',
         'contextlevel' => CONTEXT_MODULE,
@@ -64,8 +64,8 @@ $capabilities = array(
         )
     ),
 
-    // View the lesson reports.
-    'mod/lesson:viewreports' => array(
+    // View the opendsa_activity reports.
+    'mod/opendsa_activity:viewreports' => array(
         'riskbitmask' => RISK_PERSONAL,
         'captype' => 'read',
         'contextlevel' => CONTEXT_MODULE,
@@ -76,7 +76,7 @@ $capabilities = array(
         )
     ),
 
-    'mod/lesson:manage' => array(
+    'mod/opendsa_activity:manage' => array(
 
         'captype' => 'write',
         'contextlevel' => CONTEXT_MODULE,
@@ -87,8 +87,8 @@ $capabilities = array(
         )
     ),
 
-    // Edit the lesson overrides.
-    'mod/lesson:manageoverrides' => array(
+    // Edit the opendsa_activity overrides.
+    'mod/opendsa_activity:manageoverrides' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_MODULE,
         'archetypes' => array(
@@ -97,7 +97,7 @@ $capabilities = array(
         )
     ),
 
-    'mod/lesson:view' => array(
+    'mod/opendsa_activity:view' => array(
         'captype' => 'read',
         'contextlevel' => CONTEXT_MODULE,
         'archetypes' => array(

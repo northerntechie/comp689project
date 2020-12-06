@@ -1,7 +1,7 @@
-@mod @mod_lesson
-Feature: In a lesson activity, a non editing teacher can grade essay questions
+@mod @mod_opendsa_activity
+Feature: In a opendsa_activity activity, a non editing teacher can grade essay questions
   As a non editing teacher
-  I need to grade student answers to essay questions in lesson
+  I need to grade student answers to essay questions in opendsa_activity
 
   Scenario: non editing teacher grade essay questions
     Given the following "users" exist:
@@ -36,10 +36,10 @@ Feature: In a lesson activity, a non editing teacher can grade essay questions
     And I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
     And I add a "Lesson" to section "1" and I fill the form with:
-      | Name | Test lesson name |
-      | Description | Test lesson description |
+      | Name | Test opendsa_activity name |
+      | Description | Test opendsa_activity description |
       | Group mode | Separate groups |
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
     And I follow "Add a question page"
     And I set the field "Select a question type" to "Essay"
     And I press "Add a question page"
@@ -50,19 +50,19 @@ Feature: In a lesson activity, a non editing teacher can grade essay questions
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
     And I set the field "Your answer" to "<p>Once upon a time there was a little green frog."
     And I press "Submit"
     And I log out
     And I log in as "student2"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
     And I set the field "Your answer" to "<p>Once upon a time there were two little green frogs."
     And I press "Submit"
     And I log out
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
     Then I should see "Grade essays"
     And I follow "Grade essays"
     And I should see "Student 1"
@@ -87,7 +87,7 @@ Feature: In a lesson activity, a non editing teacher can grade essay questions
     And I log out
     And I log in as "teacher2"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
     Then I should see "Grade essays"
     And I follow "Grade essays"
     And I should not see "Student 1"

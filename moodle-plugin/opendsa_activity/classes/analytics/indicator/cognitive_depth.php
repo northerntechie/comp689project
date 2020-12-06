@@ -15,21 +15,21 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Cognitive depth indicator - lesson.
+ * Cognitive depth indicator - opendsa_activity.
  *
- * @package   mod_lesson
+ * @package   mod_opendsa_activity
  * @copyright 2017 David Monllao {@link http://www.davidmonllao.com}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_lesson\analytics\indicator;
+namespace mod_opendsa_activity\analytics\indicator;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Cognitive depth indicator - lesson.
+ * Cognitive depth indicator - opendsa_activity.
  *
- * @package   mod_lesson
+ * @package   mod_opendsa_activity
  * @copyright 2017 David Monllao {@link http://www.davidmonllao.com}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -43,7 +43,7 @@ class cognitive_depth extends activity_base {
      * @return \lang_string
      */
     public static function get_name() : \lang_string {
-        return new \lang_string('indicator:cognitivedepth', 'mod_lesson');
+        return new \lang_string('indicator:cognitivedepth', 'mod_opendsa_activity');
     }
 
     public function get_indicator_type() {
@@ -65,12 +65,12 @@ class cognitive_depth extends activity_base {
      */
     protected function feedback_submitted(\cm_info $cm, $contextid, $userid, $after = false) {
         if (empty($this->activitylogs[$contextid][$userid]) ||
-                empty($this->activitylogs[$contextid][$userid]['\mod_lesson\event\lesson_ended'])) {
+                empty($this->activitylogs[$contextid][$userid]['\mod_opendsa_activity\event\opendsa_activity_ended'])) {
             return false;
         }
 
-        // Multiple lesson attempts completed counts as submitted after feedback.
-        return (2 >= count($this->activitylogs[$contextid][$userid]['\mod_lesson\event\lesson_ended']->timecreated));
+        // Multiple opendsa_activity attempts completed counts as submitted after feedback.
+        return (2 >= count($this->activitylogs[$contextid][$userid]['\mod_opendsa_activity\event\opendsa_activity_ended']->timecreated));
     }
 
     /**

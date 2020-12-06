@@ -1,6 +1,6 @@
-@mod @mod_lesson
+@mod @mod_opendsa_activity
 Feature: Lesson group override
-  In order to grant a student special access to a lesson
+  In order to grant a student special access to a opendsa_activity
   As a teacher
   I need to create an override for that user.
 
@@ -31,10 +31,10 @@ Feature: Lesson group override
       | student3 | G1 |
     And the following "activities" exist:
       | activity | name             | intro                   | groupmode  | course | idnumber |
-      | lesson   | Test lesson name | Test lesson description | 1          | C1     | lesson1  |
+      | opendsa_activity   | Test opendsa_activity name | Test opendsa_activity description | 1          | C1     | opendsa_activity1  |
     And I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
     And I follow "Add a question page"
     And I set the field "Select a question type" to "True/false"
     And I press "Add a question page"
@@ -53,7 +53,7 @@ Feature: Lesson group override
   Scenario: Add, modify then delete a group override
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
-    When I follow "Test lesson name"
+    When I follow "Test opendsa_activity name"
     And I navigate to "Group overrides" in current page administration
     And I press "Add group override"
     And I set the following fields to these values:
@@ -78,7 +78,7 @@ Feature: Lesson group override
   Scenario: Duplicate a user override
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
-    When I follow "Test lesson name"
+    When I follow "Test opendsa_activity name"
     And I navigate to "Group overrides" in current page administration
     And I press "Add group override"
     And I set the following fields to these values:
@@ -99,10 +99,10 @@ Feature: Lesson group override
     And I should see "Tuesday, 1 January 2030, 8:00"
     And I should see "Group 2"
 
-  Scenario: Allow a single group to have re-take the lesson
+  Scenario: Allow a single group to have re-take the opendsa_activity
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
-    When I follow "Test lesson name"
+    When I follow "Test opendsa_activity name"
     And I navigate to "Edit settings" in current page administration
     And I set the following fields to these values:
       | Re-takes allowed | 0 |
@@ -117,55 +117,55 @@ Feature: Lesson group override
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
     And I should see "Cat is an amphibian"
     And I set the following fields to these values:
       | False | 1 |
     And I press "Submit"
     And I press "Continue"
-    And I should see "Congratulations - end of lesson reached"
-    And I follow "Test lesson name"
-    Then I should not see "You are not allowed to retake this lesson."
+    And I should see "Congratulations - end of opendsa_activity reached"
+    And I follow "Test opendsa_activity name"
+    Then I should not see "You are not allowed to retake this opendsa_activity."
     And I should see "Cat is an amphibian"
     And I log out
     And I log in as "student2"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
     And I should see "Cat is an amphibian"
     And I set the following fields to these values:
       | False | 1 |
     And I press "Submit"
     And I press "Continue"
-    And I should see "Congratulations - end of lesson reached"
-    And I follow "Test lesson name"
-    And I should see "You are not allowed to retake this lesson."
+    And I should see "Congratulations - end of opendsa_activity reached"
+    And I follow "Test opendsa_activity name"
+    And I should see "You are not allowed to retake this opendsa_activity."
 
   Scenario: Allow a single group to have a different password
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
-    When I follow "Test lesson name"
+    When I follow "Test opendsa_activity name"
     And I navigate to "Edit settings" in current page administration
     And I set the following fields to these values:
-      | Password protected lesson | Yes |
+      | Password protected opendsa_activity | Yes |
       | id_password               | moodle_rules |
     And I press "Save and display"
     And I navigate to "Group overrides" in current page administration
     And I press "Add group override"
     And I set the following fields to these values:
       | Override group            | Group 1 |
-      | Password protected lesson | 12345 |
+      | Password protected opendsa_activity | 12345 |
     And I press "Save"
-    And I should see "Password protected lesson"
+    And I should see "Password protected opendsa_activity"
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
-    Then I should see "Test lesson name is a password protected lesson"
+    And I follow "Test opendsa_activity name"
+    Then I should see "Test opendsa_activity name is a password protected opendsa_activity"
     And I should not see "Cat is an amphibian"
     And I set the field "userpassword" to "moodle_rules"
     And I press "Continue"
     And I should see "Login failed, please try again..."
-    And I should see "Test lesson name is a password protected lesson"
+    And I should see "Test opendsa_activity name is a password protected opendsa_activity"
     And I set the field "userpassword" to "12345"
     And I press "Continue"
     And I should see "Cat is an amphibian"
@@ -173,24 +173,24 @@ Feature: Lesson group override
       | False | 1 |
     And I press "Submit"
     And I press "Continue"
-    And I should see "Congratulations - end of lesson reached"
+    And I should see "Congratulations - end of opendsa_activity reached"
     And I log out
     And I log in as "student2"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
-    And I should see "Test lesson name is a password protected lesson"
+    And I follow "Test opendsa_activity name"
+    And I should see "Test opendsa_activity name is a password protected opendsa_activity"
     And I should not see "Cat is an amphibian"
     And I set the field "userpassword" to "12345"
     And I press "Continue"
     And I should see "Login failed, please try again..."
-    And I should see "Test lesson name is a password protected lesson"
+    And I should see "Test opendsa_activity name is a password protected opendsa_activity"
     And I set the field "userpassword" to "moodle_rules"
     And I press "Continue"
 
   Scenario: Allow a group to have a different due date
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
-    When I follow "Test lesson name"
+    When I follow "Test opendsa_activity name"
     And I navigate to "Edit settings" in current page administration
     And I set the following fields to these values:
       | id_deadline_enabled | 1 |
@@ -215,19 +215,19 @@ Feature: Lesson group override
     And I log out
     And I log in as "student2"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson"
-    Then I should see "This lesson closed on Saturday, 1 January 2000, 8:00"
+    And I follow "Test opendsa_activity"
+    Then I should see "This opendsa_activity closed on Saturday, 1 January 2000, 8:00"
     And I should not see "Cat is an amphibian"
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson"
+    And I follow "Test opendsa_activity"
     And I should see "Cat is an amphibian"
 
   Scenario: Allow a group to have a different start date
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
-    When I follow "Test lesson name"
+    When I follow "Test opendsa_activity name"
     And I navigate to "Edit settings" in current page administration
     And I set the following fields to these values:
       | id_available_enabled | 1 |
@@ -252,19 +252,19 @@ Feature: Lesson group override
     And I log out
     And I log in as "student2"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson"
-    Then  I should see "This lesson will be open on Tuesday, 1 January 2030, 8:00"
+    And I follow "Test opendsa_activity"
+    Then  I should see "This opendsa_activity will be open on Tuesday, 1 January 2030, 8:00"
     And I should not see "Cat is an amphibian"
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson"
+    And I follow "Test opendsa_activity"
     And I should see "Cat is an amphibian"
 
   Scenario: Allow a single group to have multiple attempts at each question
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
-    When I follow "Test lesson name"
+    When I follow "Test opendsa_activity name"
     And I navigate to "Edit settings" in current page administration
     And I set the following fields to these values:
       | Re-takes allowed | 1 |
@@ -279,7 +279,7 @@ Feature: Lesson group override
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
     And I should see "Cat is an amphibian"
     And I set the following fields to these values:
       | True | 1 |
@@ -290,23 +290,23 @@ Feature: Lesson group override
       | True | 1 |
     And I press "Submit"
     And I press "Continue"
-    And I should see "Congratulations - end of lesson reached"
+    And I should see "Congratulations - end of opendsa_activity reached"
     And I log out
     And I log in as "student2"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
     And I should see "Cat is an amphibian"
     And I set the following fields to these values:
       | True | 1 |
     And I press "Submit"
     Then I press "Continue"
-    And I should see "Congratulations - end of lesson reached"
+    And I should see "Congratulations - end of opendsa_activity reached"
 
   @javascript
   Scenario: Add both a user and group override and verify that both are applied correctly
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
-    When I follow "Test lesson name"
+    When I follow "Test opendsa_activity name"
     And I navigate to "Edit settings" in current page administration
     And I set the following fields to these values:
       | id_available_enabled | 1 |
@@ -316,7 +316,7 @@ Feature: Lesson group override
       | available[hour]      | 08 |
       | available[minute]    | 00 |
     And I press "Save and display"
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
     And I navigate to "Group overrides" in current page administration
     And I press "Add group override"
     And I set the following fields to these values:
@@ -329,7 +329,7 @@ Feature: Lesson group override
       | available[minute]    | 00 |
     And I press "Save"
     And I should see "Tuesday, 1 January 2030, 8:00"
-    And I follow "Test lesson name"
+    And I follow "Test opendsa_activity name"
     And I navigate to "User overrides" in current page administration
     And I press "Add user override"
     And I set the following fields to these values:
@@ -345,18 +345,18 @@ Feature: Lesson group override
     And I log out
     Then I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson"
-    And I should see "This lesson will be open on Wednesday, 1 January 2031, 8:00"
+    And I follow "Test opendsa_activity"
+    And I should see "This opendsa_activity will be open on Wednesday, 1 January 2031, 8:00"
     And I log out
     And I log in as "student2"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson"
-    And I should see "This lesson will be open on Sunday, 1 January 2040, 8:00"
+    And I follow "Test opendsa_activity"
+    And I should see "This opendsa_activity will be open on Sunday, 1 January 2040, 8:00"
     And I log out
     And I log in as "student3"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson"
-    And I should see "This lesson will be open on Tuesday, 1 January 2030, 8:00"
+    And I follow "Test opendsa_activity"
+    And I should see "This opendsa_activity will be open on Tuesday, 1 January 2030, 8:00"
 
   Scenario: Override a group when teacher is in no group, and does not have accessallgroups permission, and the activity's group mode is 'separate groups'
     Given the following "permission overrides" exist:
@@ -364,7 +364,7 @@ Feature: Lesson group override
       | moodle/site:accessallgroups | Prevent    | editingteacher | Course       | C1        |
     And the following "activities" exist:
       | activity | name     | intro                | course | idnumber | groupmode |
-      | lesson   | Lesson 2 | Lesson 2 description | C1     | lesson2  | 1         |
+      | opendsa_activity   | Lesson 2 | Lesson 2 description | C1     | opendsa_activity2  | 1         |
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Lesson 2"
@@ -378,7 +378,7 @@ Feature: Lesson group override
       | moodle/site:accessallgroups | Prevent    | editingteacher | Course       | C1        |
     And the following "activities" exist:
       | activity | name     | intro                | course | idnumber | groupmode |
-      | lesson   | Lesson 2 | Lesson 2 description | C1     | lesson2  | 1         |
+      | opendsa_activity   | Lesson 2 | Lesson 2 description | C1     | opendsa_activity2  | 1         |
     And the following "group members" exist:
       | user     | group |
       | teacher1 | G1    |
@@ -396,7 +396,7 @@ Feature: Lesson group override
       | moodle/site:accessallgroups | Prevent    | editingteacher | Course       | C1        |
     And the following "activities" exist:
       | activity | name     | intro                | course | idnumber | groupmode |
-      | lesson   | Lesson 2 | Lesson 2 description | C1     | lesson2  | 1         |
+      | opendsa_activity   | Lesson 2 | Lesson 2 description | C1     | opendsa_activity2  | 1         |
     And the following "group members" exist:
       | user     | group |
       | teacher1 | G1    |

@@ -1,8 +1,8 @@
-@mod @mod_lesson
-Feature: Set end of lesson reached as a completion condition for a lesson
-  In order to ensure students really see all lesson pages
+@mod @mod_opendsa_activity
+Feature: Set end of opendsa_activity reached as a completion condition for a opendsa_activity
+  In order to ensure students really see all opendsa_activity pages
   As a teacher
-  I need to set end of lesson reached to mark the lesson activity as completed
+  I need to set end of opendsa_activity reached to mark the opendsa_activity activity as completed
 
   Scenario: Set end reached as a condition
     Given the following "users" exist:
@@ -23,12 +23,12 @@ Feature: Set end of lesson reached as a completion condition for a lesson
       | Enable completion tracking | Yes |
     And I press "Save and display"
     And I add a "Lesson" to section "1" and I fill the form with:
-      | Name | Test lesson |
-      | Description | Test lesson description |
+      | Name | Test opendsa_activity |
+      | Description | Test opendsa_activity description |
       | Completion tracking | Show activity as complete when conditions are met |
       | completionview       | 0 |
       | completionendreached | 1 |
-    And I follow "Test lesson"
+    And I follow "Test opendsa_activity"
     And I follow "Add a content page"
     And I set the following fields to these values:
       | Page title | First page name |
@@ -48,21 +48,21 @@ Feature: Set end of lesson reached as a completion condition for a lesson
     And I log out
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    Then the "Test lesson" "lesson" activity with "auto" completion should be marked as not complete
-    And I follow "Test lesson"
+    Then the "Test opendsa_activity" "opendsa_activity" activity with "auto" completion should be marked as not complete
+    And I follow "Test opendsa_activity"
     And I press "Next page"
     And I am on "Course 1" course homepage
-    Then the "Test lesson" "lesson" activity with "auto" completion should be marked as not complete
+    Then the "Test opendsa_activity" "opendsa_activity" activity with "auto" completion should be marked as not complete
     And I am on "Course 1" course homepage
-    And I follow "Test lesson"
-    And I should see "You have seen more than one page of this lesson already."
+    And I follow "Test opendsa_activity"
+    And I should see "You have seen more than one page of this opendsa_activity already."
     And I should see "Do you want to start at the last page you saw?"
     And I click on "No" "link" in the "#page-content" "css_element"
     And I press "Next page"
     And I press "Next page"
     And I am on "Course 1" course homepage
-    Then the "Test lesson" "lesson" activity with "auto" completion should be marked as complete
+    Then the "Test opendsa_activity" "opendsa_activity" activity with "auto" completion should be marked as complete
     And I log out
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And "Student 1" user has completed "Test lesson" activity
+    And "Student 1" user has completed "Test opendsa_activity" activity

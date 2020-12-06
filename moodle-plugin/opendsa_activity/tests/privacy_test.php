@@ -17,7 +17,7 @@
 /**
  * Data provider tests.
  *
- * @package    mod_lesson
+ * @package    mod_opendsa_activity
  * @category   test
  * @copyright  2018 Frédéric Massart
  * @author     Frédéric Massart <fred@branchup.tech>
@@ -31,18 +31,18 @@ use core_privacy\tests\provider_testcase;
 use core_privacy\local\request\approved_contextlist;
 use core_privacy\local\request\transform;
 use core_privacy\local\request\writer;
-use mod_lesson\privacy\provider;
+use mod_opendsa_activity\privacy\provider;
 
 /**
  * Data provider testcase class.
  *
- * @package    mod_lesson
+ * @package    mod_opendsa_activity
  * @category   test
  * @copyright  2018 Frédéric Massart
  * @author     Frédéric Massart <fred@branchup.tech>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class mod_lesson_privacy_testcase extends provider_testcase {
+class mod_opendsa_activity_privacy_testcase extends provider_testcase {
 
     public function setUp() {
         global $PAGE;
@@ -62,9 +62,9 @@ class mod_lesson_privacy_testcase extends provider_testcase {
         $u5 = $dg->create_user();
         $u6 = $dg->create_user();
 
-        $cm1 = $dg->create_module('lesson', ['course' => $c1]);
-        $cm2 = $dg->create_module('lesson', ['course' => $c1]);
-        $cm3 = $dg->create_module('lesson', ['course' => $c1]);
+        $cm1 = $dg->create_module('opendsa_activity', ['course' => $c1]);
+        $cm2 = $dg->create_module('opendsa_activity', ['course' => $c1]);
+        $cm3 = $dg->create_module('opendsa_activity', ['course' => $c1]);
         $cm1ctx = context_module::instance($cm1->cmid);
         $cm2ctx = context_module::instance($cm2->cmid);
         $cm3ctx = context_module::instance($cm3->cmid);
@@ -114,7 +114,7 @@ class mod_lesson_privacy_testcase extends provider_testcase {
     public function test_get_users_in_context() {
         $dg = $this->getDataGenerator();
         $c1 = $dg->create_course();
-        $component = 'mod_lesson';
+        $component = 'mod_opendsa_activity';
 
         $u1 = $dg->create_user();
         $u2 = $dg->create_user();
@@ -123,8 +123,8 @@ class mod_lesson_privacy_testcase extends provider_testcase {
         $u5 = $dg->create_user();
         $u6 = $dg->create_user();
 
-        $cm1 = $dg->create_module('lesson', ['course' => $c1]);
-        $cm2 = $dg->create_module('lesson', ['course' => $c1]);
+        $cm1 = $dg->create_module('opendsa_activity', ['course' => $c1]);
+        $cm2 = $dg->create_module('opendsa_activity', ['course' => $c1]);
 
         $cm1ctx = context_module::instance($cm1->cmid);
         $cm2ctx = context_module::instance($cm2->cmid);
@@ -169,9 +169,9 @@ class mod_lesson_privacy_testcase extends provider_testcase {
         $u1 = $dg->create_user();
         $u2 = $dg->create_user();
 
-        $cm1 = $dg->create_module('lesson', ['course' => $c1]);
-        $cm2 = $dg->create_module('lesson', ['course' => $c1]);
-        $cm3 = $dg->create_module('lesson', ['course' => $c1]);
+        $cm1 = $dg->create_module('opendsa_activity', ['course' => $c1]);
+        $cm2 = $dg->create_module('opendsa_activity', ['course' => $c1]);
+        $cm3 = $dg->create_module('opendsa_activity', ['course' => $c1]);
 
         $c1ctx = context_course::instance($c1->id);
         $cm1ctx = context_module::instance($cm1->cmid);
@@ -202,28 +202,28 @@ class mod_lesson_privacy_testcase extends provider_testcase {
         $this->create_override($cm2, $u2);
 
         $assertcm1nochange = function() use ($DB, $u1, $u2, $cm1) {
-            $this->assertTrue($DB->record_exists('lesson_attempts', ['userid' => $u1->id, 'opendsa_activity_id' => $cm1->id]));
-            $this->assertTrue($DB->record_exists('lesson_grades', ['userid' => $u1->id, 'opendsa_activity_id' => $cm1->id]));
-            $this->assertTrue($DB->record_exists('lesson_timer', ['userid' => $u1->id, 'opendsa_activity_id' => $cm1->id]));
-            $this->assertTrue($DB->record_exists('lesson_branch', ['userid' => $u1->id, 'opendsa_activity_id' => $cm1->id]));
-            $this->assertTrue($DB->record_exists('lesson_overrides', ['userid' => $u1->id, 'opendsa_activity_id' => $cm1->id]));
-            $this->assertTrue($DB->record_exists('lesson_attempts', ['userid' => $u2->id, 'opendsa_activity_id' => $cm1->id]));
-            $this->assertTrue($DB->record_exists('lesson_grades', ['userid' => $u2->id, 'opendsa_activity_id' => $cm1->id]));
-            $this->assertTrue($DB->record_exists('lesson_timer', ['userid' => $u2->id, 'opendsa_activity_id' => $cm1->id]));
-            $this->assertTrue($DB->record_exists('lesson_branch', ['userid' => $u2->id, 'opendsa_activity_id' => $cm1->id]));
-            $this->assertTrue($DB->record_exists('lesson_overrides', ['userid' => $u2->id, 'opendsa_activity_id' => $cm1->id]));
+            $this->assertTrue($DB->record_exists('opendsa_activity_attempts', ['userid' => $u1->id, 'opendsa_activity_id' => $cm1->id]));
+            $this->assertTrue($DB->record_exists('opendsa_activity_grades', ['userid' => $u1->id, 'opendsa_activity_id' => $cm1->id]));
+            $this->assertTrue($DB->record_exists('opendsa_activity_timer', ['userid' => $u1->id, 'opendsa_activity_id' => $cm1->id]));
+            $this->assertTrue($DB->record_exists('opendsa_activity_branch', ['userid' => $u1->id, 'opendsa_activity_id' => $cm1->id]));
+            $this->assertTrue($DB->record_exists('opendsa_activity_overrides', ['userid' => $u1->id, 'opendsa_activity_id' => $cm1->id]));
+            $this->assertTrue($DB->record_exists('opendsa_activity_attempts', ['userid' => $u2->id, 'opendsa_activity_id' => $cm1->id]));
+            $this->assertTrue($DB->record_exists('opendsa_activity_grades', ['userid' => $u2->id, 'opendsa_activity_id' => $cm1->id]));
+            $this->assertTrue($DB->record_exists('opendsa_activity_timer', ['userid' => $u2->id, 'opendsa_activity_id' => $cm1->id]));
+            $this->assertTrue($DB->record_exists('opendsa_activity_branch', ['userid' => $u2->id, 'opendsa_activity_id' => $cm1->id]));
+            $this->assertTrue($DB->record_exists('opendsa_activity_overrides', ['userid' => $u2->id, 'opendsa_activity_id' => $cm1->id]));
         };
         $assertcm2nochange = function() use ($DB, $u1, $u2, $cm2) {
-            $this->assertTrue($DB->record_exists('lesson_attempts', ['userid' => $u1->id, 'opendsa_activity_id' => $cm2->id]));
-            $this->assertTrue($DB->record_exists('lesson_grades', ['userid' => $u1->id, 'opendsa_activity_id' => $cm2->id]));
-            $this->assertTrue($DB->record_exists('lesson_timer', ['userid' => $u1->id, 'opendsa_activity_id' => $cm2->id]));
-            $this->assertTrue($DB->record_exists('lesson_branch', ['userid' => $u1->id, 'opendsa_activity_id' => $cm2->id]));
-            $this->assertTrue($DB->record_exists('lesson_overrides', ['userid' => $u1->id, 'opendsa_activity_id' => $cm2->id]));
-            $this->assertTrue($DB->record_exists('lesson_attempts', ['userid' => $u2->id, 'opendsa_activity_id' => $cm2->id]));
-            $this->assertTrue($DB->record_exists('lesson_grades', ['userid' => $u2->id, 'opendsa_activity_id' => $cm2->id]));
-            $this->assertTrue($DB->record_exists('lesson_timer', ['userid' => $u2->id, 'opendsa_activity_id' => $cm2->id]));
-            $this->assertTrue($DB->record_exists('lesson_branch', ['userid' => $u2->id, 'opendsa_activity_id' => $cm2->id]));
-            $this->assertTrue($DB->record_exists('lesson_overrides', ['userid' => $u2->id, 'opendsa_activity_id' => $cm2->id]));
+            $this->assertTrue($DB->record_exists('opendsa_activity_attempts', ['userid' => $u1->id, 'opendsa_activity_id' => $cm2->id]));
+            $this->assertTrue($DB->record_exists('opendsa_activity_grades', ['userid' => $u1->id, 'opendsa_activity_id' => $cm2->id]));
+            $this->assertTrue($DB->record_exists('opendsa_activity_timer', ['userid' => $u1->id, 'opendsa_activity_id' => $cm2->id]));
+            $this->assertTrue($DB->record_exists('opendsa_activity_branch', ['userid' => $u1->id, 'opendsa_activity_id' => $cm2->id]));
+            $this->assertTrue($DB->record_exists('opendsa_activity_overrides', ['userid' => $u1->id, 'opendsa_activity_id' => $cm2->id]));
+            $this->assertTrue($DB->record_exists('opendsa_activity_attempts', ['userid' => $u2->id, 'opendsa_activity_id' => $cm2->id]));
+            $this->assertTrue($DB->record_exists('opendsa_activity_grades', ['userid' => $u2->id, 'opendsa_activity_id' => $cm2->id]));
+            $this->assertTrue($DB->record_exists('opendsa_activity_timer', ['userid' => $u2->id, 'opendsa_activity_id' => $cm2->id]));
+            $this->assertTrue($DB->record_exists('opendsa_activity_branch', ['userid' => $u2->id, 'opendsa_activity_id' => $cm2->id]));
+            $this->assertTrue($DB->record_exists('opendsa_activity_overrides', ['userid' => $u2->id, 'opendsa_activity_id' => $cm2->id]));
         };
 
         // Confirm existing state.
@@ -243,16 +243,16 @@ class mod_lesson_privacy_testcase extends provider_testcase {
         // Delete cm1: no change in cm2.
         provider::delete_data_for_all_users_in_context(context_module::instance($cm1->cmid));
         $assertcm2nochange();
-        $this->assertFalse($DB->record_exists('lesson_attempts', ['userid' => $u1->id, 'opendsa_activity_id' => $cm1->id]));
-        $this->assertFalse($DB->record_exists('lesson_grades', ['userid' => $u1->id, 'opendsa_activity_id' => $cm1->id]));
-        $this->assertFalse($DB->record_exists('lesson_timer', ['userid' => $u1->id, 'opendsa_activity_id' => $cm1->id]));
-        $this->assertFalse($DB->record_exists('lesson_branch', ['userid' => $u1->id, 'opendsa_activity_id' => $cm1->id]));
-        $this->assertFalse($DB->record_exists('lesson_overrides', ['userid' => $u1->id, 'opendsa_activity_id' => $cm1->id]));
-        $this->assertFalse($DB->record_exists('lesson_attempts', ['userid' => $u2->id, 'opendsa_activity_id' => $cm1->id]));
-        $this->assertFalse($DB->record_exists('lesson_grades', ['userid' => $u2->id, 'opendsa_activity_id' => $cm1->id]));
-        $this->assertFalse($DB->record_exists('lesson_timer', ['userid' => $u2->id, 'opendsa_activity_id' => $cm1->id]));
-        $this->assertFalse($DB->record_exists('lesson_branch', ['userid' => $u2->id, 'opendsa_activity_id' => $cm1->id]));
-        $this->assertFalse($DB->record_exists('lesson_overrides', ['userid' => $u2->id, 'opendsa_activity_id' => $cm1->id]));
+        $this->assertFalse($DB->record_exists('opendsa_activity_attempts', ['userid' => $u1->id, 'opendsa_activity_id' => $cm1->id]));
+        $this->assertFalse($DB->record_exists('opendsa_activity_grades', ['userid' => $u1->id, 'opendsa_activity_id' => $cm1->id]));
+        $this->assertFalse($DB->record_exists('opendsa_activity_timer', ['userid' => $u1->id, 'opendsa_activity_id' => $cm1->id]));
+        $this->assertFalse($DB->record_exists('opendsa_activity_branch', ['userid' => $u1->id, 'opendsa_activity_id' => $cm1->id]));
+        $this->assertFalse($DB->record_exists('opendsa_activity_overrides', ['userid' => $u1->id, 'opendsa_activity_id' => $cm1->id]));
+        $this->assertFalse($DB->record_exists('opendsa_activity_attempts', ['userid' => $u2->id, 'opendsa_activity_id' => $cm1->id]));
+        $this->assertFalse($DB->record_exists('opendsa_activity_grades', ['userid' => $u2->id, 'opendsa_activity_id' => $cm1->id]));
+        $this->assertFalse($DB->record_exists('opendsa_activity_timer', ['userid' => $u2->id, 'opendsa_activity_id' => $cm1->id]));
+        $this->assertFalse($DB->record_exists('opendsa_activity_branch', ['userid' => $u2->id, 'opendsa_activity_id' => $cm1->id]));
+        $this->assertFalse($DB->record_exists('opendsa_activity_overrides', ['userid' => $u2->id, 'opendsa_activity_id' => $cm1->id]));
     }
 
     public function test_delete_data_for_user() {
@@ -262,9 +262,9 @@ class mod_lesson_privacy_testcase extends provider_testcase {
         $u1 = $dg->create_user();
         $u2 = $dg->create_user();
 
-        $cm1 = $dg->create_module('lesson', ['course' => $c1]);
-        $cm2 = $dg->create_module('lesson', ['course' => $c1]);
-        $cm3 = $dg->create_module('lesson', ['course' => $c1]);
+        $cm1 = $dg->create_module('opendsa_activity', ['course' => $c1]);
+        $cm2 = $dg->create_module('opendsa_activity', ['course' => $c1]);
+        $cm3 = $dg->create_module('opendsa_activity', ['course' => $c1]);
 
         $c1ctx = context_course::instance($c1->id);
         $cm1ctx = context_module::instance($cm1->cmid);
@@ -294,28 +294,28 @@ class mod_lesson_privacy_testcase extends provider_testcase {
         $this->create_override($cm2, $u2);
 
         $assertu1nochange = function() use ($DB, $u1, $cm1, $cm2) {
-            $this->assertTrue($DB->record_exists('lesson_attempts', ['userid' => $u1->id, 'opendsa_activity_id' => $cm1->id]));
-            $this->assertTrue($DB->record_exists('lesson_grades', ['userid' => $u1->id, 'opendsa_activity_id' => $cm1->id]));
-            $this->assertTrue($DB->record_exists('lesson_timer', ['userid' => $u1->id, 'opendsa_activity_id' => $cm1->id]));
-            $this->assertTrue($DB->record_exists('lesson_branch', ['userid' => $u1->id, 'opendsa_activity_id' => $cm1->id]));
-            $this->assertTrue($DB->record_exists('lesson_overrides', ['userid' => $u1->id, 'opendsa_activity_id' => $cm1->id]));
-            $this->assertTrue($DB->record_exists('lesson_attempts', ['userid' => $u1->id, 'opendsa_activity_id' => $cm2->id]));
-            $this->assertTrue($DB->record_exists('lesson_grades', ['userid' => $u1->id, 'opendsa_activity_id' => $cm2->id]));
-            $this->assertTrue($DB->record_exists('lesson_timer', ['userid' => $u1->id, 'opendsa_activity_id' => $cm2->id]));
-            $this->assertTrue($DB->record_exists('lesson_branch', ['userid' => $u1->id, 'opendsa_activity_id' => $cm2->id]));
-            $this->assertTrue($DB->record_exists('lesson_overrides', ['userid' => $u1->id, 'opendsa_activity_id' => $cm2->id]));
+            $this->assertTrue($DB->record_exists('opendsa_activity_attempts', ['userid' => $u1->id, 'opendsa_activity_id' => $cm1->id]));
+            $this->assertTrue($DB->record_exists('opendsa_activity_grades', ['userid' => $u1->id, 'opendsa_activity_id' => $cm1->id]));
+            $this->assertTrue($DB->record_exists('opendsa_activity_timer', ['userid' => $u1->id, 'opendsa_activity_id' => $cm1->id]));
+            $this->assertTrue($DB->record_exists('opendsa_activity_branch', ['userid' => $u1->id, 'opendsa_activity_id' => $cm1->id]));
+            $this->assertTrue($DB->record_exists('opendsa_activity_overrides', ['userid' => $u1->id, 'opendsa_activity_id' => $cm1->id]));
+            $this->assertTrue($DB->record_exists('opendsa_activity_attempts', ['userid' => $u1->id, 'opendsa_activity_id' => $cm2->id]));
+            $this->assertTrue($DB->record_exists('opendsa_activity_grades', ['userid' => $u1->id, 'opendsa_activity_id' => $cm2->id]));
+            $this->assertTrue($DB->record_exists('opendsa_activity_timer', ['userid' => $u1->id, 'opendsa_activity_id' => $cm2->id]));
+            $this->assertTrue($DB->record_exists('opendsa_activity_branch', ['userid' => $u1->id, 'opendsa_activity_id' => $cm2->id]));
+            $this->assertTrue($DB->record_exists('opendsa_activity_overrides', ['userid' => $u1->id, 'opendsa_activity_id' => $cm2->id]));
         };
         $assertu2nochange = function() use ($DB, $u2, $cm1, $cm2) {
-            $this->assertTrue($DB->record_exists('lesson_attempts', ['userid' => $u2->id, 'opendsa_activity_id' => $cm1->id]));
-            $this->assertTrue($DB->record_exists('lesson_grades', ['userid' => $u2->id, 'opendsa_activity_id' => $cm1->id]));
-            $this->assertTrue($DB->record_exists('lesson_timer', ['userid' => $u2->id, 'opendsa_activity_id' => $cm1->id]));
-            $this->assertTrue($DB->record_exists('lesson_branch', ['userid' => $u2->id, 'opendsa_activity_id' => $cm1->id]));
-            $this->assertTrue($DB->record_exists('lesson_overrides', ['userid' => $u2->id, 'opendsa_activity_id' => $cm1->id]));
-            $this->assertTrue($DB->record_exists('lesson_attempts', ['userid' => $u2->id, 'opendsa_activity_id' => $cm2->id]));
-            $this->assertTrue($DB->record_exists('lesson_grades', ['userid' => $u2->id, 'opendsa_activity_id' => $cm2->id]));
-            $this->assertTrue($DB->record_exists('lesson_timer', ['userid' => $u2->id, 'opendsa_activity_id' => $cm2->id]));
-            $this->assertTrue($DB->record_exists('lesson_branch', ['userid' => $u2->id, 'opendsa_activity_id' => $cm2->id]));
-            $this->assertTrue($DB->record_exists('lesson_overrides', ['userid' => $u2->id, 'opendsa_activity_id' => $cm2->id]));
+            $this->assertTrue($DB->record_exists('opendsa_activity_attempts', ['userid' => $u2->id, 'opendsa_activity_id' => $cm1->id]));
+            $this->assertTrue($DB->record_exists('opendsa_activity_grades', ['userid' => $u2->id, 'opendsa_activity_id' => $cm1->id]));
+            $this->assertTrue($DB->record_exists('opendsa_activity_timer', ['userid' => $u2->id, 'opendsa_activity_id' => $cm1->id]));
+            $this->assertTrue($DB->record_exists('opendsa_activity_branch', ['userid' => $u2->id, 'opendsa_activity_id' => $cm1->id]));
+            $this->assertTrue($DB->record_exists('opendsa_activity_overrides', ['userid' => $u2->id, 'opendsa_activity_id' => $cm1->id]));
+            $this->assertTrue($DB->record_exists('opendsa_activity_attempts', ['userid' => $u2->id, 'opendsa_activity_id' => $cm2->id]));
+            $this->assertTrue($DB->record_exists('opendsa_activity_grades', ['userid' => $u2->id, 'opendsa_activity_id' => $cm2->id]));
+            $this->assertTrue($DB->record_exists('opendsa_activity_timer', ['userid' => $u2->id, 'opendsa_activity_id' => $cm2->id]));
+            $this->assertTrue($DB->record_exists('opendsa_activity_branch', ['userid' => $u2->id, 'opendsa_activity_id' => $cm2->id]));
+            $this->assertTrue($DB->record_exists('opendsa_activity_overrides', ['userid' => $u2->id, 'opendsa_activity_id' => $cm2->id]));
         };
 
         // Confirm existing state.
@@ -323,28 +323,28 @@ class mod_lesson_privacy_testcase extends provider_testcase {
         $assertu2nochange();
 
         // Delete the course: no change.
-        provider::delete_data_for_user(new approved_contextlist($u1, 'mod_lesson', [context_course::instance($c1->id)->id]));
+        provider::delete_data_for_user(new approved_contextlist($u1, 'mod_opendsa_activity', [context_course::instance($c1->id)->id]));
         $assertu1nochange();
         $assertu2nochange();
 
         // Delete another module: no change.
-        provider::delete_data_for_user(new approved_contextlist($u1, 'mod_lesson', [context_module::instance($cm3->cmid)->id]));
+        provider::delete_data_for_user(new approved_contextlist($u1, 'mod_opendsa_activity', [context_module::instance($cm3->cmid)->id]));
         $assertu1nochange();
         $assertu2nochange();
 
         // Delete u1 in cm1: no change for u2 and in cm2.
-        provider::delete_data_for_user(new approved_contextlist($u1, 'mod_lesson', [context_module::instance($cm1->cmid)->id]));
+        provider::delete_data_for_user(new approved_contextlist($u1, 'mod_opendsa_activity', [context_module::instance($cm1->cmid)->id]));
         $assertu2nochange();
-        $this->assertFalse($DB->record_exists('lesson_attempts', ['userid' => $u1->id, 'opendsa_activity_id' => $cm1->id]));
-        $this->assertFalse($DB->record_exists('lesson_grades', ['userid' => $u1->id, 'opendsa_activity_id' => $cm1->id]));
-        $this->assertFalse($DB->record_exists('lesson_timer', ['userid' => $u1->id, 'opendsa_activity_id' => $cm1->id]));
-        $this->assertFalse($DB->record_exists('lesson_branch', ['userid' => $u1->id, 'opendsa_activity_id' => $cm1->id]));
-        $this->assertFalse($DB->record_exists('lesson_overrides', ['userid' => $u1->id, 'opendsa_activity_id' => $cm1->id]));
-        $this->assertTrue($DB->record_exists('lesson_attempts', ['userid' => $u1->id, 'opendsa_activity_id' => $cm2->id]));
-        $this->assertTrue($DB->record_exists('lesson_grades', ['userid' => $u1->id, 'opendsa_activity_id' => $cm2->id]));
-        $this->assertTrue($DB->record_exists('lesson_timer', ['userid' => $u1->id, 'opendsa_activity_id' => $cm2->id]));
-        $this->assertTrue($DB->record_exists('lesson_branch', ['userid' => $u1->id, 'opendsa_activity_id' => $cm2->id]));
-        $this->assertTrue($DB->record_exists('lesson_overrides', ['userid' => $u1->id, 'opendsa_activity_id' => $cm2->id]));
+        $this->assertFalse($DB->record_exists('opendsa_activity_attempts', ['userid' => $u1->id, 'opendsa_activity_id' => $cm1->id]));
+        $this->assertFalse($DB->record_exists('opendsa_activity_grades', ['userid' => $u1->id, 'opendsa_activity_id' => $cm1->id]));
+        $this->assertFalse($DB->record_exists('opendsa_activity_timer', ['userid' => $u1->id, 'opendsa_activity_id' => $cm1->id]));
+        $this->assertFalse($DB->record_exists('opendsa_activity_branch', ['userid' => $u1->id, 'opendsa_activity_id' => $cm1->id]));
+        $this->assertFalse($DB->record_exists('opendsa_activity_overrides', ['userid' => $u1->id, 'opendsa_activity_id' => $cm1->id]));
+        $this->assertTrue($DB->record_exists('opendsa_activity_attempts', ['userid' => $u1->id, 'opendsa_activity_id' => $cm2->id]));
+        $this->assertTrue($DB->record_exists('opendsa_activity_grades', ['userid' => $u1->id, 'opendsa_activity_id' => $cm2->id]));
+        $this->assertTrue($DB->record_exists('opendsa_activity_timer', ['userid' => $u1->id, 'opendsa_activity_id' => $cm2->id]));
+        $this->assertTrue($DB->record_exists('opendsa_activity_branch', ['userid' => $u1->id, 'opendsa_activity_id' => $cm2->id]));
+        $this->assertTrue($DB->record_exists('opendsa_activity_overrides', ['userid' => $u1->id, 'opendsa_activity_id' => $cm2->id]));
     }
 
     /*
@@ -357,9 +357,9 @@ class mod_lesson_privacy_testcase extends provider_testcase {
         $u1 = $dg->create_user();
         $u2 = $dg->create_user();
 
-        $cm1 = $dg->create_module('lesson', ['course' => $c1]);
-        $cm2 = $dg->create_module('lesson', ['course' => $c1]);
-        $cm3 = $dg->create_module('lesson', ['course' => $c1]);
+        $cm1 = $dg->create_module('opendsa_activity', ['course' => $c1]);
+        $cm2 = $dg->create_module('opendsa_activity', ['course' => $c1]);
+        $cm3 = $dg->create_module('opendsa_activity', ['course' => $c1]);
         $context1 = context_module::instance($cm1->cmid);
         $context3 = context_module::instance($cm3->cmid);
 
@@ -386,19 +386,19 @@ class mod_lesson_privacy_testcase extends provider_testcase {
         $this->create_override($cm2, $u2);
 
         $assertnochange = function($user, $cm) use ($DB) {
-            $this->assertTrue($DB->record_exists('lesson_attempts', ['userid' => $user->id, 'opendsa_activity_id' => $cm->id]));
-            $this->assertTrue($DB->record_exists('lesson_grades', ['userid' => $user->id, 'opendsa_activity_id' => $cm->id]));
-            $this->assertTrue($DB->record_exists('lesson_timer', ['userid' => $user->id, 'opendsa_activity_id' => $cm->id]));
-            $this->assertTrue($DB->record_exists('lesson_branch', ['userid' => $user->id, 'opendsa_activity_id' => $cm->id]));
-            $this->assertTrue($DB->record_exists('lesson_overrides', ['userid' => $user->id, 'opendsa_activity_id' => $cm->id]));
+            $this->assertTrue($DB->record_exists('opendsa_activity_attempts', ['userid' => $user->id, 'opendsa_activity_id' => $cm->id]));
+            $this->assertTrue($DB->record_exists('opendsa_activity_grades', ['userid' => $user->id, 'opendsa_activity_id' => $cm->id]));
+            $this->assertTrue($DB->record_exists('opendsa_activity_timer', ['userid' => $user->id, 'opendsa_activity_id' => $cm->id]));
+            $this->assertTrue($DB->record_exists('opendsa_activity_branch', ['userid' => $user->id, 'opendsa_activity_id' => $cm->id]));
+            $this->assertTrue($DB->record_exists('opendsa_activity_overrides', ['userid' => $user->id, 'opendsa_activity_id' => $cm->id]));
         };
 
         $assertdeleted = function($user, $cm) use ($DB) {
-            $this->assertFalse($DB->record_exists('lesson_attempts', ['userid' => $user->id, 'opendsa_activity_id' => $cm->id]));
-            $this->assertFalse($DB->record_exists('lesson_grades', ['userid' => $user->id, 'opendsa_activity_id' => $cm->id]));
-            $this->assertFalse($DB->record_exists('lesson_timer', ['userid' => $user->id, 'opendsa_activity_id' => $cm->id]));
-            $this->assertFalse($DB->record_exists('lesson_branch', ['userid' => $user->id, 'opendsa_activity_id' => $cm->id]));
-            $this->assertFalse($DB->record_exists('lesson_overrides', ['userid' => $user->id, 'opendsa_activity_id' => $cm->id]));
+            $this->assertFalse($DB->record_exists('opendsa_activity_attempts', ['userid' => $user->id, 'opendsa_activity_id' => $cm->id]));
+            $this->assertFalse($DB->record_exists('opendsa_activity_grades', ['userid' => $user->id, 'opendsa_activity_id' => $cm->id]));
+            $this->assertFalse($DB->record_exists('opendsa_activity_timer', ['userid' => $user->id, 'opendsa_activity_id' => $cm->id]));
+            $this->assertFalse($DB->record_exists('opendsa_activity_branch', ['userid' => $user->id, 'opendsa_activity_id' => $cm->id]));
+            $this->assertFalse($DB->record_exists('opendsa_activity_overrides', ['userid' => $user->id, 'opendsa_activity_id' => $cm->id]));
         };
 
         // Confirm existing state.
@@ -408,7 +408,7 @@ class mod_lesson_privacy_testcase extends provider_testcase {
         $assertnochange($u2, $cm2);
 
         // Delete another module: no change.
-        $approveduserlist = new core_privacy\local\request\approved_userlist($context3, 'mod_lesson', [$u1->id]);
+        $approveduserlist = new core_privacy\local\request\approved_userlist($context3, 'mod_opendsa_activity', [$u1->id]);
         provider::delete_data_for_users($approveduserlist);
 
         $assertnochange($u1, $cm1);
@@ -417,7 +417,7 @@ class mod_lesson_privacy_testcase extends provider_testcase {
         $assertnochange($u2, $cm2);
 
         // Delete cm1 for u1: no change for u2 and in cm2.
-        $approveduserlist = new core_privacy\local\request\approved_userlist($context1, 'mod_lesson', [$u1->id]);
+        $approveduserlist = new core_privacy\local\request\approved_userlist($context1, 'mod_opendsa_activity', [$u1->id]);
         provider::delete_data_for_users($approveduserlist);
 
         $assertdeleted($u1, $cm1);
@@ -432,8 +432,8 @@ class mod_lesson_privacy_testcase extends provider_testcase {
         $u1 = $dg->create_user();
         $u2 = $dg->create_user();
 
-        $cm1 = $dg->create_module('lesson', ['course' => $c1]);
-        $cm2 = $dg->create_module('lesson', ['course' => $c1]);
+        $cm1 = $dg->create_module('opendsa_activity', ['course' => $c1]);
+        $cm2 = $dg->create_module('opendsa_activity', ['course' => $c1]);
         $cm1ctx = context_module::instance($cm1->cmid);
         $cm2ctx = context_module::instance($cm2->cmid);
 
@@ -455,7 +455,7 @@ class mod_lesson_privacy_testcase extends provider_testcase {
             'retake' => 1,
         ]);
 
-        provider::export_user_data(new approved_contextlist($u1, 'mod_lesson', [$cm1ctx->id, $cm2ctx->id]));
+        provider::export_user_data(new approved_contextlist($u1, 'mod_opendsa_activity', [$cm1ctx->id, $cm2ctx->id]));
         $data = writer::with_context($cm1ctx)->get_data([]);
         $this->assertNotEmpty($data);
         $data = writer::with_context($cm1ctx)->get_related_data([], 'overrides');
@@ -479,7 +479,7 @@ class mod_lesson_privacy_testcase extends provider_testcase {
         $this->assertEquals('1337 5p34k', $data->password);
 
         writer::reset();
-        provider::export_user_data(new approved_contextlist($u2, 'mod_lesson', [$cm1ctx->id, $cm2ctx->id]));
+        provider::export_user_data(new approved_contextlist($u2, 'mod_opendsa_activity', [$cm1ctx->id, $cm2ctx->id]));
         $data = writer::with_context($cm1ctx)->get_data([]);
         $this->assertNotEmpty($data);
         $data = writer::with_context($cm1ctx)->get_related_data([], 'overrides');
@@ -503,8 +503,8 @@ class mod_lesson_privacy_testcase extends provider_testcase {
         $u1 = $dg->create_user();
         $u2 = $dg->create_user();
 
-        $cm1 = $dg->create_module('lesson', ['course' => $c1]);
-        $cm2 = $dg->create_module('lesson', ['course' => $c1]);
+        $cm1 = $dg->create_module('opendsa_activity', ['course' => $c1]);
+        $cm2 = $dg->create_module('opendsa_activity', ['course' => $c1]);
         $cm1ctx = context_module::instance($cm1->cmid);
         $cm2ctx = context_module::instance($cm2->cmid);
 
@@ -514,7 +514,7 @@ class mod_lesson_privacy_testcase extends provider_testcase {
         $this->create_grade($cm2, $u1, ['grade' => 81.23, 'completed' => $now - 100]);
         $this->create_grade($cm1, $u2, ['grade' => 99.98, 'completed' => $now - 86400]);
 
-        provider::export_user_data(new approved_contextlist($u1, 'mod_lesson', [$cm1ctx->id, $cm2ctx->id]));
+        provider::export_user_data(new approved_contextlist($u1, 'mod_opendsa_activity', [$cm1ctx->id, $cm2ctx->id]));
         $data = writer::with_context($cm1ctx)->get_related_data([], 'grades');
         $this->assertEmpty($data);
         $data = writer::with_context($cm2ctx)->get_related_data([], 'grades');
@@ -528,7 +528,7 @@ class mod_lesson_privacy_testcase extends provider_testcase {
         $this->assertEquals(transform::datetime($now - 100), $data->grades[2]->completed);
 
         writer::reset();
-        provider::export_user_data(new approved_contextlist($u2, 'mod_lesson', [$cm1ctx->id, $cm2ctx->id]));
+        provider::export_user_data(new approved_contextlist($u2, 'mod_opendsa_activity', [$cm1ctx->id, $cm2ctx->id]));
         $data = writer::with_context($cm2ctx)->get_related_data([], 'grades');
         $this->assertEmpty($data);
         $data = writer::with_context($cm1ctx)->get_related_data([], 'grades');
@@ -544,19 +544,19 @@ class mod_lesson_privacy_testcase extends provider_testcase {
         $u1 = $dg->create_user();
         $u2 = $dg->create_user();
 
-        $cm1 = $dg->create_module('lesson', ['course' => $c1]);
-        $cm2 = $dg->create_module('lesson', ['course' => $c1]);
+        $cm1 = $dg->create_module('opendsa_activity', ['course' => $c1]);
+        $cm2 = $dg->create_module('opendsa_activity', ['course' => $c1]);
         $cm1ctx = context_module::instance($cm1->cmid);
         $cm2ctx = context_module::instance($cm2->cmid);
 
         $now = time();
-        $this->create_timer($cm2, $u1, ['starttime' => $now - 2000, 'lessontime' => $now + 3600, 'completed' => 0,
+        $this->create_timer($cm2, $u1, ['starttime' => $now - 2000, 'opendsa_activitytime' => $now + 3600, 'completed' => 0,
             'timemodifiedoffline' => $now - 7000]);
-        $this->create_timer($cm2, $u1, ['starttime' => $now - 1000, 'lessontime' => $now + 1600, 'completed' => 0]);
-        $this->create_timer($cm2, $u1, ['starttime' => $now - 500, 'lessontime' => $now + 100, 'completed' => 1]);
-        $this->create_timer($cm1, $u2, ['starttime' => $now - 1000, 'lessontime' => $now + 1800, 'completed' => 1]);
+        $this->create_timer($cm2, $u1, ['starttime' => $now - 1000, 'opendsa_activitytime' => $now + 1600, 'completed' => 0]);
+        $this->create_timer($cm2, $u1, ['starttime' => $now - 500, 'opendsa_activitytime' => $now + 100, 'completed' => 1]);
+        $this->create_timer($cm1, $u2, ['starttime' => $now - 1000, 'opendsa_activitytime' => $now + 1800, 'completed' => 1]);
 
-        provider::export_user_data(new approved_contextlist($u1, 'mod_lesson', [$cm1ctx->id, $cm2ctx->id]));
+        provider::export_user_data(new approved_contextlist($u1, 'mod_opendsa_activity', [$cm1ctx->id, $cm2ctx->id]));
         $data = writer::with_context($cm1ctx)->get_related_data([], 'timers');
         $this->assertEmpty($data);
         $data = writer::with_context($cm2ctx)->get_related_data([], 'timers');
@@ -578,7 +578,7 @@ class mod_lesson_privacy_testcase extends provider_testcase {
         $this->assertNull($data->timers[2]->timemodifiedoffline);
 
         writer::reset();
-        provider::export_user_data(new approved_contextlist($u2, 'mod_lesson', [$cm1ctx->id, $cm2ctx->id]));
+        provider::export_user_data(new approved_contextlist($u2, 'mod_opendsa_activity', [$cm1ctx->id, $cm2ctx->id]));
         $data = writer::with_context($cm2ctx)->get_related_data([], 'timers');
         $this->assertEmpty($data);
         $data = writer::with_context($cm1ctx)->get_related_data([], 'timers');
@@ -592,14 +592,14 @@ class mod_lesson_privacy_testcase extends provider_testcase {
     public function test_export_data_for_user_attempts() {
         global $DB;
         $dg = $this->getDataGenerator();
-        $lg = $dg->get_plugin_generator('mod_lesson');
+        $lg = $dg->get_plugin_generator('mod_opendsa_activity');
 
         $c1 = $dg->create_course();
         $u1 = $dg->create_user();
         $u2 = $dg->create_user();
 
-        $cm1 = $dg->create_module('lesson', ['course' => $c1]);
-        $cm2 = $dg->create_module('lesson', ['course' => $c1]);
+        $cm1 = $dg->create_module('opendsa_activity', ['course' => $c1]);
+        $cm2 = $dg->create_module('opendsa_activity', ['course' => $c1]);
         $cm1ctx = context_module::instance($cm1->cmid);
         $cm2ctx = context_module::instance($cm2->cmid);
 
@@ -613,9 +613,9 @@ class mod_lesson_privacy_testcase extends provider_testcase {
                 ['text' => 'Dogs', 'format' => FORMAT_PLAIN, 'score' => 1],
                 ['text' => 'Birds', 'format' => FORMAT_PLAIN, 'score' => 0],
             ],
-            'jumpto' => [LESSON_NEXTPAGE, LESSON_NEXTPAGE, LESSON_THISPAGE]
+            'jumpto' => [OPENDSA_ACTIVITY_NEXTPAGE, OPENDSA_ACTIVITY_NEXTPAGE, OPENDSA_ACTIVITY_THISPAGE]
         ]);
-        $page4answers = array_keys($DB->get_records('lesson_answers', ['pageid' => $page4->id], 'id'));
+        $page4answers = array_keys($DB->get_records('opendsa_activity_answers', ['pageid' => $page4->id], 'id'));
         $page5 = $lg->create_question_matching($cm1, [
             'answer_editor' => [
                 2 => ['text' => 'The plural of cat', 'format' => FORMAT_PLAIN],
@@ -651,7 +651,7 @@ class mod_lesson_privacy_testcase extends provider_testcase {
         ])]);
         $this->create_branch($cm1, $u1, ['pageid' => $page9->id, 'nextpageid' => 0]);
 
-        provider::export_user_data(new approved_contextlist($u1, 'mod_lesson', [$cm1ctx->id, $cm2ctx->id]));
+        provider::export_user_data(new approved_contextlist($u1, 'mod_opendsa_activity', [$cm1ctx->id, $cm2ctx->id]));
         $data = writer::with_context($cm2ctx)->get_related_data([], 'attempts');
         $this->assertEmpty($data);
         $data = writer::with_context($cm1ctx)->get_related_data([], 'attempts');
@@ -665,7 +665,7 @@ class mod_lesson_privacy_testcase extends provider_testcase {
         $this->assertTrue(strpos($jump['went_to'], $page2->title) !== false);
         $jump = $data->attempts[0]->jumps[1];
         $this->assert_attempt_page($page9, $jump);
-        $this->assertEquals(get_string('endoflesson', 'mod_lesson'), $jump['went_to']);
+        $this->assertEquals(get_string('endofopendsa_activity', 'mod_opendsa_activity'), $jump['went_to']);
         $answer = $data->attempts[0]->answers[0];
         $this->assert_attempt_page($page2, $answer);
         $this->assertEquals(transform::yesno(false), $answer['correct']);
@@ -705,7 +705,7 @@ class mod_lesson_privacy_testcase extends provider_testcase {
         $this->assertEquals('Me too!', $answer['response']);
 
         writer::reset();
-        provider::export_user_data(new approved_contextlist($u2, 'mod_lesson', [$cm1ctx->id, $cm2ctx->id]));
+        provider::export_user_data(new approved_contextlist($u2, 'mod_opendsa_activity', [$cm1ctx->id, $cm2ctx->id]));
         $data = writer::with_context($cm1ctx)->get_related_data([], 'attempts');
         $this->assertEmpty($data);
         $data = writer::with_context($cm2ctx)->get_related_data([], 'attempts');
@@ -722,7 +722,7 @@ class mod_lesson_privacy_testcase extends provider_testcase {
         $this->create_attempt($cm2, $u2, ['pageid' => $pageb3->id, 'useranswer' => 'Def']);
 
         writer::reset();
-        provider::export_user_data(new approved_contextlist($u1, 'mod_lesson', [$cm1ctx->id, $cm2ctx->id]));
+        provider::export_user_data(new approved_contextlist($u1, 'mod_opendsa_activity', [$cm1ctx->id, $cm2ctx->id]));
         $data = writer::with_context($cm1ctx)->get_related_data([], 'attempts');
         $this->assertNotEmpty($data);
         $this->assertCount(2, $data->attempts);
@@ -750,7 +750,7 @@ class mod_lesson_privacy_testcase extends provider_testcase {
         $this->assertEquals('Abc', $attempt->answers[0]['answer']);
 
         writer::reset();
-        provider::export_user_data(new approved_contextlist($u2, 'mod_lesson', [$cm1ctx->id, $cm2ctx->id]));
+        provider::export_user_data(new approved_contextlist($u2, 'mod_opendsa_activity', [$cm1ctx->id, $cm2ctx->id]));
         $data = writer::with_context($cm1ctx)->get_related_data([], 'attempts');
         $this->assertEmpty($data);
 
@@ -782,15 +782,15 @@ class mod_lesson_privacy_testcase extends provider_testcase {
     /**
      * Create an attempt (answer to a question).
      *
-     * @param object $lesson The lesson.
+     * @param object $opendsa_activity The opendsa_activity.
      * @param object $user The user.
      * @param array $options Options.
      * @return object
      */
-    protected function create_attempt($lesson, $user, array $options = []) {
+    protected function create_attempt($opendsa_activity, $user, array $options = []) {
         global $DB;
         $record = (object) array_merge([
-            'opendsa_activity_id' => $lesson->id,
+            'opendsa_activity_id' => $opendsa_activity->id,
             'userid' => $user->id,
             'pageid' => 0,
             'answerid' => 0,
@@ -799,65 +799,65 @@ class mod_lesson_privacy_testcase extends provider_testcase {
             'useranswer' => '',
             'timeseen' => time(),
         ], $options);
-        $record->id = $DB->insert_record('lesson_attempts', $record);
+        $record->id = $DB->insert_record('opendsa_activity_attempts', $record);
         return $record;
     }
 
     /**
      * Create a grade.
      *
-     * @param object $lesson The lesson.
+     * @param object $opendsa_activity The opendsa_activity.
      * @param object $user The user.
      * @param array $options Options.
      * @return object
      */
-    protected function create_grade($lesson, $user, array $options = []) {
+    protected function create_grade($opendsa_activity, $user, array $options = []) {
         global $DB;
         $record = (object) array_merge([
-            'opendsa_activity_id' => $lesson->id,
+            'opendsa_activity_id' => $opendsa_activity->id,
             'userid' => $user->id,
             'late' => 0,
             'grade' => 50.0,
             'completed' => time(),
         ], $options);
-        $record->id = $DB->insert_record('lesson_grades', $record);
+        $record->id = $DB->insert_record('opendsa_activity_grades', $record);
         return $record;
     }
 
     /**
      * Create a timer.
      *
-     * @param object $lesson The lesson.
+     * @param object $opendsa_activity The opendsa_activity.
      * @param object $user The user.
      * @param array $options Options.
      * @return object
      */
-    protected function create_timer($lesson, $user, array $options = []) {
+    protected function create_timer($opendsa_activity, $user, array $options = []) {
         global $DB;
         $record = (object) array_merge([
-            'opendsa_activity_id' => $lesson->id,
+            'opendsa_activity_id' => $opendsa_activity->id,
             'userid' => $user->id,
             'starttime' => time() - 600,
-            'lessontime' => time(),
+            'opendsa_activitytime' => time(),
             'completed' => 1,
             'timemodifiedoffline' => 0,
         ], $options);
-        $record->id = $DB->insert_record('lesson_timer', $record);
+        $record->id = $DB->insert_record('opendsa_activity_timer', $record);
         return $record;
     }
 
     /**
      * Create a branch (choice on page).
      *
-     * @param object $lesson The lesson.
+     * @param object $opendsa_activity The opendsa_activity.
      * @param object $user The user.
      * @param array $options Options.
      * @return object
      */
-    protected function create_branch($lesson, $user, array $options = []) {
+    protected function create_branch($opendsa_activity, $user, array $options = []) {
         global $DB;
         $record = (object) array_merge([
-            'opendsa_activity_id' => $lesson->id,
+            'opendsa_activity_id' => $opendsa_activity->id,
             'userid' => $user->id,
             'pageid' => 0,
             'retry' => 0,
@@ -865,25 +865,25 @@ class mod_lesson_privacy_testcase extends provider_testcase {
             'timeseen' => time(),
             'nextpageid' => 0,
         ], $options);
-        $record->id = $DB->insert_record('lesson_branch', $record);
+        $record->id = $DB->insert_record('opendsa_activity_branch', $record);
         return $record;
     }
 
     /**
      * Create an override.
      *
-     * @param object $lesson The lesson.
+     * @param object $opendsa_activity The opendsa_activity.
      * @param object $user The user.
      * @param array $options Options.
      * @return object
      */
-    protected function create_override($lesson, $user, array $options = []) {
+    protected function create_override($opendsa_activity, $user, array $options = []) {
         global $DB;
         $record = (object) array_merge([
-            'opendsa_activity_id' => $lesson->id,
+            'opendsa_activity_id' => $opendsa_activity->id,
             'userid' => $user->id,
         ], $options);
-        $record->id = $DB->insert_record('lesson_overrides', $record);
+        $record->id = $DB->insert_record('opendsa_activity_overrides', $record);
         return $record;
     }
 }

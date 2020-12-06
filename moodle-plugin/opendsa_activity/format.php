@@ -21,7 +21,7 @@
  *
  * Included by import.ph
  *
- * @package mod_lesson
+ * @package mod_opendsa_activity
  * @copyright  1999 onwards Martin Dougiamas  {@link http://moodle.com}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  **/
@@ -36,17 +36,17 @@ defined('MOODLE_INTERNAL') || die();
  * @param object $answer answer object
  * @param int $contextid
  **/
-function lesson_import_question_files($field, $data, $answer, $contextid) {
+function opendsa_activity_import_question_files($field, $data, $answer, $contextid) {
     global $DB;
     if (!isset($data['itemid'])) {
         return;
     }
     $text = file_save_draft_area_files($data['itemid'],
-            $contextid, 'mod_lesson', 'page_' . $field . 's', $answer->id,
+            $contextid, 'mod_opendsa_activity', 'page_' . $field . 's', $answer->id,
             array('subdirs' => false, 'maxfiles' => -1, 'maxbytes' => 0),
             $answer->$field);
 
-    $DB->set_field("lesson_answers", $field, $text, array("id" => $answer->id));
+    $DB->set_field("opendsa_activity_answers", $field, $text, array("id" => $answer->id));
 }
 
 /**
@@ -64,19 +64,19 @@ function lesson_import_question_files($field, $data, $answer, $contextid) {
  *    6. For multichoice questions with more than one answer the qoption field is true
  *
  * @param object $question Contains question data like question, type and answers.
- * @param object $lesson
+ * @param object $opendsa_activity
  * @param int $contextid
  * @return object Returns $result->error or $result->notice.
  **/
-function lesson_save_question_options($question, $lesson, $contextid) {
+function opendsa_activity_save_question_options($question, $opendsa_activity, $contextid) {
     global $DB;
 
     // These lines are required to ensure that all page types have
     // been loaded for the following switch
-    if (!($lesson instanceof lesson)) {
-        $lesson = new lesson($lesson);
+    if (!($opendsa_activity instanceof opendsa_activity)) {
+        $opendsa_activity = new opendsa_activity($opendsa_activity);
     }
-    $manager = lesson_page_type_manager::get($lesson);
+    $manager = opendsa_activity_page_type_manager::get($opendsa_activity);
 
     $timenow = time();
     $result = new stdClass();
@@ -87,12 +87,12 @@ function lesson_save_question_options($question, $lesson, $contextid) {
     $defaultanswer->pageid = $question->id;
     $defaultanswer->timecreated   = $timenow;
     $defaultanswer->answerformat = FORMAT_HTML;
-    $defaultanswer->jumpto = LESSON_THISPAGE;
+    $defaultanswer->jumpto = opendsa_activity_THISPAGE;
     $defaultanswer->grade = 0;
     $defaultanswer->score = 0;
 
     switch ($question->qtype) {
-        case LESSON_PAGE_SHORTANSWER:
+        case opendsa_activity_PAGE_SHORTANSWER:
 
             $answers = array();
             $maxfraction = -1;
@@ -102,15 +102,15 @@ function lesson_save_question_options($question, $lesson, $contextid) {
                 if ($dataanswer != "") {
                     $answer = clone($defaultanswer);
                     if ($question->fraction[$key] >=0.5) {
-                        $answer->jumpto = LESSON_NEXTPAGE;
+                        $answer->jumpto = opendsa_activity_NEXTPAGE;
                         $answer->score = 1;
                     }
                     $answer->grade = round($question->fraction[$key] * 100);
                     $answer->answer   = $dataanswer;
                     $answer->response = $question->feedback[$key]['text'];
                     $answer->responseformat = $question->feedback[$key]['format'];
-                    $answer->id = $DB->insert_record("lesson_answers", $answer);
-                    lesson_import_question_files('response', $question->feedback[$key], $answer, $contextid);
+                    $answer->id = $DB->insert_record("opendsa_activity_answers", $answer);
+                    opendsa_activity_import_question_files('response', $question->feedback[$key], $answer, $contextid);
                     $answers[] = $answer->id;
                     if ($question->fraction[$key] > $maxfraction) {
                         $maxfraction = $question->fraction[$key];
@@ -122,12 +122,12 @@ function lesson_save_question_options($question, $lesson, $contextid) {
             /// Perform sanity checks on fractional grades
             if ($maxfraction != 1) {
                 $maxfraction = $maxfraction * 100;
-                $result->notice = get_string("fractionsnomax", "lesson", $maxfraction);
+                $result->notice = get_string("fractionsnomax", "opendsa_activity", $maxfraction);
                 return $result;
             }
             break;
 
-        case LESSON_PAGE_NUMERICAL:   // Note similarities to shortanswer.
+        case opendsa_activity_PAGE_NUMERICAL:   // Note similarities to shortanswer.
 
             $answers = array();
             $maxfraction = -1;
@@ -138,7 +138,7 @@ function lesson_save_question_options($question, $lesson, $contextid) {
                 if ($dataanswer != "") {
                     $answer = clone($defaultanswer);
                     if ($question->fraction[$key] >= 0.5) {
-                        $answer->jumpto = LESSON_NEXTPAGE;
+                        $answer->jumpto = opendsa_activity_NEXTPAGE;
                         $answer->score = 1;
                     }
                     $answer->grade = round($question->fraction[$key] * 100);
@@ -147,8 +147,8 @@ function lesson_save_question_options($question, $lesson, $contextid) {
                     $answer->answer   = $min.":".$max;
                     $answer->response = $question->feedback[$key]['text'];
                     $answer->responseformat = $question->feedback[$key]['format'];
-                    $answer->id = $DB->insert_record("lesson_answers", $answer);
-                    lesson_import_question_files('response', $question->feedback[$key], $answer, $contextid);
+                    $answer->id = $DB->insert_record("opendsa_activity_answers", $answer);
+                    opendsa_activity_import_question_files('response', $question->feedback[$key], $answer, $contextid);
 
                     $answers[] = $answer->id;
                     if ($question->fraction[$key] > $maxfraction) {
@@ -160,61 +160,61 @@ function lesson_save_question_options($question, $lesson, $contextid) {
             /// Perform sanity checks on fractional grades
             if ($maxfraction != 1) {
                 $maxfraction = $maxfraction * 100;
-                $result->notice = get_string("fractionsnomax", "lesson", $maxfraction);
+                $result->notice = get_string("fractionsnomax", "opendsa_activity", $maxfraction);
                 return $result;
             }
         break;
 
 
-        case LESSON_PAGE_TRUEFALSE:
+        case opendsa_activity_PAGE_TRUEFALSE:
 
-            // In lesson the correct answer always come first, as it was the case
+            // In opendsa_activity the correct answer always come first, as it was the case
             // in question bank exports years ago.
             $answer = clone($defaultanswer);
             $answer->grade = 100;
-            $answer->jumpto = LESSON_NEXTPAGE;
+            $answer->jumpto = opendsa_activity_NEXTPAGE;
             $answer->score = 1;
             if ($question->correctanswer) {
-                $answer->answer = get_string("true", "lesson");
+                $answer->answer = get_string("true", "opendsa_activity");
                 if (isset($question->feedbacktrue)) {
                     $answer->response = $question->feedbacktrue['text'];
                     $answer->responseformat = $question->feedbacktrue['format'];
-                    $answer->id = $DB->insert_record("lesson_answers", $answer);
-                    lesson_import_question_files('response', $question->feedbacktrue, $answer, $contextid);
+                    $answer->id = $DB->insert_record("opendsa_activity_answers", $answer);
+                    opendsa_activity_import_question_files('response', $question->feedbacktrue, $answer, $contextid);
                 }
             } else {
-                $answer->answer = get_string("false", "lesson");
+                $answer->answer = get_string("false", "opendsa_activity");
                 if (isset($question->feedbackfalse)) {
                     $answer->response = $question->feedbackfalse['text'];
                     $answer->responseformat = $question->feedbackfalse['format'];
-                    $answer->id = $DB->insert_record("lesson_answers", $answer);
-                    lesson_import_question_files('response', $question->feedbackfalse, $answer, $contextid);
+                    $answer->id = $DB->insert_record("opendsa_activity_answers", $answer);
+                    opendsa_activity_import_question_files('response', $question->feedbackfalse, $answer, $contextid);
                 }
             }
 
             // Now the wrong answer.
             $answer = clone($defaultanswer);
             if ($question->correctanswer) {
-                $answer->answer = get_string("false", "lesson");
+                $answer->answer = get_string("false", "opendsa_activity");
                 if (isset($question->feedbackfalse)) {
                     $answer->response = $question->feedbackfalse['text'];
                     $answer->responseformat = $question->feedbackfalse['format'];
-                    $answer->id = $DB->insert_record("lesson_answers", $answer);
-                    lesson_import_question_files('response', $question->feedbackfalse, $answer, $contextid);
+                    $answer->id = $DB->insert_record("opendsa_activity_answers", $answer);
+                    opendsa_activity_import_question_files('response', $question->feedbackfalse, $answer, $contextid);
                 }
             } else {
-                $answer->answer = get_string("true", "lesson");
+                $answer->answer = get_string("true", "opendsa_activity");
                 if (isset($question->feedbacktrue)) {
                     $answer->response = $question->feedbacktrue['text'];
                     $answer->responseformat = $question->feedbacktrue['format'];
-                    $answer->id = $DB->insert_record("lesson_answers", $answer);
-                    lesson_import_question_files('response', $question->feedbacktrue, $answer, $contextid);
+                    $answer->id = $DB->insert_record("opendsa_activity_answers", $answer);
+                    opendsa_activity_import_question_files('response', $question->feedbacktrue, $answer, $contextid);
                 }
             }
 
           break;
 
-        case LESSON_PAGE_MULTICHOICE:
+        case opendsa_activity_PAGE_MULTICHOICE:
 
             $totalfraction = 0;
             $maxfraction = -1;
@@ -229,13 +229,13 @@ function lesson_save_question_options($question, $lesson, $contextid) {
 
                     if ($question->single) {
                         if ($answer->grade > 50) {
-                            $answer->jumpto = LESSON_NEXTPAGE;
+                            $answer->jumpto = opendsa_activity_NEXTPAGE;
                             $answer->score = 1;
                         }
                     } else {
                         // If multi answer allowed, any answer with fraction > 0 is considered correct.
                         if ($question->fraction[$key] > 0) {
-                            $answer->jumpto = LESSON_NEXTPAGE;
+                            $answer->jumpto = opendsa_activity_NEXTPAGE;
                             $answer->score = 1;
                         }
                     }
@@ -243,9 +243,9 @@ function lesson_save_question_options($question, $lesson, $contextid) {
                     $answer->answerformat   = $dataanswer['format'];
                     $answer->response = $question->feedback[$key]['text'];
                     $answer->responseformat = $question->feedback[$key]['format'];
-                    $answer->id = $DB->insert_record("lesson_answers", $answer);
-                    lesson_import_question_files('answer', $dataanswer, $answer, $contextid);
-                    lesson_import_question_files('response', $question->feedback[$key], $answer, $contextid);
+                    $answer->id = $DB->insert_record("opendsa_activity_answers", $answer);
+                    opendsa_activity_import_question_files('answer', $dataanswer, $answer, $contextid);
+                    opendsa_activity_import_question_files('response', $question->feedback[$key], $answer, $contextid);
 
                     // for Sanity checks
                     if ($question->fraction[$key] > 0) {
@@ -261,34 +261,34 @@ function lesson_save_question_options($question, $lesson, $contextid) {
             if ($question->single) {
                 if ($maxfraction != 1) {
                     $maxfraction = $maxfraction * 100;
-                    $result->notice = get_string("fractionsnomax", "lesson", $maxfraction);
+                    $result->notice = get_string("fractionsnomax", "opendsa_activity", $maxfraction);
                     return $result;
                 }
             } else {
                 $totalfraction = round($totalfraction,2);
                 if ($totalfraction != 1) {
                     $totalfraction = $totalfraction * 100;
-                    $result->notice = get_string("fractionsaddwrong", "lesson", $totalfraction);
+                    $result->notice = get_string("fractionsaddwrong", "opendsa_activity", $totalfraction);
                     return $result;
                 }
             }
         break;
 
-        case LESSON_PAGE_MATCHING:
+        case opendsa_activity_PAGE_MATCHING:
 
             $subquestions = array();
 
             // The first answer should always be the correct answer
             $correctanswer = clone($defaultanswer);
-            $correctanswer->answer = get_string('thatsthecorrectanswer', 'lesson');
-            $correctanswer->jumpto = LESSON_NEXTPAGE;
+            $correctanswer->answer = get_string('thatsthecorrectanswer', 'opendsa_activity');
+            $correctanswer->jumpto = opendsa_activity_NEXTPAGE;
             $correctanswer->score = 1;
-            $DB->insert_record("lesson_answers", $correctanswer);
+            $DB->insert_record("opendsa_activity_answers", $correctanswer);
 
             // The second answer should always be the wrong answer
             $wronganswer = clone($defaultanswer);
-            $wronganswer->answer = get_string('thatsthewronganswer', 'lesson');
-            $DB->insert_record("lesson_answers", $wronganswer);
+            $wronganswer->answer = get_string('thatsthewronganswer', 'opendsa_activity');
+            $DB->insert_record("opendsa_activity_answers", $wronganswer);
 
             $i = 0;
             // Insert all the new question+answer pairs
@@ -301,22 +301,22 @@ function lesson_save_question_options($question, $lesson, $contextid) {
                     $answer->response   = $answertext;
                     if ($i == 0) {
                         // first answer contains the correct answer jump
-                        $answer->jumpto = LESSON_NEXTPAGE;
+                        $answer->jumpto = opendsa_activity_NEXTPAGE;
                     }
-                    $answer->id = $DB->insert_record("lesson_answers", $answer);
-                    lesson_import_question_files('answer', $questiontext, $answer, $contextid);
+                    $answer->id = $DB->insert_record("opendsa_activity_answers", $answer);
+                    opendsa_activity_import_question_files('answer', $questiontext, $answer, $contextid);
                     $subquestions[] = $answer->id;
                     $i++;
                 }
             }
 
             if (count($subquestions) < 3) {
-                $result->notice = get_string("notenoughsubquestions", "lesson");
+                $result->notice = get_string("notenoughsubquestions", "opendsa_activity");
                 return $result;
             }
             break;
 
-        case LESSON_PAGE_ESSAY:
+        case opendsa_activity_PAGE_ESSAY:
             $answer = new stdClass();
             $answer->opendsa_activity_id = $question->opendsa_activity_id;
             $answer->pageid = $question->id;
@@ -325,10 +325,10 @@ function lesson_save_question_options($question, $lesson, $contextid) {
             $answer->answerformat = FORMAT_MOODLE;
             $answer->grade = 0;
             $answer->score = 1;
-            $answer->jumpto = LESSON_NEXTPAGE;
+            $answer->jumpto = opendsa_activity_NEXTPAGE;
             $answer->response = null;
             $answer->responseformat = FORMAT_MOODLE;
-            $answer->id = $DB->insert_record("lesson_answers", $answer);
+            $answer->id = $DB->insert_record("opendsa_activity_answers", $answer);
         break;
         default:
             $result->error = "Unsupported question type ($question->qtype)!";
@@ -344,12 +344,12 @@ class qformat_default {
     var $category = null;
     var $questionids = array();
     protected $importcontext = null;
-    var $qtypeconvert = array('numerical'   => LESSON_PAGE_NUMERICAL,
-                               'multichoice' => LESSON_PAGE_MULTICHOICE,
-                               'truefalse'   => LESSON_PAGE_TRUEFALSE,
-                               'shortanswer' => LESSON_PAGE_SHORTANSWER,
-                               'match'       => LESSON_PAGE_MATCHING,
-                               'essay'       => LESSON_PAGE_ESSAY
+    var $qtypeconvert = array('numerical'   => opendsa_activity_PAGE_NUMERICAL,
+                               'multichoice' => opendsa_activity_PAGE_MULTICHOICE,
+                               'truefalse'   => opendsa_activity_PAGE_TRUEFALSE,
+                               'shortanswer' => opendsa_activity_PAGE_SHORTANSWER,
+                               'match'       => opendsa_activity_PAGE_MATCHING,
+                               'essay'       => opendsa_activity_PAGE_ESSAY
                               );
 
     // Importing functions
@@ -400,7 +400,7 @@ class qformat_default {
         return true;
     }
 
-    function importprocess($filename, $lesson, $pageid) {
+    function importprocess($filename, $opendsa_activity, $pageid) {
         global $DB, $OUTPUT;
 
     /// Processes a given file.  There's probably little need to change this
@@ -417,16 +417,16 @@ class qformat_default {
         }
 
         //Avoid category as question type
-        echo $OUTPUT->notification(get_string('importcount', 'lesson',
+        echo $OUTPUT->notification(get_string('importcount', 'opendsa_activity',
                 $this->count_questions($questions)), 'notifysuccess');
 
         $count = 0;
         $addquestionontop = false;
         if ($pageid == 0) {
             $addquestionontop = true;
-            $updatelessonpage = $DB->get_record('lesson_pages', array('opendsa_activity_id' => $lesson->id, 'prevpageid' => 0));
+            $updateopendsa_activitypage = $DB->get_record('opendsa_activity_pages', array('opendsa_activity_id' => $opendsa_activity->id, 'prevpageid' => 0));
         } else {
-            $updatelessonpage = $DB->get_record('lesson_pages', array('opendsa_activity_id' => $lesson->id, 'id' => $pageid));
+            $updateopendsa_activitypage = $DB->get_record('opendsa_activity_pages', array('opendsa_activity_id' => $opendsa_activity->id, 'id' => $pageid));
         }
 
         $unsupportedquestions = 0;
@@ -449,7 +449,7 @@ class qformat_default {
                     echo "<hr><p><b>$count</b>. ".$this->format_question_text($question)."</p>";
 
                     $newpage = new stdClass;
-                    $newpage->opendsa_activity_id = $lesson->id;
+                    $newpage->opendsa_activity_id = $opendsa_activity->id;
                     $newpage->qtype = $this->qtypeconvert[$question->qtype];
                     switch ($question->qtype) {
                         case 'shortanswer' :
@@ -475,31 +475,31 @@ class qformat_default {
                     // set up page links
                     if ($pageid) {
                         // the new page follows on from this page
-                        if (!$page = $DB->get_record("lesson_pages", array("id" => $pageid))) {
-                            print_error('invalidpageid', 'lesson');
+                        if (!$page = $DB->get_record("opendsa_activity_pages", array("id" => $pageid))) {
+                            print_error('invalidpageid', 'opendsa_activity');
                         }
                         $newpage->prevpageid = $pageid;
                         $newpage->nextpageid = $page->nextpageid;
                         // insert the page and reset $pageid
-                        $newpageid = $DB->insert_record("lesson_pages", $newpage);
+                        $newpageid = $DB->insert_record("opendsa_activity_pages", $newpage);
                         // update the linked list
-                        $DB->set_field("lesson_pages", "nextpageid", $newpageid, array("id" => $pageid));
+                        $DB->set_field("opendsa_activity_pages", "nextpageid", $newpageid, array("id" => $pageid));
                     } else {
                         // new page is the first page
                         // get the existing (first) page (if any)
-                        $params = array ("opendsa_activity_id" => $lesson->id, "prevpageid" => 0);
-                        if (!$page = $DB->get_record_select("lesson_pages", "opendsa_activity_id = :opendsa_activity_id AND prevpageid = :prevpageid", $params)) {
+                        $params = array ("opendsa_activity_id" => $opendsa_activity->id, "prevpageid" => 0);
+                        if (!$page = $DB->get_record_select("opendsa_activity_pages", "opendsa_activity_id = :opendsa_activity_id AND prevpageid = :prevpageid", $params)) {
                             // there are no existing pages
                             $newpage->prevpageid = 0; // this is a first page
                             $newpage->nextpageid = 0; // this is the only page
-                            $newpageid = $DB->insert_record("lesson_pages", $newpage);
+                            $newpageid = $DB->insert_record("opendsa_activity_pages", $newpage);
                         } else {
                             // there are existing pages put this at the start
                             $newpage->prevpageid = 0; // this is a first page
                             $newpage->nextpageid = $page->id;
-                            $newpageid = $DB->insert_record("lesson_pages", $newpage);
+                            $newpageid = $DB->insert_record("opendsa_activity_pages", $newpage);
                             // update the linked list
-                            $DB->set_field("lesson_pages", "prevpageid", $newpageid, array("id" => $page->id));
+                            $DB->set_field("opendsa_activity_pages", "prevpageid", $newpageid, array("id" => $page->id));
                         }
                     }
 
@@ -512,17 +512,17 @@ class qformat_default {
                     // Import images in question text.
                     if (isset($question->questiontextitemid)) {
                         $questiontext = file_save_draft_area_files($question->questiontextitemid,
-                                $this->importcontext->id, 'mod_lesson', 'page_contents', $newpageid,
+                                $this->importcontext->id, 'mod_opendsa_activity', 'page_contents', $newpageid,
                                 null , $question->questiontext);
                         // Update content with recoded urls.
-                        $DB->set_field("lesson_pages", "contents", $questiontext, array("id" => $newpageid));
+                        $DB->set_field("opendsa_activity_pages", "contents", $questiontext, array("id" => $newpageid));
                     }
 
                     // Now to save all the answers and type-specific options
 
-                    $question->opendsa_activity_id = $lesson->id; // needed for foreign key
+                    $question->opendsa_activity_id = $opendsa_activity->id; // needed for foreign key
                     $question->qtype = $this->qtypeconvert[$question->qtype];
-                    $result = lesson_save_question_options($question, $lesson, $this->importcontext->id);
+                    $result = opendsa_activity_save_question_options($question, $opendsa_activity, $this->importcontext->id);
 
                     if (!empty($result->error)) {
                         echo $OUTPUT->notification($result->error);
@@ -541,15 +541,15 @@ class qformat_default {
             }
         }
         // Update the prev links if there were existing pages.
-        if (!empty($updatelessonpage)) {
+        if (!empty($updateopendsa_activitypage)) {
             if ($addquestionontop) {
-                $DB->set_field("lesson_pages", "prevpageid", $pageid, array("id" => $updatelessonpage->id));
+                $DB->set_field("opendsa_activity_pages", "prevpageid", $pageid, array("id" => $updateopendsa_activitypage->id));
             } else {
-                $DB->set_field("lesson_pages", "prevpageid", $pageid, array("id" => $updatelessonpage->nextpageid));
+                $DB->set_field("opendsa_activity_pages", "prevpageid", $pageid, array("id" => $updateopendsa_activitypage->nextpageid));
             }
         }
         if ($unsupportedquestions) {
-            echo $OUTPUT->notification(get_string('unknownqtypesnotimported', 'lesson', $unsupportedquestions));
+            echo $OUTPUT->notification(get_string('unknownqtypesnotimported', 'opendsa_activity', $unsupportedquestions));
         }
         return true;
     }
@@ -731,7 +731,7 @@ class qformat_default {
     }
 
     /**
-     * Since the lesson module tries to re-use the question bank import classes in
+     * Since the opendsa_activity module tries to re-use the question bank import classes in
      * a crazy way, this is necessary to stop things breaking.
      */
     protected function add_blank_combined_feedback($question) {
@@ -741,7 +741,7 @@ class qformat_default {
 
 
 /**
- * Since the lesson module tries to re-use the question bank import classes in
+ * Since the opendsa_activity module tries to re-use the question bank import classes in
  * a crazy way, this is necessary to stop things breaking. This should be exactly
  * the same as the class defined in question/format.php.
  */

@@ -1,8 +1,8 @@
-@mod @mod_lesson
-Feature: Set time spent as a completion condition for a lesson
-  In order to ensure students spend the needed time to study lessons
+@mod @mod_opendsa_activity
+Feature: Set time spent as a completion condition for a opendsa_activity
+  In order to ensure students spend the needed time to study opendsa_activitys
   As a teacher
-  I need to set time spent to mark the lesson activity as completed
+  I need to set time spent to mark the opendsa_activity activity as completed
 
   Scenario: Set time spent as a condition
     Given the following "users" exist:
@@ -23,14 +23,14 @@ Feature: Set time spent as a completion condition for a lesson
       | Enable completion tracking | Yes |
     And I press "Save and display"
     And I add a "Lesson" to section "1" and I fill the form with:
-      | Name | Test lesson |
-      | Description | Test lesson description |
+      | Name | Test opendsa_activity |
+      | Description | Test opendsa_activity description |
       | Completion tracking | Show activity as complete when conditions are met |
       | completionview                | 0 |
       | completiontimespentenabled    | 1 |
       | completiontimespent[timeunit] | 1 |
       | completiontimespent[number]   | 10 |
-    And I follow "Test lesson"
+    And I follow "Test opendsa_activity"
     And I follow "Add a content page"
     And I set the following fields to these values:
       | Page title | First page name |
@@ -50,25 +50,25 @@ Feature: Set time spent as a completion condition for a lesson
     And I log out
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    Then the "Test lesson" "lesson" activity with "auto" completion should be marked as not complete
-    And I follow "Test lesson"
+    Then the "Test opendsa_activity" "opendsa_activity" activity with "auto" completion should be marked as not complete
+    And I follow "Test opendsa_activity"
     And I press "Next page"
-    # Add 1 sec delay so lesson knows a valid attempt has been made in past.
+    # Add 1 sec delay so opendsa_activity knows a valid attempt has been made in past.
     And I wait "1" seconds
     And I press "Next page"
-    And I should see "You completed this lesson in"
-    And I should see ", which is less than the required time of 10 secs. You might need to attempt the lesson again."
+    And I should see "You completed this opendsa_activity in"
+    And I should see ", which is less than the required time of 10 secs. You might need to attempt the opendsa_activity again."
     And I am on "Course 1" course homepage
-    And the "Test lesson" "lesson" activity with "auto" completion should be marked as not complete
+    And the "Test opendsa_activity" "opendsa_activity" activity with "auto" completion should be marked as not complete
     And I am on "Course 1" course homepage
-    And I follow "Test lesson"
+    And I follow "Test opendsa_activity"
     And I press "Next page"
     And I wait "11" seconds
     And I press "Next page"
-    And I should not see "You might need to attempt the lesson again."
+    And I should not see "You might need to attempt the opendsa_activity again."
     And I am on "Course 1" course homepage
-    And the "Test lesson" "lesson" activity with "auto" completion should be marked as complete
+    And the "Test opendsa_activity" "opendsa_activity" activity with "auto" completion should be marked as complete
     And I log out
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And "Student 1" user has completed "Test lesson" activity
+    And "Student 1" user has completed "Test opendsa_activity" activity

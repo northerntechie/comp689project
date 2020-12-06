@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="mod/lesson/db" VERSION="20150720" COMMENT="XMLDB file for Moodle mod/lesson"
+<XMLDB PATH="mod/opendsa_activity/db" VERSION="20150720" COMMENT="XMLDB file for Moodle mod/opendsa_activity"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
   <TABLES>
-    <TABLE NAME="lesson" COMMENT="Defines lesson">
+    <TABLE NAME="opendsa_activity" COMMENT="Defines opendsa_activity">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
@@ -47,7 +47,7 @@
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="completionendreached" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="completiontimespent" TYPE="int" LENGTH="11" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="allowofflineattempts" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="Whether to allow the lesson to be attempted offline in the mobile app"/>
+        <FIELD NAME="allowofflineattempts" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="Whether to allow the opendsa_activity to be attempted offline in the mobile app"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
@@ -56,7 +56,7 @@
         <INDEX NAME="course" UNIQUE="false" FIELDS="course"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="lesson_pages" COMMENT="Defines lesson_pages">
+    <TABLE NAME="opendsa_activity_pages" COMMENT="Defines opendsa_activity_pages">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="opendsa_activity_id" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
@@ -74,10 +74,10 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="opendsa_activity_id" TYPE="foreign" FIELDS="opendsa_activity_id" REFTABLE="lesson" REFFIELDS="id"/>
+        <KEY NAME="opendsa_activity_id" TYPE="foreign" FIELDS="opendsa_activity_id" REFTABLE="opendsa_activity" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="lesson_answers" COMMENT="Defines lesson_answers">
+    <TABLE NAME="opendsa_activity_answers" COMMENT="Defines opendsa_activity_answers">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="opendsa_activity_id" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
@@ -95,11 +95,11 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="opendsa_activity_id" TYPE="foreign" FIELDS="opendsa_activity_id" REFTABLE="lesson" REFFIELDS="id"/>
-        <KEY NAME="pageid" TYPE="foreign" FIELDS="pageid" REFTABLE="lesson_pages" REFFIELDS="id"/>
+        <KEY NAME="opendsa_activity_id" TYPE="foreign" FIELDS="opendsa_activity_id" REFTABLE="opendsa_activity" REFFIELDS="id"/>
+        <KEY NAME="pageid" TYPE="foreign" FIELDS="pageid" REFTABLE="opendsa_activity_pages" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="lesson_attempts" COMMENT="Defines lesson_attempts">
+    <TABLE NAME="opendsa_activity_attempts" COMMENT="Defines opendsa_activity_attempts">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="opendsa_activity_id" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
@@ -113,15 +113,15 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="opendsa_activity_id" TYPE="foreign" FIELDS="opendsa_activity_id" REFTABLE="lesson" REFFIELDS="id"/>
-        <KEY NAME="pageid" TYPE="foreign" FIELDS="pageid" REFTABLE="lesson_pages" REFFIELDS="id"/>
-        <KEY NAME="answerid" TYPE="foreign" FIELDS="answerid" REFTABLE="lesson_answers" REFFIELDS="id"/>
+        <KEY NAME="opendsa_activity_id" TYPE="foreign" FIELDS="opendsa_activity_id" REFTABLE="opendsa_activity" REFFIELDS="id"/>
+        <KEY NAME="pageid" TYPE="foreign" FIELDS="pageid" REFTABLE="opendsa_activity_pages" REFFIELDS="id"/>
+        <KEY NAME="answerid" TYPE="foreign" FIELDS="answerid" REFTABLE="opendsa_activity_answers" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
         <INDEX NAME="userid" UNIQUE="false" FIELDS="userid"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="lesson_grades" COMMENT="Defines lesson_grades">
+    <TABLE NAME="opendsa_activity_grades" COMMENT="Defines opendsa_activity_grades">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="opendsa_activity_id" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
@@ -132,31 +132,31 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="opendsa_activity_id" TYPE="foreign" FIELDS="opendsa_activity_id" REFTABLE="lesson" REFFIELDS="id"/>
+        <KEY NAME="opendsa_activity_id" TYPE="foreign" FIELDS="opendsa_activity_id" REFTABLE="opendsa_activity" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
         <INDEX NAME="userid" UNIQUE="false" FIELDS="userid"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="lesson_timer" COMMENT="lesson timer for each lesson">
+    <TABLE NAME="opendsa_activity_timer" COMMENT="opendsa_activity timer for each opendsa_activity">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="opendsa_activity_id" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="starttime" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="lessontime" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="opendsa_activitytime" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="completed" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="timemodifiedoffline" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Last modified time via web services (mobile app)."/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="opendsa_activity_id" TYPE="foreign" FIELDS="opendsa_activity_id" REFTABLE="lesson" REFFIELDS="id"/>
+        <KEY NAME="opendsa_activity_id" TYPE="foreign" FIELDS="opendsa_activity_id" REFTABLE="opendsa_activity" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
         <INDEX NAME="userid" UNIQUE="false" FIELDS="userid"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="lesson_branch" COMMENT="branches for each lesson/user">
+    <TABLE NAME="opendsa_activity_branch" COMMENT="branches for each opendsa_activity/user">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="opendsa_activity_id" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
@@ -169,30 +169,30 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="opendsa_activity_id" TYPE="foreign" FIELDS="opendsa_activity_id" REFTABLE="lesson" REFFIELDS="id"/>
-        <KEY NAME="pageid" TYPE="foreign" FIELDS="pageid" REFTABLE="lesson_pages" REFFIELDS="id"/>
+        <KEY NAME="opendsa_activity_id" TYPE="foreign" FIELDS="opendsa_activity_id" REFTABLE="opendsa_activity" REFFIELDS="id"/>
+        <KEY NAME="pageid" TYPE="foreign" FIELDS="pageid" REFTABLE="opendsa_activity_pages" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
         <INDEX NAME="userid" UNIQUE="false" FIELDS="userid"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="lesson_overrides" COMMENT="The overrides to lesson settings.">
+    <TABLE NAME="opendsa_activity_overrides" COMMENT="The overrides to opendsa_activity settings.">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="opendsa_activity_id" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Foreign key references lesson.id"/>
+        <FIELD NAME="opendsa_activity_id" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Foreign key references opendsa_activity.id"/>
         <FIELD NAME="groupid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Foreign key references groups.id.  Can be null if this is a per-user override."/>
         <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Foreign key references user.id.  Can be null if this is a per-group override."/>
-        <FIELD NAME="available" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Time at which students may start attempting this lesson. Can be null, in which case the lesson default is used."/>
-        <FIELD NAME="deadline" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Time by which students must have completed their attempt.  Can be null, in which case the lesson default is used."/>
-        <FIELD NAME="timelimit" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Time limit in seconds.  Can be null, in which case the lesson default is used."/>
+        <FIELD NAME="available" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Time at which students may start attempting this opendsa_activity. Can be null, in which case the opendsa_activity default is used."/>
+        <FIELD NAME="deadline" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Time by which students must have completed their attempt.  Can be null, in which case the opendsa_activity default is used."/>
+        <FIELD NAME="timelimit" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Time limit in seconds.  Can be null, in which case the opendsa_activity default is used."/>
         <FIELD NAME="review" TYPE="int" LENGTH="3" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="maxattempts" TYPE="int" LENGTH="3" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="retake" TYPE="int" LENGTH="3" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="password" TYPE="char" LENGTH="32" NOTNULL="false" SEQUENCE="false" COMMENT="Lesson password.  Can be null, in which case the lesson default is used."/>
+        <FIELD NAME="password" TYPE="char" LENGTH="32" NOTNULL="false" SEQUENCE="false" COMMENT="Lesson password.  Can be null, in which case the opendsa_activity default is used."/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="opendsa_activity_id" TYPE="foreign" FIELDS="opendsa_activity_id" REFTABLE="lesson" REFFIELDS="id"/>
+        <KEY NAME="opendsa_activity_id" TYPE="foreign" FIELDS="opendsa_activity_id" REFTABLE="opendsa_activity" REFFIELDS="id"/>
         <KEY NAME="groupid" TYPE="foreign" FIELDS="groupid" REFTABLE="groups" REFFIELDS="id"/>
         <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
       </KEYS>

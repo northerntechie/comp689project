@@ -18,7 +18,7 @@
 /**
  * Cluster
  *
- * @package mod_lesson
+ * @package mod_opendsa_activity
  * @copyright  2009 Sam Hemelryk
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  **/
@@ -26,13 +26,13 @@
 defined('MOODLE_INTERNAL') || die();
 
  /** Start of Cluster page */
-define("LESSON_PAGE_CLUSTER",   "30");
+define("OPENDSA_ACTIVITY_PAGE_CLUSTER",   "30");
 
-class lesson_page_type_cluster extends lesson_page {
+class opendsa_activity_page_type_cluster extends opendsa_activity_page {
 
-    protected $type = lesson_page::TYPE_STRUCTURE;
+    protected $type = opendsa_activity_page::TYPE_STRUCTURE;
     protected $typeidstring = 'cluster';
-    protected $typeid = LESSON_PAGE_CLUSTER;
+    protected $typeid = OPENDSA_ACTIVITY_PAGE_CLUSTER;
     protected $string = null;
     protected $jumpto = null;
 
@@ -45,7 +45,7 @@ class lesson_page_type_cluster extends lesson_page {
     }
     public function get_typestring() {
         if ($this->string===null) {
-            $this->string = get_string($this->typeidstring, 'lesson');
+            $this->string = get_string($this->typeidstring, 'opendsa_activity');
         }
         return $this->string;
     }
@@ -58,8 +58,8 @@ class lesson_page_type_cluster extends lesson_page {
     public function callback_on_view($canmanage, $redirect = true) {
         global $USER;
         if (!$canmanage) {
-            // Get the next page in the lesson cluster jump
-            return (int) $this->lesson->cluster_jump($this->properties->id);
+            // Get the next page in the opendsa_activity cluster jump
+            return (int) $this->opendsa_activity->cluster_jump($this->properties->id);
         } else {
             // get the next page
             return (int) $this->properties->nextpageid;
@@ -67,16 +67,16 @@ class lesson_page_type_cluster extends lesson_page {
     }
     public function override_next_page() {
         global $USER;
-        return $this->lesson->cluster_jump($this->properties->id);
+        return $this->opendsa_activity->cluster_jump($this->properties->id);
     }
     public function add_page_link($previd) {
         global $PAGE, $CFG;
-        $addurl = new moodle_url('/mod/lesson/editpage.php', array('id'=>$PAGE->cm->id, 'pageid'=>$previd, 'sesskey'=>sesskey(), 'qtype'=>LESSON_PAGE_CLUSTER));
-        return array('addurl'=>$addurl, 'type'=>LESSON_PAGE_CLUSTER, 'name'=>get_string('addcluster', 'lesson'));
+        $addurl = new moodle_url('/mod/opendsa_activity/editpage.php', array('id'=>$PAGE->cm->id, 'pageid'=>$previd, 'sesskey'=>sesskey(), 'qtype'=>OPENDSA_ACTIVITY_PAGE_CLUSTER));
+        return array('addurl'=>$addurl, 'type'=>OPENDSA_ACTIVITY_PAGE_CLUSTER, 'name'=>get_string('addcluster', 'opendsa_activity'));
     }
     public function valid_page_and_view(&$validpages, &$pageviews) {
         $validpages[$this->properties->id] = 1;  // add the cluster page as a valid page
-        foreach ($this->lesson->get_sub_pages_of($this->properties->id, array(LESSON_PAGE_ENDOFCLUSTER)) as $subpage) {
+        foreach ($this->opendsa_activity->get_sub_pages_of($this->properties->id, array(OPENDSA_ACTIVITY_PAGE_ENDOFCLUSTER)) as $subpage) {
             if (in_array($subpage->id, $pageviews)) {
                 unset($pageviews[array_search($subpage->id, $pageviews)]);  // remove it
                 // since the user did see one page in the cluster, add the cluster pageid to the viewedpageids
@@ -89,9 +89,9 @@ class lesson_page_type_cluster extends lesson_page {
     }
 }
 
-class lesson_add_page_form_cluster extends lesson_add_page_form_base {
+class opendsa_activity_add_page_form_cluster extends opendsa_activity_add_page_form_base {
 
-    public $qtype = LESSON_PAGE_CLUSTER;
+    public $qtype = OPENDSA_ACTIVITY_PAGE_CLUSTER;
     public $qtypestring = 'cluster';
     protected $standard = false;
 
@@ -99,8 +99,8 @@ class lesson_add_page_form_cluster extends lesson_add_page_form_base {
         global $PAGE, $CFG;
 
         $mform = $this->_form;
-        $lesson = $this->_customdata['lesson'];
-        $jumptooptions = lesson_page_type_branchtable::get_jumptooptions(optional_param('firstpage', false, PARAM_BOOL), $lesson);
+        $opendsa_activity = $this->_customdata['opendsa_activity'];
+        $jumptooptions = opendsa_activity_page_type_branchtable::get_jumptooptions(optional_param('firstpage', false, PARAM_BOOL), $opendsa_activity);
 
         $mform->addElement('hidden', 'firstpage');
         $mform->setType('firstpage', PARAM_BOOL);
@@ -108,7 +108,7 @@ class lesson_add_page_form_cluster extends lesson_add_page_form_base {
         $mform->addElement('hidden', 'qtype');
         $mform->setType('qtype', PARAM_TEXT);
 
-        $mform->addElement('text', 'title', get_string("pagetitle", "lesson"), array('size'=>70));
+        $mform->addElement('text', 'title', get_string("pagetitle", "opendsa_activity"), array('size'=>70));
         if (!empty($CFG->formatstringstriptags)) {
             $mform->setType('title', PARAM_TEXT);
         } else {
@@ -116,23 +116,23 @@ class lesson_add_page_form_cluster extends lesson_add_page_form_base {
         }
 
         $this->editoroptions = array('noclean'=>true, 'maxfiles'=>EDITOR_UNLIMITED_FILES, 'maxbytes'=>$PAGE->course->maxbytes);
-        $mform->addElement('editor', 'contents_editor', get_string("pagecontents", "lesson"), null, $this->editoroptions);
+        $mform->addElement('editor', 'contents_editor', get_string("pagecontents", "opendsa_activity"), null, $this->editoroptions);
         $mform->setType('contents_editor', PARAM_RAW);
 
         $this->add_jumpto(0);
     }
 
 
-    public function construction_override($pageid, lesson $lesson) {
+    public function construction_override($pageid, opendsa_activity $opendsa_activity) {
         global $PAGE, $CFG, $DB;
         require_sesskey();
 
         $timenow = time();
 
         if ($pageid == 0) {
-            if ($lesson->has_pages()) {
-                if (!$page = $DB->get_record("lesson_pages", array("prevpageid" => 0, "opendsa_activity_id" => $lesson->id))) {
-                    print_error('cannotfindpagerecord', 'lesson');
+            if ($opendsa_activity->has_pages()) {
+                if (!$page = $DB->get_record("opendsa_activity_pages", array("prevpageid" => 0, "opendsa_activity_id" => $opendsa_activity->id))) {
+                    print_error('cannotfindpagerecord', 'opendsa_activity');
                 }
             } else {
                 // This is the ONLY page
@@ -140,12 +140,12 @@ class lesson_add_page_form_cluster extends lesson_add_page_form_base {
                 $page->id = 0;
             }
         } else {
-            if (!$page = $DB->get_record("lesson_pages", array("id" => $pageid))) {
-                print_error('cannotfindpagerecord', 'lesson');
+            if (!$page = $DB->get_record("opendsa_activity_pages", array("id" => $pageid))) {
+                print_error('cannotfindpagerecord', 'opendsa_activity');
             }
         }
         $newpage = new stdClass;
-        $newpage->opendsa_activity_id = $lesson->id;
+        $newpage->opendsa_activity_id = $opendsa_activity->id;
         $newpage->prevpageid = $pageid;
         if ($pageid != 0) {
             $newpage->nextpageid = $page->nextpageid;
@@ -154,12 +154,12 @@ class lesson_add_page_form_cluster extends lesson_add_page_form_base {
         }
         $newpage->qtype = $this->qtype;
         $newpage->timecreated = $timenow;
-        $newpage->title = get_string("clustertitle", "lesson");
-        $newpage->contents = get_string("clustertitle", "lesson");
-        $newpageid = $DB->insert_record("lesson_pages", $newpage);
+        $newpage->title = get_string("clustertitle", "opendsa_activity");
+        $newpage->contents = get_string("clustertitle", "opendsa_activity");
+        $newpageid = $DB->insert_record("opendsa_activity_pages", $newpage);
         // update the linked list...
         if ($pageid != 0) {
-            $DB->set_field("lesson_pages", "nextpageid", $newpageid, array("id" => $pageid));
+            $DB->set_field("opendsa_activity_pages", "nextpageid", $newpageid, array("id" => $pageid));
         }
 
         if ($pageid == 0) {
@@ -167,16 +167,16 @@ class lesson_add_page_form_cluster extends lesson_add_page_form_base {
         }
         if ($page->nextpageid) {
             // the new page is not the last page
-            $DB->set_field("lesson_pages", "prevpageid", $newpageid, array("id" => $page->nextpageid));
+            $DB->set_field("opendsa_activity_pages", "prevpageid", $newpageid, array("id" => $page->nextpageid));
         }
         // ..and the single "answer"
         $newanswer = new stdClass;
-        $newanswer->opendsa_activity_id = $lesson->id;
+        $newanswer->opendsa_activity_id = $opendsa_activity->id;
         $newanswer->pageid = $newpageid;
         $newanswer->timecreated = $timenow;
-        $newanswer->jumpto = LESSON_CLUSTERJUMP;
-        $newanswerid = $DB->insert_record("lesson_answers", $newanswer);
-        $lesson->add_message(get_string('addedcluster', 'lesson'), 'notifysuccess');
-        redirect($CFG->wwwroot.'/mod/lesson/edit.php?id='.$PAGE->cm->id);
+        $newanswer->jumpto = OPENDSA_ACTIVITY_CLUSTERJUMP;
+        $newanswerid = $DB->insert_record("opendsa_activity_answers", $newanswer);
+        $opendsa_activity->add_message(get_string('addedcluster', 'opendsa_activity'), 'notifysuccess');
+        redirect($CFG->wwwroot.'/mod/opendsa_activity/edit.php?id='.$PAGE->cm->id);
     }
 }
