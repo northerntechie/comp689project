@@ -19,4 +19,4 @@ The docker container can then be ran in interactive mode with the command,
 
 To interactively administer the docker container, the container can be interacted with using the bash interactive terminal with the command,
 
-```$ ```
+```$ docker exec -it <docker_running_image_name> /bin/bash```
