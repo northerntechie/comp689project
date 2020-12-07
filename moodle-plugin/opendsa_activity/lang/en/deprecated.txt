@@ -1,4 +1,0 @@
-additionalattemptsremaining,mod_opendsa_activity
-opendsa_activitycloseson,mod_opendsa_activity
-opendsa_activityname,mod_opendsa_activity
-xattempts,mod_opendsa_activity
