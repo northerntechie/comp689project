@@ -291,3 +291,8 @@ function opendsa_extend_navigation($opendsanode, $course, $module, $cm) {
  */
 function opendsa_extend_settings_navigation($settingsnav, $opendsanode = null) {
 }
+
+/**
+ * 
+ * @param 
+ */

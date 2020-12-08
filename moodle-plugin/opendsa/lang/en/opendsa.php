@@ -23,8 +23,15 @@
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+defined('MOODLE_INTERNAL') || die;
 
 $string['opendsa'] = 'OpenDSA';
 $string['opendsa:assign'] = 'Assign exercise';
 $string['pluginname'] = 'OpenDSA';
+$string['modulename'] = 'opendsa';
+
+// Settings page
+$string['opendsaconfigurl'] = 'mod_opendsa/opendsaconfigurl';
+$string['opendsaconfigurlstring'] = 'OpenDSA REST URL';
+$string['opendsaconfigurldesc'] = 'OpendDSA REST microservice URL service address';
+$string['opendsaconfigurldefault'] = 'http://localhost:8080';
