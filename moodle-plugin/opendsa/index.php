@@ -1,93 +1,107 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
-/**
- * Display information about all the mod_opendsa modules in the requested course.
- *
- * @package     mod_opendsa
- * @copyright   2020 Public commons
- * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
+    require_once("../../config.php");
+    require_once("lib.php");
 
-require(__DIR__.'/../../config.php');
+    $id = required_param('id',PARAM_INT);   // course
 
-require_once(__DIR__.'/lib.php');
+    $PAGE->set_url('/mod/opendsa/index.php', array('id'=>$id));
 
-$id = required_param('id', PARAM_INT);
-
-$course = $DB->get_record('course', array('id' => $id), '*', MUST_EXIST);
-require_course_login($course);
-
-$coursecontext = context_course::instance($course->id);
-
-$event = \mod_opendsa\event\course_module_instance_list_viewed::create(array(
-    'context' => $modulecontext
-));
-$event->add_record_snapshot('course', $course);
-$event->trigger();
-
-$PAGE->set_url('/mod/opendsa/index.php', array('id' => $id));
-$PAGE->set_title(format_string($course->fullname));
-$PAGE->set_heading(format_string($course->fullname));
-$PAGE->set_context($coursecontext);
-
-echo $OUTPUT->header();
-
-$modulename = get_string('modulename');
-$modulenameplural = get_string('modulenameplural', 'mod_opendsa', 'OpenDSA Activities');
-echo $OUTPUT->heading($modulenameplural);
-
-$opendsas = get_all_instances_in_course('opendsa', $course);
-
-if (empty($opendsas)) {
-    notice(get_string('nonewmodules', 'mod_opendsa'), new moodle_url('/course/view.php', array('id' => $course->id)));
-}
-
-$table = new html_table();
-$table->attributes['class'] = 'generaltable mod_index';
-
-if ($course->format == 'weeks') {
-    $table->head  = array(get_string('week'), get_string('name'));
-    $table->align = array('center', 'left');
-} else if ($course->format == 'topics') {
-    $table->head  = array(get_string('topic'), get_string('name'));
-    $table->align = array('center', 'left', 'left', 'left');
-} else {
-    $table->head  = array(get_string('name'));
-    $table->align = array('left', 'left', 'left');
-}
-
-foreach ($opendsas as $opendsa) {
-    if (!$opendsa->visible) {
-        $link = html_writer::link(
-            new moodle_url('/mod/opendsa/view.php', array('id' => $opendsa->coursemodule)),
-            format_string($opendsa->name, true),
-            array('class' => 'dimmed'));
-    } else {
-        $link = html_writer::link(
-            new moodle_url('/mod/opendsa/view.php', array('id' => $opendsa->coursemodule)),
-            format_string($opendsa->name, true));
+    if (!$course = $DB->get_record('course', array('id'=>$id))) {
+        print_error('invalidcourseid');
     }
 
-    if ($course->format == 'weeks' or $course->format == 'topics') {
-        $table->data[] = array($opendsa->section, $link);
-    } else {
-        $table->data[] = array($link);
-    }
-}
+    require_course_login($course);
+    $PAGE->set_pagelayout('incourse');
 
-echo html_writer::table($table);
-echo $OUTPUT->footer();
+    $eventdata = array('context' => context_course::instance($id));
+    $event = \mod_opendsa\event\course_module_instance_list_viewed::create($eventdata);
+    $event->add_record_snapshot('course', $course);
+    $event->trigger();
+
+    $stropendsa = get_string("modulename", "opendsa");
+    $stropendsas = get_string("modulenameplural", "opendsa");
+    $PAGE->set_title($stropendsas);
+    $PAGE->set_heading($course->fullname);
+    $PAGE->navbar->add($stropendsas);
+    echo $OUTPUT->header();
+
+    if (! $opendsas = get_all_instances_in_course("opendsa", $course)) {
+        notice(get_string('thereareno', 'moodle', $stropendsas), "../../course/view.php?id=$course->id");
+    }
+
+    $usesections = course_format_uses_sections($course->format);
+
+    $sql = "SELECT cha.*
+              FROM {opendsa} ch, {opendsa_answers} cha
+             WHERE cha.opendsaid = ch.id AND
+                   ch.course = ? AND cha.userid = ?";
+
+    $answers = array () ;
+    if (isloggedin() and !isguestuser() and $allanswers = $DB->get_records_sql($sql, array($course->id, $USER->id))) {
+        foreach ($allanswers as $aa) {
+            $answers[$aa->opendsaid] = $aa;
+        }
+        unset($allanswers);
+    }
+
+
+    $timenow = time();
+
+    $table = new html_table();
+
+    if ($usesections) {
+        $strsectionname = get_string('sectionname', 'format_'.$course->format);
+        $table->head  = array ($strsectionname, get_string("question"), get_string("answer"));
+        $table->align = array ("center", "left", "left");
+    } else {
+        $table->head  = array (get_string("question"), get_string("answer"));
+        $table->align = array ("left", "left");
+    }
+
+    $currentsection = "";
+
+    foreach ($opendsas as $opendsa) {
+        if (!empty($answers[$opendsa->id])) {
+            $answer = $answers[$opendsa->id];
+        } else {
+            $answer = "";
+        }
+        if (!empty($answer->optionid)) {
+            $aa = format_string(opendsa_get_option_text($opendsa, $answer->optionid));
+        } else {
+            $aa = "";
+        }
+        if ($usesections) {
+            $printsection = "";
+            if ($opendsa->section !== $currentsection) {
+                if ($opendsa->section) {
+                    $printsection = get_section_name($course, $opendsa->section);
+                }
+                if ($currentsection !== "") {
+                    $table->data[] = 'hr';
+                }
+                $currentsection = $opendsa->section;
+            }
+        }
+
+        //Calculate the href
+        if (!$opendsa->visible) {
+            //Show dimmed if the mod is hidden
+            $tt_href = "<a class=\"dimmed\" href=\"view.php?id=$opendsa->coursemodule\">".format_string($opendsa->name,true)."</a>";
+        } else {
+            //Show normal if the mod is visible
+            $tt_href = "<a href=\"view.php?id=$opendsa->coursemodule\">".format_string($opendsa->name,true)."</a>";
+        }
+        if ($usesections) {
+            $table->data[] = array ($printsection, $tt_href, $aa);
+        } else {
+            $table->data[] = array ($tt_href, $aa);
+        }
+    }
+    echo "<br />";
+    echo html_writer::table($table);
+
+    echo $OUTPUT->footer();
+
+

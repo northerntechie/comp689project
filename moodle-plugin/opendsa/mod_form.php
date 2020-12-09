@@ -1,83 +1,177 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+if (!defined('MOODLE_INTERNAL')) {
+    die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
+}
 
-/**
- * The main mod_opendsa configuration form.
- *
- * @package     mod_opendsa
- * @copyright   2020 Public commons
- * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
+require_once ($CFG->dirroot.'/course/moodleform_mod.php');
 
-defined('MOODLE_INTERNAL') || die();
-
-require_once($CFG->dirroot.'/course/moodleform_mod.php');
-
-/**
- * Module instance settings form.
- *
- * @package    mod_opendsa
- * @copyright  2020 Public commons
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
 class mod_opendsa_mod_form extends moodleform_mod {
 
-    /**
-     * Defines forms elements
-     */
-    public function definition() {
-        global $CFG;
+    function definition() {
+        global $CFG, $OPENDSA_SHOWRESULTS, $OPENDSA_PUBLISH, $OPENDSA_DISPLAY, $DB;
 
-        $mform = $this->_form;
+        $mform    =& $this->_form;
 
-        // Adding the "general" fieldset, where all the common settings are shown.
+//-------------------------------------------------------------------------------
         $mform->addElement('header', 'general', get_string('general', 'form'));
 
-        // Adding the standard "name" field.
-        $mform->addElement('text', 'name', get_string('opendsaname', 'mod_opendsa'), array('size' => '64'));
-
+        $mform->addElement('text', 'name', get_string('opendsaname', 'opendsa'), array('size'=>'64'));
         if (!empty($CFG->formatstringstriptags)) {
             $mform->setType('name', PARAM_TEXT);
         } else {
             $mform->setType('name', PARAM_CLEANHTML);
         }
-
         $mform->addRule('name', null, 'required', null, 'client');
         $mform->addRule('name', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
-        $mform->addHelpButton('name', 'opendsaname', 'mod_opendsa');
 
-        // Adding the standard "intro" and "introformat" fields.
-        if ($CFG->branch >= 29) {
-            $this->standard_intro_elements();
-        } else {
-            $this->add_intro_editor();
+        $this->standard_intro_elements(get_string('description', 'opendsa'));
+
+        $mform->addElement('select', 'display', get_string("displaymode","opendsa"), $OPENDSA_DISPLAY);
+
+        //-------------------------------------------------------------------------------
+        $mform->addElement('header', 'optionhdr', get_string('options', 'opendsa'));
+
+        $mform->addElement('selectyesno', 'allowupdate', get_string("allowupdate", "opendsa"));
+
+        $mform->addElement('selectyesno', 'allowmultiple', get_string('allowmultiple', 'opendsa'));
+        if ($this->_instance) {
+            if ($DB->count_records('opendsa_answers', array('opendsaid' => $this->_instance)) > 0) {
+                // Prevent user from toggeling the number of allowed answers once there are submissions.
+                $mform->freeze('allowmultiple');
+            }
         }
 
-        // Adding the rest of mod_opendsa settings, spreading all them into this fieldset
-        // ... or adding more fieldsets ('header' elements) if needed for better logic.
-        $mform->addElement('static', 'label1', 'opendsasettings', get_string('opendsasettings', 'mod_opendsa'));
-        $mform->addElement('header', 'opendsafieldset', get_string('opendsafieldset', 'mod_opendsa'));
+        $mform->addElement('selectyesno', 'limitanswers', get_string('limitanswers', 'opendsa'));
+        $mform->addHelpButton('limitanswers', 'limitanswers', 'opendsa');
 
-        // Add standard grading elements.
-        $this->standard_grading_coursemodule_elements();
+        $repeatarray = array();
+        $repeatarray[] = $mform->createElement('text', 'option', get_string('optionno', 'opendsa'));
+        $repeatarray[] = $mform->createElement('text', 'limit', get_string('limitno', 'opendsa'));
+        $repeatarray[] = $mform->createElement('hidden', 'optionid', 0);
 
-        // Add standard elements.
+        if ($this->_instance){
+            $repeatno = $DB->count_records('opendsa_options', array('opendsaid'=>$this->_instance));
+            $repeatno += 2;
+        } else {
+            $repeatno = 5;
+        }
+
+        $repeateloptions = array();
+        $repeateloptions['limit']['default'] = 0;
+        $repeateloptions['limit']['hideif'] = array('limitanswers', 'eq', 0);
+        $repeateloptions['limit']['rule'] = 'numeric';
+        $repeateloptions['limit']['type'] = PARAM_INT;
+
+        $repeateloptions['option']['helpbutton'] = array('opendsaoptions', 'opendsa');
+        $mform->setType('option', PARAM_CLEANHTML);
+
+        $mform->setType('optionid', PARAM_INT);
+
+        $this->repeat_elements($repeatarray, $repeatno,
+                    $repeateloptions, 'option_repeats', 'option_add_fields', 3, null, true);
+
+        // Make the first option required
+        if ($mform->elementExists('option[0]')) {
+            $mform->addRule('option[0]', get_string('atleastoneoption', 'opendsa'), 'required', null, 'client');
+        }
+
+//-------------------------------------------------------------------------------
+        $mform->addElement('header', 'availabilityhdr', get_string('availability'));
+        $mform->addElement('date_time_selector', 'timeopen', get_string("opendsaopen", "opendsa"),
+            array('optional' => true));
+
+        $mform->addElement('date_time_selector', 'timeclose', get_string("opendsaclose", "opendsa"),
+            array('optional' => true));
+
+        $mform->addElement('advcheckbox', 'showpreview', get_string('showpreview', 'opendsa'));
+        $mform->addHelpButton('showpreview', 'showpreview', 'opendsa');
+        $mform->disabledIf('showpreview', 'timeopen[enabled]');
+
+//-------------------------------------------------------------------------------
+        $mform->addElement('header', 'resultshdr', get_string('results', 'opendsa'));
+
+        $mform->addElement('select', 'showresults', get_string("publish", "opendsa"), $OPENDSA_SHOWRESULTS);
+
+        $mform->addElement('select', 'publish', get_string("privacy", "opendsa"), $OPENDSA_PUBLISH);
+        $mform->hideIf('publish', 'showresults', 'eq', 0);
+
+        $mform->addElement('selectyesno', 'showunanswered', get_string("showunanswered", "opendsa"));
+
+        $mform->addElement('selectyesno', 'includeinactive', get_string('includeinactive', 'opendsa'));
+        $mform->setDefault('includeinactive', 0);
+
+//-------------------------------------------------------------------------------
         $this->standard_coursemodule_elements();
-
-        // Add standard buttons.
+//-------------------------------------------------------------------------------
         $this->add_action_buttons();
     }
+
+    function data_preprocessing(&$default_values){
+        global $DB;
+        if (!empty($this->_instance) && ($options = $DB->get_records_menu('opendsa_options',array('opendsaid'=>$this->_instance), 'id', 'id,text'))
+               && ($options2 = $DB->get_records_menu('opendsa_options', array('opendsaid'=>$this->_instance), 'id', 'id,maxanswers')) ) {
+            $opendsaids=array_keys($options);
+            $options=array_values($options);
+            $options2=array_values($options2);
+
+            foreach (array_keys($options) as $key){
+                $default_values['option['.$key.']'] = $options[$key];
+                $default_values['limit['.$key.']'] = $options2[$key];
+                $default_values['optionid['.$key.']'] = $opendsaids[$key];
+            }
+
+        }
+
+    }
+
+    /**
+     * Allows module to modify the data returned by form get_data().
+     * This method is also called in the bulk activity completion form.
+     *
+     * Only available on moodleform_mod.
+     *
+     * @param stdClass $data the form data to be modified.
+     */
+    public function data_postprocessing($data) {
+        parent::data_postprocessing($data);
+        // Set up completion section even if checkbox is not ticked
+        if (!empty($data->completionunlocked)) {
+            if (empty($data->completionsubmit)) {
+                $data->completionsubmit = 0;
+            }
+        }
+    }
+
+    /**
+     * Enforce validation rules here
+     *
+     * @param array $data array of ("fieldname"=>value) of submitted data
+     * @param array $files array of uploaded files "element_name"=>tmp_file_path
+     * @return array
+     **/
+    public function validation($data, $files) {
+        $errors = parent::validation($data, $files);
+
+        // Check open and close times are consistent.
+        if ($data['timeopen'] && $data['timeclose'] &&
+                $data['timeclose'] < $data['timeopen']) {
+            $errors['timeclose'] = get_string('closebeforeopen', 'opendsa');
+        }
+
+        return $errors;
+    }
+
+    function add_completion_rules() {
+        $mform =& $this->_form;
+
+        $mform->addElement('checkbox', 'completionsubmit', '', get_string('completionsubmit', 'opendsa'));
+        // Enable this completion rule by default.
+        $mform->setDefault('completionsubmit', 1);
+        return array('completionsubmit');
+    }
+
+    function completion_rule_enabled($data) {
+        return !empty($data['completionsubmit']);
+    }
 }
+

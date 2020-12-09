@@ -1,5 +1,6 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
+
+// This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -12,23 +13,15 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Code to be executed after the plugin's database scheme has been installed is defined here.
- *
- * @package     mod_opendsa
- * @category    upgrade
- * @copyright   2020 Public commons
- * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    mod_opendsa
+ * @subpackage backup-moodle2
+ * @copyright 2010 onwards Eloy Lafuente (stronk7) {@link http://stronk7.com}
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
-/**
- * Custom code to be run on installing the plugin.
- */
-function xmldb_opendsa_install() {
-
-    return true;
-}
+ // This activity has not particular settings but the inherited from the generic
+ // backup_activity_task so here there isn't any class definition, like the ones
+ // existing in /backup/moodle2/backup_settingslib.php (activities section)

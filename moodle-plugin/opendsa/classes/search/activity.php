@@ -15,16 +15,32 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information
+ * Search area for mod_opendsa activities.
  *
- * @package   mod_opendsa
- * @copyright 1999 onwards Martin Dougiamas  {@link http://moodle.com}
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    mod_opendsa
+ * @copyright  2015 David Monllao {@link http://www.davidmonllao.com}
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+namespace mod_opendsa\search;
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2020061502;       // The current module version (Date: YYYYMMDDXX)
-$plugin->requires  = 2020060900;    // Requires this Moodle version
-$plugin->component = 'mod_opendsa';     // Full name of the plugin (used for diagnostics)
-$plugin->cron      = 0;
+/**
+ * Search area for mod_opendsa activities.
+ *
+ * @package    mod_opendsa
+ * @copyright  2015 David Monllao {@link http://www.davidmonllao.com}
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class activity extends \core_search\base_activity {
+
+    /**
+     * Returns true if this area uses file indexing.
+     *
+     * @return bool
+     */
+    public function uses_file_indexing() {
+        return true;
+    }
+}

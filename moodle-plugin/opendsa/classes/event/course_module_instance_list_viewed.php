@@ -15,16 +15,24 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information
+ * The mod_opendsa instance list viewed event.
  *
- * @package   mod_opendsa
- * @copyright 1999 onwards Martin Dougiamas  {@link http://moodle.com}
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    mod_opendsa
+ * @copyright  2013 Ankit Agarwal
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace mod_opendsa\event;
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2020061502;       // The current module version (Date: YYYYMMDDXX)
-$plugin->requires  = 2020060900;    // Requires this Moodle version
-$plugin->component = 'mod_opendsa';     // Full name of the plugin (used for diagnostics)
-$plugin->cron      = 0;
+/**
+ * The mod_opendsa instance list viewed event class.
+ *
+ * @package    mod_opendsa
+ * @since      Moodle 2.7
+ * @copyright  2013 onwards Ankit Agarwal
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class course_module_instance_list_viewed extends \core\event\course_module_instance_list_viewed {
+}
+
