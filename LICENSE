@@ -1,4 +1,10 @@
-MIT License
+This software project has two different license types.  They are independent of each
+and do not require compile- or run-time linkage.  They are intended to communicate
+through a REST API through the standard network stack.
+
+moodle-plugin/opendsa component GPL License
+
+server/ component MIT License
 
 Copyright (c) 2020 Todd Saharchuk
 
