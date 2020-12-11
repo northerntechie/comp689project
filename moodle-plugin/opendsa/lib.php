@@ -124,27 +124,8 @@ function opendsa_add_instance($opendsa) {
 
     //insert answers
     $opendsa->id = $DB->insert_record("opendsa", $opendsa);
-    foreach ($opendsa->option as $key => $value) {
-        $value = trim($value);
-        if (isset($value) && $value <> '') {
-            $option = new stdClass();
-            $option->text = $value;
-            $option->opendsaid = $opendsa->id;
-            if (isset($opendsa->limit[$key])) {
-                $option->maxanswers = $opendsa->limit[$key];
-            }
-            $option->timemodified = time();
-            $DB->insert_record("opendsa_options", $option);
-        }
-    }
-
-    // Add calendar events if necessary.
-    opendsa_set_events($opendsa);
-    if (!empty($opendsa->completionexpected)) {
-        \core_completion\api::update_completion_date_event($opendsa->coursemodule, 'opendsa', $opendsa->id,
-                $opendsa->completionexpected);
-    }
-
+    var_dump($opendsa);
+    
     return $opendsa->id;
 }
 
@@ -164,6 +145,7 @@ function opendsa_update_instance($opendsa) {
     $opendsa->id = $opendsa->instance;
     $opendsa->timemodified = time();
 
+    /*
     //update, delete or insert answers
     foreach ($opendsa->option as $key => $value) {
         $value = trim($value);
@@ -195,9 +177,8 @@ function opendsa_update_instance($opendsa) {
     opendsa_set_events($opendsa);
     $completionexpected = (!empty($opendsa->completionexpected)) ? $opendsa->completionexpected : null;
     \core_completion\api::update_completion_date_event($opendsa->coursemodule, 'opendsa', $opendsa->id, $completionexpected);
-
+    */
     return $DB->update_record('opendsa', $opendsa);
-
 }
 
 /**
@@ -673,13 +654,7 @@ function opendsa_get_opendsa($opendsaid) {
     global $DB;
 
     if ($opendsa = $DB->get_record("opendsa", array("id" => $opendsaid))) {
-        if ($options = $DB->get_records("opendsa_options", array("opendsaid" => $opendsaid), "id")) {
-            foreach ($options as $option) {
-                $opendsa->option[$option->id] = $option->text;
-                $opendsa->maxanswers[$option->id] = $option->maxanswers;
-            }
-            return $opendsa;
-        }
+        return $opendsa;
     }
     return false;
 }
@@ -801,10 +776,10 @@ function opendsa_get_response_data($opendsa, $cm, $groupmode, $onlyactive) {
             user_picture::fields('u', $extrafields), null, 0, 0, $onlyactive);
 
 /// Get all the recorded responses for this opendsa
-    $rawresponses = $DB->get_records('opendsa_answers', array('opendsaid' => $opendsa->id));
+    //$rawresponses = $DB->get_records('opendsa_answers', array('opendsaid' => $opendsa->id));
 
 /// Use the responses to move users into the correct column
-
+/*
     if ($rawresponses) {
         $answeredusers = array();
         foreach ($rawresponses as $response) {
@@ -818,7 +793,8 @@ function opendsa_get_response_data($opendsa, $cm, $groupmode, $onlyactive) {
         foreach ($answeredusers as $answereduser) {
             unset($allresponses[0][$answereduser]);
         }
-    }
+    } */
+
     return $allresponses;
 }
 

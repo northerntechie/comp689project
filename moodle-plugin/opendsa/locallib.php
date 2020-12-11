@@ -157,3 +157,30 @@ function opendsa_get_catalog($host, $port) {
     
     return $_json_data;
 }
+
+/**
+ * Generate a list of options using the exercise name as the 
+ * key into a dictionary array.
+ * @param array(object) items
+ * @return array(string) options
+ */
+function generate_catalog_options($list) {
+    $options = [];
+    foreach ($list as $obj) {
+        array_push($options, $obj->name);
+    }
+    return $options;
+}
+
+/**
+ * Get catalog exercise object
+ */
+function get_exercise(&$list, &$name) {
+    $item = array_filter($list, function ($e) use ($name) {
+        return $e->name == $name;
+    });
+    $values = array_values($item);
+    $obj = array_shift($values);
+    return $obj;
+}
+
