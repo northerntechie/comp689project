@@ -34,9 +34,14 @@ class mod_opendsa_mod_form extends moodleform_mod {
         //$mform->addElement('header', 'optionhdr', get_string('options', 'opendsa'));
         $mform->addElement('header', 'optionhdr', get_string('restserverurlheading', 'opendsa'));
 
-        $mform->addElement('text', 'resturl', get_string('resturlfield', 'opendsa'));
-        $mform->addElement('text', 'restport', get_string('restportfield', 'opendsa'));
-        
+        $url_attributes = [];
+        $url_attributes['value'] = 'http://localhost';
+        $mform->addElement('text', 'resturl', get_string('resturlfield', 'opendsa'), $url_attributes);
+
+        $port_attributes = [];
+        $port_attributes['value'] = '8080';
+        $mform->addElement('text', 'restport', get_string('restportfield', 'opendsa'), $port_attributes);
+
         // DEVELOPMENT ONLY.  Needs persistent data for host and port.
         $GLOBALS['opendsa_catalog'] = opendsa_get_catalog('localhost','8080');
         $GLOBALS['opendsa_list'] = generate_catalog_options($GLOBALS['opendsa_catalog']);
