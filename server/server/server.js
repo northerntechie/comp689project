@@ -45,7 +45,7 @@ app.get('/catalog', (req,res) => {
 });
 
 //! OpenDSA exercise request by id
-app.get('/opendsa-exercise/:id', (req,res) => {
+app.get('/exercise/:id', (req,res) => {
     console.log(`Processing request for opendsa-exercise: {req.params.id}`)
     res.send(`Exercise ${req.params.id} requested.`);
 });
